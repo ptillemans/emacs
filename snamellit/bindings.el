@@ -15,12 +15,6 @@
 (global-set-key (kbd "C-S-N") 'word-count)
 (global-set-key (kbd "A-F") 'ack)
 
-; todo
-(global-set-key [M-return] 'defunkt-todo-toggle)
-(global-set-key "\C-xt" 'defunkt-todo-quick-enter)
-(global-set-key [M-down] 'defunkt-todo-move-item-down)
-(global-set-key [M-up] 'defunkt-todo-move-item-up)
-
 ; vim emulation
 (global-set-key [C-tab] 'other-window)
 ;; (global-set-key [M-up] 'defunkt-inc-num-at-point)
