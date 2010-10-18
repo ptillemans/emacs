@@ -1,9 +1,9 @@
 # 
-# After a fresh clone. For defunkt.
+# After a fresh clone. For snamellit.
 #
 
 File.open('local.el', 'w') do |f|
-  f.puts '(load "defunkt")'
+  f.puts '(load "snamellit")'
 end
 
 puts "Don't forget to M-x byte-compile-file js2"

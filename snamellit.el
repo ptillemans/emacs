@@ -15,7 +15,6 @@
 (load "snamellit/temp_files")
 (load "snamellit/github")
 (load "snamellit/git")
-(load "snamellit/todo")
 (load "snamellit/coffee")
 (load "snamellit/org-mode")
 (load "snamellit/slime")

@@ -38,9 +38,9 @@ This emulates Vim's `dt` behavior, which rocks."
 (defun defunkt-ido-find-config ()
   (interactive)
   (find-file
-   (concat "~/.emacs.d/defunkt/"
+   (concat "~/.emacs.d/snamellit/"
            (ido-completing-read "Config file: "
-                                (directory-files "~/.emacs.d/defunkt/"
+                                (directory-files "~/.emacs.d/snamellit/"
                                                  nil
                                                  "^[^.]")))))
 
@@ -60,7 +60,7 @@ This emulates Vim's `dt` behavior, which rocks."
 
 (defun defunkt-goto-config ()
   (interactive)
-  (find-file "~/.emacs.d/defunkt.el"))
+  (find-file "~/.emacs.d/snamellit.el"))
 
 ;; fix kill-word
 (defun defunkt-kill-word (arg)
@@ -111,7 +111,7 @@ This emulates Vim's `dt` behavior, which rocks."
          (normal (concat "~/.emacs.d/vendor/" file))
          (lisp-normal (concat normal "lisp"))
          (suffix (concat normal ".el"))
-         (defunkt (concat "~/.emacs.d/defunkt/" file)))
+         (defunkt (concat "~/.emacs.d/snamellit/" file)))
     (cond
      ; needed for org-mode
      ((file-directory-p lisp-normal) (add-to-list 'load-path lisp-normal) (require library))
