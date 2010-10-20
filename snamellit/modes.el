@@ -1,16 +1,16 @@
 ;; others
-(load "defunkt/dired")
-(load "defunkt/ruby")
-(load "defunkt/shell")
-(load "defunkt/javascript")
-(load "defunkt/erlang")
-(load "defunkt/python")
-(load "defunkt/sgml")
-(load "defunkt/erc")
-(load "defunkt/artist")
-(load "defunkt/coffee")
-(load "defunkt/markdown")
-(load "defunkt/css")
+(load "snamellit/dired")
+(load "snamellit/ruby")
+(load "snamellit/shell")
+(load "snamellit/javascript")
+(load "snamellit/erlang")
+(load "snamellit/python")
+(load "snamellit/sgml")
+(load "snamellit/erc")
+(load "snamellit/artist")
+(load "snamellit/coffee")
+(load "snamellit/markdown")
+(load "snamellit/css")
 
 ;; all modes
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -56,12 +56,6 @@
     '(lambda ()
        (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
 
-
-; c
-(add-hook 'c-mode-hook
-          '(lambda ()
-             (setq c-auto-newline t)
-             (define-key c-mode-map "{" 'defunkt/c-electric-brace)))
 
 ;; mustache
 (add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))

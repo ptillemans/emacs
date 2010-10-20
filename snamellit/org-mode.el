@@ -1,4 +1,6 @@
-(add-to-list 'load-path "~/.emacs.d/vendor/org-mode/lisp" "~/.emacs.d/vendor/org-mode/contrib/lisp")
+
+(add-to-list 'load-path "~/.emacs.d/vendor/org-mode/lisp")
+(add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("README$" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
