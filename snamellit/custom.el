@@ -10,6 +10,8 @@
  '(emulate-mac-french-keyboard-mode t)
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
+ '(org-export-latex-classes (quote (("article" "\\documentclass[a4paper,11pt]{article} [DEFAULT_PACKAGES] [PACKAGES] [EXTRA] \\CenterWallPaper{1.0}{mlx_portrait.pdf} " ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}") ("\\paragraph{%s}" . "\\paragraph*{%s}") ("\\subparagraph{%s}" . "\\subparagraph*{%s}")) ("report" "\\documentclass[11pt]{report}" ("\\part{%s}" . "\\part*{%s}") ("\\chapter{%s}" . "\\chapter*{%s}") ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}")) ("book" "\\documentclass[11pt]{book}" ("\\part{%s}" . "\\part*{%s}") ("\\chapter{%s}" . "\\chapter*{%s}") ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}")) ("beamer" "\\documentclass{beamer}" org-beamer-sectioning))))
+ '(org-export-latex-packages-alist (quote (("" "wallpaper" nil))))
  '(visual-line-mode nil t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
