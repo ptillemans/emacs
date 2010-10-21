@@ -2,8 +2,10 @@
 (add-to-list 'load-path "~/.emacs.d/vendor/org-mode/lisp")
 (add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(add-to-list 'auto-mode-alist '("README$" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
 (global-font-lock-mode 1)
 
 ;; Set to the location of your Org files on your local system
