@@ -1,9 +1,5 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 
-; custom place to save customizations
-(setq custom-file "~/.emacs.d/snamellit/custom.el")
-(when (file-exists-p custom-file) (load custom-file))
-
 (when (file-exists-p ".passwords") (load ".passwords"))
 
 (load "snamellit/lisp")
@@ -35,3 +31,8 @@
 (vendor 'ooc-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
+
+; custom place to save customizations
+(setq custom-file "~/.emacs.d/snamellit/custom.el")
+(when (file-exists-p custom-file) (load custom-file))
+
