@@ -28,7 +28,7 @@
 \\setbeamersize{sidebar width left=0.5in, sidebar width right=0.5in, text margin left=0.5in, text margin right=0.5in}
 \\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{mlx_presentation_bg.pdf}} " org-beamer-sectioning))))
  '(org-export-latex-default-packages-alist (quote (("AUTO" "inputenc" t) ("T1" "fontenc" t) ("" "fixltx2e" nil) ("" "graphicx" t) ("" "longtable" nil) ("" "float" nil) ("" "wrapfig" nil) ("" "soul" t) ("" "textcomp" t) ("" "marvosym" t) ("" "wasysym" t) ("" "latexsym" t) ("" "amssymb" t) ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil) "\\tolerance=1000")))
- '(org-export-latex-packages-alist (quote (("" "wallpaper" nil))))
+ '(org-export-latex-packages-alist (quote (("" "wallpaper" nil) ("" "bookman" nil))))
  '(visual-line-mode nil t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
