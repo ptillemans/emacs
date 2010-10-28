@@ -34,7 +34,7 @@
 (vendor 'clojure-mode)
 
 
-(setq yas/root-directory "~/emacs.d/snammellit/snippets")
+(setq yas/root-directory "~/.emacs.d/snamellit/snippets")
 (yas/load-directory yas/root-directory)
 
 ; custom place to save customizations
