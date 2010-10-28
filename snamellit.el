@@ -14,6 +14,7 @@
 (load "snamellit/coffee")
 (load "snamellit/org-mode")
 (load "snamellit/slime")
+(load "snamellit/yasnippet-bundle")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
@@ -31,6 +32,10 @@
 (vendor 'ooc-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
+
+
+(setq yas/root-directory "~/emacs.d/snammellit/snippets")
+(yas/load-directory yas/root-directory)
 
 ; custom place to save customizations
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
