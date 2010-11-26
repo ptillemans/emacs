@@ -10,6 +10,7 @@
  '(emulate-mac-french-keyboard-mode t)
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
+ '(org-agenda-files (quote ("~/org/todo.org" "~/org/pfus.org")))
  '(org-export-latex-classes (quote (("article" "\\documentclass[a4paper,11pt]{article}
 [PACKAGES]
 [EXTRA]
