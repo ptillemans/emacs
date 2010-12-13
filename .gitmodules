@@ -43,3 +43,6 @@
 [submodule "vendor/twittering-mode"]
 	path = vendor/twittering-mode
 	url = http://github.com/hayamiz/twittering-mode.git
+[submodule "vendor/org2blog"]
+	path = vendor/org2blog
+	url = http://github.com/punchagan/org2blog.git

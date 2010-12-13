@@ -31,6 +31,8 @@
 (vendor 'ooc-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
+(vendor 'xml-rpc)
+(vendor 'org2blog)
 
 ; custom place to save customizations
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
