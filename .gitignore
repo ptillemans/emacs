@@ -7,3 +7,4 @@ private.el
 *CVS*
 .cvsignore
 session.*
+.org-id-locations
