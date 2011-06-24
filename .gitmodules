@@ -43,6 +43,10 @@
 [submodule "vendor/twittering-mode"]
 	path = vendor/twittering-mode
 	url = http://github.com/hayamiz/twittering-mode.git
+[submodule "vendor/org2blog"]
+	path = vendor/org2blog
+	url = http://github.com/punchagan/org2blog.git
 [submodule "vendor/yasnippet"]
 	path = vendor/yasnippet
 	url = http://github.com/emacsmirror/yasnippet.git
+>>>>>>> ab1d0a3c69431727972bf662381854c0e54be78c

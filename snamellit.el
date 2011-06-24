@@ -24,7 +24,7 @@
 (vendor 'magit)
 (vendor 'gist)
 (vendor 'growl)
-(vendor 'twittering-mode)
+;; (vendor 'twittering-mode)
 (vendor 'textile-mode)
 (vendor 'yaml-mode)
 (vendor 'tpl-mode)
@@ -32,6 +32,8 @@
 (vendor 'ooc-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
+(vendor 'xml-rpc)
+(vendor 'org2blog)
 
 
 (setq yas/root-directory "~/.emacs.d/snamellit/snippets")

@@ -31,3 +31,8 @@
 (setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
 
 (require 'org-install)
+
+(org-mobile-pull)
+
+(setq org-default-notes-file (concat org-directory "~/org/notes.org"))
+(define-key global-map "\C-cc" 'org-capture)
