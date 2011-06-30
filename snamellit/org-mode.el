@@ -25,6 +25,11 @@
             (org-set-local 'yas/trigger-key [tab])
             (define-key yas/keymap [tab] 'yas/next-field-group)))
 
+;; Add support for effort etimation
+(setq org-global-properties
+      '(("Effort_ALL" . "4:00 5:00 6:00 7:00 8:00 16:00 24:00 32:00 40:00")))
+(setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
+
 (require 'org-install)
 
 (org-mobile-pull)

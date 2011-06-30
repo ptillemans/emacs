@@ -1,5 +1,7 @@
 (defun twittering-friends-refresh ()
   (interactive)
   (twittering-mode)
+  (twittering-icon-mode)
   (twittering-friends-timeline))
 (global-set-key "\C-x\C-t" 'twittering-friends-refresh)
+(setq twittering-auth-method 'xauth)
