@@ -11,9 +11,11 @@
 (load "snamellit/temp_files")
 (load "snamellit/github")
 (load "snamellit/coffee")
+(load "snamellit/yasnippet-bundle")
 (load "snamellit/org-mode")
 (load "snamellit/org2blog")
 (load "snamellit/slime")
+(load "snamellit/groovy")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
