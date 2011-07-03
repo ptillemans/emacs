@@ -13,7 +13,6 @@
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
 (load "snamellit/org-mode")
-(load "snamellit/org2blog")
 (load "snamellit/slime")
 (load "snamellit/groovy")
 
