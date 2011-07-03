@@ -10,11 +10,10 @@
 (load "snamellit/theme")
 (load "snamellit/temp_files")
 (load "snamellit/github")
-(load "snamellit/git")
 (load "snamellit/coffee")
 (load "snamellit/org-mode")
+(load "snamellit/org2blog")
 (load "snamellit/slime")
-(load "snamellit/yasnippet-bundle")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))

@@ -60,7 +60,3 @@
 ;; mustache
 (add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
 
-;; textmate.el
-(vendor 'textmate)
-(textmate-mode)
-(setq textmate-find-files-command "git ls-tree --full-tree --name-only -r HEAD")
