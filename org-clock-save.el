@@ -1,2 +1,2 @@
-;; org-persist.el - pti-laptop at <2011-07-04 Mon 15:14>
-(setq stored-clock-history '(("/home/pti/org/emacs.org" . 15995) ("/home/pti/org/melexis/melexis.org" . 113) ("/home/pti/org/emacs.org" . 14708) ("/home/pti/org/emacs.org_archive" . 77) ("/home/pti/org/emacs.org" . 16164) ("/home/pti/org/emacs.org" . 17108) ("/home/pti/org/emacs.org" . 14937) ("/home/pti/org/refile.org" . 20) ("/home/pti/org/emacs.org" . 16608) ("/home/pti/org/emacs.org" . 11400)))
+;; org-persist.el - pti-laptop at <2011-07-05 Tue 00:51>
+(setq stored-clock-history '(("/home/pti/org/melexis/melexis.org" . 238) ("/home/pti/org/emacs.org" . 27423) ("/home/pti/org/emacs.org" . 21892) ("/home/pti/org/melexis/melexis.org" . 8816) ("/home/pti/org/emacs.org" . 27821) ("/home/pti/org/melexis/melexis.org" . 9976) ("/home/pti/org/melexis/melexis.org" . 1223) ("/home/pti/org/melexis/melexis.org" . 10277) ("/home/pti/org/melexis/melexis.org" . 8226) ("/home/pti/org/todo.org" . 2518)))

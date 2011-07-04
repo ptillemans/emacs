@@ -15,6 +15,7 @@
 (load "snamellit/org-mode")
 (load "snamellit/slime")
 (load "snamellit/groovy")
+(load "snamellit/gnus")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
