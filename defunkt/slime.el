@@ -1,5 +1,0 @@
-(add-to-list 'load-path "~/.emacs.d/vendor/slime")
-(setq inferior-lisp-program "/opt/local/bin/sbcl")
-(require 'slime)
-(slime-setup)
-(slime-setup '(slime-repl))
