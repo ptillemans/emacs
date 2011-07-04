@@ -10,7 +10,7 @@
  '(emulate-mac-french-keyboard-mode t)
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
- '(org-mobile-files (quote (org-agenda-files "~/org/todo.org" "~/org/emacs.org" "~/org/pfus.org")))
+ '(org-agenda-files nil)
  '(org-export-latex-classes (quote (("article" "\\documentclass[a4paper,11pt]{article}
 [PACKAGES]
 [EXTRA]
@@ -30,6 +30,7 @@
 \\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{mlx_presentation_bg.pdf}} " org-beamer-sectioning))))
  '(org-export-latex-default-packages-alist (quote (("AUTO" "inputenc" t) ("T1" "fontenc" t) ("" "fixltx2e" nil) ("" "graphicx" t) ("" "longtable" nil) ("" "float" nil) ("" "wrapfig" nil) ("" "soul" t) ("" "textcomp" t) ("" "marvosym" t) ("" "wasysym" t) ("" "latexsym" t) ("" "amssymb" t) ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil) "\\tolerance=1000")))
  '(org-export-latex-packages-alist (quote (("" "wallpaper" nil) ("" "bookman" nil))))
+ '(org-mobile-files (quote (org-agenda-files "~/org/todo.org" "~/org/emacs.org" "~/org/pfus.org")))
  '(visual-line-mode nil t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.

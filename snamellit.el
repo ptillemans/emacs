@@ -10,7 +10,6 @@
 (load "snamellit/theme")
 (load "snamellit/temp_files")
 (load "snamellit/github")
-(load "snamellit/git")
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
 (load "snamellit/org-mode")
