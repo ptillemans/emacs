@@ -13,9 +13,6 @@
 [submodule "gist.el"]
 	path = vendor/gist.el
 	url = git://github.com/defunkt/gist.el.git
-[submodule "vendor/textmate.el"]
-	path = vendor/textmate.el
-	url = git://github.com/defunkt/textmate.el.git
 [submodule "vendor/yaml-mode.el"]
 	path = vendor/yaml-mode.el
 	url = git://github.com/yoshiki/yaml-mode.git
@@ -49,3 +46,6 @@
 [submodule "vendor/yasnippet"]
 	path = vendor/yasnippet
 	url = http://github.com/emacsmirror/yasnippet.git
+[submodule "vendor/zenburn-el"]
+	path = vendor/zenburn-el
+	url = https://github.com/dbrock/zenburn-el.git

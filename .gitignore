@@ -8,3 +8,4 @@ private.el
 .cvsignore
 session.*
 .org-id-locations
+org-clock-save.el
