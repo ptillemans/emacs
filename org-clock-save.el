@@ -1,0 +1,2 @@
+;; org-persist.el - pti-laptop at <2011-07-04 Mon 12:33>
+(setq stored-clock-history '(("/home/pti/org/emacs.org" . 15590) ("/home/pti/org/melexis/melexis.org" . 113)  ("/home/pti/org/emacs.org" . 14303) ("/home/pti/org/emacs.org_archive" . 77) ("/home/pti/org/emacs.org" . 15759) ("/home/pti/org/emacs.org" . 16670) ("/home/pti/org/emacs.org" . 14532) ("/home/pti/org/refile.org" . 20) ("/home/pti/org/emacs.org" . 16203)))
