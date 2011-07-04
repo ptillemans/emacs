@@ -33,6 +33,10 @@
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 (define-key global-map "\C-cc" 'org-capture)
 
+;; Archiving configuration
+(setq org-archive-mark-done nil)
+(setq org-archive-location "%s_archive::* Archived Tasks")
+
 ;; fix acces to tab key for yasnippet
 (add-hook 'org-mode-hook
                     (lambda ()
@@ -449,6 +453,26 @@ This does not support projects with subprojects"
       next-headline)
      (t
       nil))))
+
+(defun bh/skip-non-archivable-tasks ()
+  "Skip trees that are not available for archiving"
+  (let ((next-headline (save-excursion (outline-next-heading))))
+    ;; Consider only tasks with done todo headings as archivable candidates
+    (if (member (org-get-todo-state) org-done-keywords)
+        (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+               (daynr (string-to-int (format-time-string "%d" (current-time))))
+               (a-month-ago (* 60 60 24 (+ daynr 1)))
+               (last-month (format-time-string "%Y-%m-" (time-subtract (current-time) (seconds-to-time a-month-ago))))
+               (this-month (format-time-string "%Y-%m-" (current-time)))
+               (subtree-is-current (save-excursion
+                                     (forward-line 1)
+                                     (and (< (point) subtree-end)
+                                          (re-search-forward (concat last-month "\\|" this-month) subtree-end t)))))
+          (if subtree-is-current
+              subtree-end ; Has a date in this month or last month, skip it
+            nil))  ; available to archive
+      (or next-headline (point-max)))))
+
 
 (require 'org-id)
 (defun bh/clock-in-task-by-id (id)
