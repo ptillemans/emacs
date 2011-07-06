@@ -56,6 +56,13 @@
 (require 'org-install)
 
 (org-mobile-pull)
+(defun org-mobile-pullpush nil nil (org-mobile-pull)
+                                    (org-mobile-push))
+
+;; sync at start, finish and in between 2x p hr
+(add-hook 'after-init-hook 'org-mobile-pullpush)
+(add-hook 'kill-emacs-hook 'org-mobile-pullpush)
+(run-at-time "00:29" 1800 'org-mobile-pullpush)
 
 (setq org-default-notes-file "~/org/refile.org")
 (define-key global-map "\C-cc" 'org-capture)
