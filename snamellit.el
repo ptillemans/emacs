@@ -16,6 +16,7 @@
 (load "snamellit/slime")
 (load "snamellit/groovy")
 (load "snamellit/gnus")
+(load "snamellit/real-auto-save")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
@@ -44,3 +45,7 @@
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
 (when (file-exists-p custom-file) (load custom-file))
 
+(require 'real-auto-save)
+(add-hook 'text-mode-hook 'turn-on-real-auto-save)
+(add-hook 'org-mode-hook 'turn-on-real-auto-save)
+(add-hook 'clojure-mode-hook 'turn-on-real-auto-save)
