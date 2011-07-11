@@ -1,1 +1,2 @@
-;; org-persist.el - pti-air.local at <2011-07-05 Tue 12:30>
+;; org-persist.el - pti-laptop at <2011-07-11 Mon 11:42>
+(setq stored-clock-history '(("/home/pti/org/melexis/melexis.org" . 22345) ("/home/pti/org/melexis/melexis.org" . 6088) ("/home/pti/org/melexis/melexis.org" . 22807) ("/home/pti/org/melexis/melexis.org" . 9073) ("/home/pti/org/melexis/melexis.org" . 10984) ("/home/pti/org/melexis/melexis.org" . 17968) ("/home/pti/org/melexis/melexis.org" . 18592) ("/home/pti/org/melexis/melexis.org" . 19108) ("/home/pti/org/refile.org" . 1436) ("/home/pti/org/melexis/oee.org" . 643)))
