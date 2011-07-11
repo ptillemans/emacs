@@ -60,7 +60,21 @@
 
 (require 'org-install)
 
-(org-mobile-pull)
+;; wait 15 min between auto updates to avoid losing time
+;; when "catching up"
+(setq  org-mobile-last-sync 0)
+(defun org-mobile-pullpush nil nil
+  ( if (> (- (float-time) org-mobile-last-sync) 900)
+     (progn
+        (org-mobile-pull)
+        (org-mobile-push)
+        (setq org-mobile-last-sync (float-time))))
+)
+
+;; sync at start, finish and in between 2x p hr
+(add-hook 'after-init-hook 'org-mobile-pull)
+(add-hook 'kill-emacs-hook 'org-mobile-push)
+(run-at-time "00:29" 1800 'org-mobile-pullpush)
 
 (setq org-default-notes-file "~/org/refile.org")
 (define-key global-map "\C-cc" 'org-capture)
