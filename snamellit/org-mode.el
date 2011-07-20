@@ -587,3 +587,6 @@ A prefix arg forces clock in of the default task."
   (org-publish-current-project))
 
 (global-set-key (kbd "C-s-<f12>") 'bh/save-then-publish)
+
+;; checklists
+(require 'org-checklist)
