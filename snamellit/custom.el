@@ -7,6 +7,7 @@
  '(aquamacs-customization-version-id 210 t)
  '(aquamacs-tool-bar-user-customization nil t)
  '(emulate-mac-french-keyboard-mode t)
+ '(exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin" "/usr/X11/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Aquamacs.app/Contents/MacOS/bin" "/usr/texbin" "/Users/pti/bin")))
  '(flyspell-use-meta-tab nil)
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
@@ -32,8 +33,7 @@
  '(org-export-latex-default-packages-alist (quote (("AUTO" "inputenc" t) ("T1" "fontenc" t) ("" "fixltx2e" nil) ("" "graphicx" t) ("" "longtable" nil) ("" "float" nil) ("" "wrapfig" nil) ("" "soul" t) ("" "textcomp" t) ("" "marvosym" t) ("" "wasysym" t) ("" "latexsym" t) ("" "amssymb" t) ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil) "\\tolerance=1000")))
  '(org-export-latex-packages-alist (quote (("" "wallpaper" nil) ("" "bookman" nil))))
  '(org-mobile-files (quote (org-agenda-files "~/org/todo.org" "~/org/emacs.org" "~/org/pfus.org")))
- '(visual-line-mode nil t)
-)
+ '(visual-line-mode nil t))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.

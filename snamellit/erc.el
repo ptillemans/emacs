@@ -28,6 +28,4 @@
 ;;             (defunkt-erc-update-topic parsed)))
 
 (setq erc-autojoin-channels-alist
-      '(("freenode.net" "#github" "#logicalawesome" "#rip"
-         "#resque" "#{" "#sinatra" "#redis" "#coffeescript"
-         "#thechangelog" )))
+      '(("freenode.net" "#github" "#cassandra" "#clojure")))
