@@ -10,12 +10,6 @@
 [submodule "cheat.el"]
 	path = vendor/cheat.el
 	url = git://github.com/defunkt/cheat.el.git
-[submodule "gh.el"]
-	path = vendor/gh.el
-	url = https://github.com/sigma/gh.el.git
-[submodule "gist.el"]
-	path = vendor/gist.el
-	url = https://github.com/sigma/gist.el.git
 [submodule "vendor/yaml-mode.el"]
 	path = vendor/yaml-mode.el
 	url = git://github.com/yoshiki/yaml-mode.git
@@ -46,6 +40,3 @@
 [submodule "vendor/zenburn-el"]
 	path = vendor/zenburn-el
 	url = git://github.com/dbrock/zenburn-el.git
-[submodule "vendor/gh.el"]
-	path = vendor/gh.el
-	url = git://github.com/sigma/gh.el.git
