@@ -1,4 +1,13 @@
+
+(defun extend-exec-path (s)
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" s)))
+  (setq exec-path (append exec-path (list s))))
+
+(extend-exec-path "/usr/local/bin")
+
+
 (add-to-list 'load-path "~/.emacs.d/vendor")
+
 
 (when (file-exists-p ".passwords") (load ".passwords"))
 
