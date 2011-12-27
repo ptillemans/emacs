@@ -59,6 +59,17 @@
 (setq org-columns-default-format "%80ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM")
 
 (require 'org-install)
+(require 'cl)
+
+(defun open-buffer-names ()
+  (mapcar 'buffer-name (buffer-list)))
+
+(defun restore-buffers (fn)
+  (let ((old-open-buffers (open-buffer-names)))
+    (funcall fn)
+    (dolist ( buffer-name (set-difference (open-buffer-names) old-open-buffers))
+      (kill-buffer buffer-name))))
+
 
 ;; wait 15 min between auto updates to avoid losing time
 ;; when "catching up"
@@ -66,14 +77,14 @@
 (defun org-mobile-pullpush nil nil
   ( if (> (- (float-time) org-mobile-last-sync) 900)
      (progn
-        (org-mobile-pull)
-        (org-mobile-push)
+        (restore-buffers 'org-mobile-pull)
+        (restore-buffers 'org-mobile-push)
         (setq org-mobile-last-sync (float-time))))
 )
 
 ;; sync at start, finish and in between 2x p hr
-(add-hook 'after-init-hook 'org-mobile-pull)
-(add-hook 'kill-emacs-hook 'org-mobile-push)
+(add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
+(add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
 (run-at-time "00:29" 1800 'org-mobile-pullpush)
 
 (setq org-default-notes-file "~/org/refile.org")

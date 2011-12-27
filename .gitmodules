@@ -10,9 +10,6 @@
 [submodule "cheat.el"]
 	path = vendor/cheat.el
 	url = git://github.com/defunkt/cheat.el.git
-[submodule "gist.el"]
-	path = vendor/gist.el
-	url = git://github.com/defunkt/gist.el.git
 [submodule "vendor/yaml-mode.el"]
 	path = vendor/yaml-mode.el
 	url = git://github.com/yoshiki/yaml-mode.git

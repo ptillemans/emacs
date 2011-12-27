@@ -1,4 +1,13 @@
+
+(defun extend-exec-path (s)
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" s)))
+  (setq exec-path (append exec-path (list s))))
+
+(extend-exec-path "/usr/local/bin")
+
+
 (add-to-list 'load-path "~/.emacs.d/vendor")
+
 
 (when (file-exists-p ".passwords") (load ".passwords"))
 
@@ -13,7 +22,7 @@
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
 (load "snamellit/org-mode")
-(load "snamellit/slime")
+;;(load "snamellit/slime")
 (load "snamellit/groovy")
 (load "snamellit/gnus")
 (load "snamellit/real-auto-save")
@@ -24,7 +33,6 @@
 (vendor 'ack)
 (vendor 'cheat)
 (vendor 'magit)
-(vendor 'gist)
 (vendor 'growl)
 (vendor 'twittering-mode)
 (vendor 'textile-mode)
