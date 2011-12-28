@@ -71,11 +71,11 @@
       (kill-buffer buffer-name))))
 
 
-;; wait 15 min between auto updates to avoid losing time
+;; wait 60 min between auto updates to avoid losing time
 ;; when "catching up"
 (setq  org-mobile-last-sync 0)
 (defun org-mobile-pullpush nil nil
-  ( if (> (- (float-time) org-mobile-last-sync) 900)
+  ( if (> (- (float-time) org-mobile-last-sync) 3600)
      (progn
         (restore-buffers 'org-mobile-pull)
         (restore-buffers 'org-mobile-push)
@@ -85,7 +85,7 @@
 ;; sync at start, finish and in between 2x p hr
 (add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
 (add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
-(run-at-time "00:29" 1800 'org-mobile-pullpush)
+(run-at-time "00:29" 7200 'org-mobile-pullpush)
 
 (setq org-default-notes-file "~/org/refile.org")
 (define-key global-map "\C-cc" 'org-capture)
