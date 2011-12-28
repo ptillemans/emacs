@@ -39,7 +39,6 @@
 (vendor 'yaml-mode)
 (vendor 'tpl-mode)
 (vendor 'open-file-in-github)
-(vendor 'ooc-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
 (vendor 'xml-rpc)
