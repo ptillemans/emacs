@@ -6,7 +6,7 @@
 	url = git://github.com/crafterm/twilight-emacs.git
 [submodule "/magit"]
 	path = vendor/magit
-	url = git://github.com/technomancy/magit.git
+	url = git://github.com/magit/magit.git
 [submodule "cheat.el"]
 	path = vendor/cheat.el
 	url = git://github.com/defunkt/cheat.el.git
