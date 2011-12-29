@@ -43,3 +43,6 @@
 [submodule "vendor/gist.el"]
 	path = vendor/gist.el
 	url = https://github.com/defunkt/gist.el.git
+[submodule "vendor/ess"]
+	path = vendor/ess
+	url = https://github.com/emacsmirror/ess.git
