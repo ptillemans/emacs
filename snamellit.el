@@ -43,7 +43,7 @@
 (vendor 'xml-rpc)
 (vendor 'org2blog)
 (vendor 'feature-mode)
-
+(vendor 'gist.el)
 
 (setq yas/root-directory "~/.emacs.d/snamellit/snippets")
 (yas/load-directory yas/root-directory)

@@ -40,3 +40,6 @@
 [submodule "vendor/feature-mode"]
 	path = vendor/feature-mode
 	url = https://github.com/michaelklishin/cucumber.el.git
+[submodule "vendor/gist.el"]
+	path = vendor/gist.el
+	url = https://github.com/defunkt/gist.el.git
