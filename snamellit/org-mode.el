@@ -58,7 +58,6 @@
       '(("Effort_ALL" . "0:10 0:30 1:00 2:00 3:00 4:00 6:00 8:00 16:00 24:00 32:00 40:00")))
 (setq org-columns-default-format "%80ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM")
 
-(require 'org-install)
 (require 'cl)
 
 (defun open-buffer-names ()
@@ -278,7 +277,9 @@
 
 ;;
 ;; Resume clocking tasks when emacs is restarted
+(setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
+
 ;;
 ;; Small windows on my Eee PC displays only the end of long lists which isn't very useful
 (setq org-clock-history-length 10)

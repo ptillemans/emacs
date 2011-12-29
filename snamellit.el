@@ -22,7 +22,6 @@
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
 (load "snamellit/org-mode")
-;;(load "snamellit/slime")
 (load "snamellit/groovy")
 (load "snamellit/gnus")
 (load "snamellit/real-auto-save")
@@ -44,6 +43,7 @@
 (vendor 'clojure-mode)
 (vendor 'xml-rpc)
 (vendor 'org2blog)
+(vendor 'feature-mode)
 
 
 (setq yas/root-directory "~/.emacs.d/snamellit/snippets")

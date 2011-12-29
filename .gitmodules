@@ -40,3 +40,6 @@
 [submodule "vendor/zenburn-el"]
 	path = vendor/zenburn-el
 	url = git://github.com/dbrock/zenburn-el.git
+[submodule "vendor/feature-mode"]
+	path = vendor/feature-mode
+	url = https://github.com/michaelklishin/cucumber.el.git
