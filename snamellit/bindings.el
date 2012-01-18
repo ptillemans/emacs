@@ -39,3 +39,7 @@
 ; no mailing!
 (global-unset-key (kbd "C-x m"))
 (global-unset-key "\C-z")
+
+; comment and uncomment regions
+(global-set-key (kbd "C-/") 'comment-region)
+(global-set-key (kbd "C-?") 'uncomment-region)
