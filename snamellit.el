@@ -24,6 +24,7 @@
 (load "snamellit/org-mode")
 (load "snamellit/groovy")
 (load "snamellit/gnus")
+(load "snamellit/rcirc")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
@@ -42,7 +43,7 @@
 (vendor 'xml-rpc)
 (vendor 'org2blog)
 (vendor 'feature-mode)
-(vendor 'gist.el)
+(vendor 'gist)
 
 (setq yas/root-directory "~/.emacs.d/snamellit/snippets")
 (yas/load-directory yas/root-directory)

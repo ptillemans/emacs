@@ -82,9 +82,9 @@
 )
 
 ;; sync at start, finish and in between 2x p hr
-(add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
-(add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
-(run-at-time "00:29" 7200 'org-mobile-pullpush)
+;(add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
+;(add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
+;(run-at-time "00:29" 7200 'org-mobile-pullpush)
 
 (setq org-default-notes-file "~/org/refile.org")
 (define-key global-map "\C-cc" 'org-capture)
