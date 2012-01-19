@@ -14,5 +14,9 @@
 (when (boundp 'aquamacs-version)
   (one-buffer-one-frame-mode 0))
 
+;; use aspell for spell correction
+(setq-default ispell-program-name "aspell")
+(setq ispell-extra-args '("--sug-mode=ultra"))
+
 ;; start emacs-server
 (server-start)
