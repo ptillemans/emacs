@@ -25,6 +25,11 @@
 (global-set-key [remap backward-kill-word] 'defunkt-backward-kill-word)
 (global-set-key [remap aquamacs-backward-kill-word] 'defunkt-backward-kill-word)
 
+; Sane clipbaord interaction
+(global-set-key "\C-w" 'clipboard-kill-region)
+(global-set-key "\M-w" 'clipboard-kill-ring-save)
+(global-set-key "\C-y" 'clipboard-yank)
+
 ;; no printing!
 ;; no changing meta key!!
 (when (boundp 'osx-key-mode-map)
