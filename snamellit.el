@@ -21,12 +21,18 @@
 (load "snamellit/github")
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
-(load "snamellit/org-mode")
 (load "snamellit/groovy")
 (load "snamellit/gnus")
+(load "snamellit/rcirc")
+(load "snamellit/org-mode")
+
+(print "Loading settings done.")
 
 (when (file-exists-p "snamellit/private")
   (load "snamellit/private"))
+
+
+(print "Loading vendor extensions")
 
 (vendor 'ack)
 (vendor 'cheat)
@@ -42,12 +48,18 @@
 (vendor 'xml-rpc)
 (vendor 'org2blog)
 (vendor 'feature-mode)
-(vendor 'gist.el)
+(vendor 'gist)
+
+(print "Loading vendor extensions done")
+
+(print "Loading snippets")
 
 (setq yas/root-directory "~/.emacs.d/snamellit/snippets")
 (yas/load-directory yas/root-directory)
+(print "Snippets done")
 
 ; custom place to save customizations
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
 (when (file-exists-p custom-file) (load custom-file))
+(print "Customization done")
 
