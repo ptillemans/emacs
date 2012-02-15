@@ -46,3 +46,9 @@
 [submodule "vendor/ess"]
 	path = vendor/ess
 	url = https://github.com/emacsmirror/ess.git
+[submodule "vendor/js2-mode"]
+	path = vendor/js2-mode
+	url = https://github.com/mooz/js2-mode.git
+[submodule "vendor/org-jira"]
+	path = vendor/org-jira
+	url = git://github.com/baohaojun/org-jira.git

@@ -38,10 +38,12 @@
 (vendor 'yaml-mode)
 (vendor 'tpl-mode)
 (vendor 'open-file-in-github)
+(vendor 'js2-mode)
 (vendor 'coffee-mode)
 (vendor 'clojure-mode)
 (vendor 'xml-rpc)
 (vendor 'org2blog)
+(vendor 'org-jira)
 (vendor 'feature-mode)
 (vendor 'gist)
 

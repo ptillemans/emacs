@@ -9,6 +9,7 @@
  '(emulate-mac-french-keyboard-mode t)
  '(exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin" "/usr/X11/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Aquamacs.app/Contents/MacOS/bin" "/usr/texbin" "/Users/pti/bin")))
  '(flyspell-use-meta-tab nil)
+ '(jiralib-url "http://extranet.melexis.com/jira")
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
  '(org-agenda-files (quote ("~/org/" "~/org/melexis/")))

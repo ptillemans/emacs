@@ -1,6 +1,8 @@
+(setq load-path
+           (append (list nil "~/.emacs.d/vendor/org-mode/lisp"
+                         "~/.emacs.d/vendor/org-mode/contrib/lisp")
+                   load-path))
 
-(add-to-list 'load-path "~/.emacs.d/vendor/org-mode/lisp")
-(add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_backup$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.txt$" . org-mode))
