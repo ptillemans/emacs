@@ -49,3 +49,6 @@
 [submodule "vendor/js2-mode"]
 	path = vendor/js2-mode
 	url = https://github.com/mooz/js2-mode.git
+[submodule "vendor/org-jira"]
+	path = vendor/org-jira
+	url = https://github.com/baohaojun/org-jira.git
