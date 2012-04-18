@@ -17,6 +17,8 @@
 
 ;; emacs
 (define-key emacs-lisp-mode-map (kbd "A-r") 'eval-buffer)
+;; Paredit overshadows the C-j bindings in lisp interaction mode.
+(define-key lisp-interaction-mode-map [S-return] 'eval-print-last-sexp)
 
 ; bash
 (setq auto-mode-alist (cons '("\\.bashrc" . sh-mode) auto-mode-alist))
