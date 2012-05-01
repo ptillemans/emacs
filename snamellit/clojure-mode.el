@@ -49,5 +49,8 @@
 
 (add-hook 'clojure-mode-hook
           '(lambda ()
+             (paredit-mode 1)
              (define-key clojure-mode-map (kbd "C-c e") 'shell-eval-last-expression)
              (define-key clojure-mode-map (kbd "C-c x") 'shell-eval-defun)))
+
+
