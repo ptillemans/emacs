@@ -30,8 +30,5 @@
 (setq rcirc-default-full-name "peter tillemans")
 
 ;; Join these channels at startup.
-(setq rcirc-startup-channels-alist
-      '(("freenode" "#emacs" "#rcirc" "#clojure" "#cucumber")))
-
 (setq rcirc-server-alist '(("irc.freenode.net" :channels ("#rcirc" "#clojure" "#cucumber" "#leiningen"))))
 
