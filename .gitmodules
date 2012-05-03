@@ -52,3 +52,12 @@
 [submodule "vendor/org-jira"]
 	path = vendor/org-jira
 	url = https://github.com/baohaojun/org-jira.git
+[submodule "vendor/gh.el"]
+	path = vendor/gh.el
+	url = https://github.com/sigma/gh.el
+[submodule "vendor/pcache"]
+	path = vendor/pcache
+	url = https://github.com/sigma/pcache
+[submodule "vendor/logito"]
+	path = vendor/logito
+	url = https://github.com/sigma/logito

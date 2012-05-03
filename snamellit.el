@@ -18,7 +18,6 @@
 (load "snamellit/modes")
 (load "snamellit/theme")
 (load "snamellit/temp_files")
-(load "snamellit/github")
 (load "snamellit/coffee")
 (load "snamellit/yasnippet-bundle")
 (load "snamellit/groovy")
@@ -50,6 +49,11 @@
 (vendor 'org2blog)
 (vendor 'org-jira)
 (vendor 'feature-mode)
+
+; github support is more modular these days
+(vendor 'logito)
+(vendor 'pcache)
+(vendor 'gh)
 (vendor 'gist)
 
 (print "Loading vendor extensions done")
