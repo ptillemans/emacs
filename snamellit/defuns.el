@@ -47,11 +47,3 @@
       (when (not (member (car buffers) safe))
         (kill-buffer (car buffers))
         (setq buffers (cdr buffers))))))
-
-
-
-
-
-
-
-

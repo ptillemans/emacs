@@ -1,13 +1,24 @@
 
+;; Missing function in git emacs
+(defun plist-to-alist (p)
+  (if (empty? p)
+    p
+    (let (( c (cons (car p) (cadr p))))
+      (cons c (plist-to-alist (cddr p)))
+      )))
+
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(package-initialize)
+
 (defun extend-exec-path (s)
   (setenv "PATH" (concat (getenv "PATH") (concat ":" s)))
   (setq exec-path (append exec-path (list s))))
 
 (extend-exec-path "/usr/local/bin")
 
-
 (add-to-list 'load-path "~/.emacs.d/vendor")
-
 
 (when (file-exists-p ".passwords") (load ".passwords"))
 
@@ -68,4 +79,3 @@
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
 (when (file-exists-p custom-file) (load custom-file))
 (print "Customization done")
-
