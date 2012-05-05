@@ -1,16 +1,24 @@
 ;; others
-(load "snamellit/dired")
-(load "snamellit/ruby")
-(load "snamellit/shell")
-(load "snamellit/javascript")
-(load "snamellit/erlang")
-(load "snamellit/python")
-(load "snamellit/sgml")
-(load "snamellit/erc")
 (load "snamellit/artist")
 (load "snamellit/coffee")
-(load "snamellit/markdown")
 (load "snamellit/css")
+(load "snamellit/clojure-mode")
+(load "snamellit/cucumber")
+(load "snamellit/dired")
+(load "snamellit/groovy")
+(load "snamellit/javascript")
+(load "snamellit/markdown")
+(load "snamellit/python")
+(load "snamellit/ruby")
+(load "snamellit/sgml")
+(load "snamellit/shell")
+
+(load "snamellit/org-mode")
+(load "snamellit/org2blog")
+
+(load "snamellit/gnus")
+(load "snamellit/rcirc")
+(load "snamellit/shell")
 
 ;; all modes
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -22,10 +30,6 @@
 
 ; bash
 (setq auto-mode-alist (cons '("\\.bashrc" . sh-mode) auto-mode-alist))
-
-; obj-c
-(setq auto-mode-alist (cons '("\\.m$" . objc-mode) auto-mode-alist))
-;; (setq c-default-style "bsd" c-basic-offset 2)
 
 ; magit
 (eval-after-load 'magit
@@ -61,4 +65,3 @@
 
 ;; mustache
 (add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
-
