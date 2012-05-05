@@ -1,4 +1,4 @@
-(setq tags-file-name ".TAGS")
+G(setq tags-file-name ".TAGS")
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 (setq mac-emulate-three-button-mouse nil)
@@ -25,3 +25,7 @@
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 ;;(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 ;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+
+;; wen opening à file return To last cursor position  
+(require 'saveplace)
+(setq-default save-place t)
