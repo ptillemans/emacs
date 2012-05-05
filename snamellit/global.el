@@ -50,3 +50,7 @@
 
 ;; make vendor extensions visible
 (add-to-list 'load-path "~/.emacs.d/vendor")
+
+;; when opening à file return To last cursor position
+(require 'saveplace)
+(setq-default save-place t)
