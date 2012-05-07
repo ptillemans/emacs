@@ -25,3 +25,28 @@
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 ;;(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 ;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+
+;; Missing function in git emacs
+(defun plist-to-alist (p)
+  (if (empty? p)
+    p
+    (let (( c (cons (car p) (cadr p))))
+      (cons c (plist-to-alist (cddr p)))
+      )))
+
+;; enable marmalade package repository
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(package-initialize)
+
+;; add some useful paths to start external apps
+(defun extend-exec-path (s)
+  (setenv "PATH" (concat (getenv "PATH") (concat ":" s)))
+  (setq exec-path (append exec-path (list s))))
+
+(extend-exec-path "/usr/local/bin")
+(extend-exec-path "~/bin")
+
+;; make vendor extensions visible
+(add-to-list 'load-path "~/.emacs.d/vendor")

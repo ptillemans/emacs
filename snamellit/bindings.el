@@ -4,9 +4,7 @@
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
 (global-set-key "\C-xg" 'magit-status)
-(global-set-key "\C-xp" 'defunkt-ido-find-project)
 (global-set-key "\C-cP" 'defunkt-goto-config)
-(global-set-key "\C-x\C-g" 'github-ido-find-file)
 (global-set-key "\C-R" 'replace-string)
 
 ; Sane clipboard interaction
