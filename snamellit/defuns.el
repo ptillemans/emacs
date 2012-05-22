@@ -28,7 +28,7 @@
     (cond
      ; needed for org-mode
      ((file-directory-p lisp-normal) (add-to-list 'load-path lisp-normal) (require library))
-     ((file-directory-p normal) (add-to-list 'load-path normal) (require library))
+    ((file-directory-p normal) (add-to-list 'load-path normal) (require library))
      ((file-directory-p suffix) (add-to-list 'load-path suffix) (require library))
      ((file-exists-p suffix) (require library)))
     (when (file-exists-p (concat defunkt ".el"))

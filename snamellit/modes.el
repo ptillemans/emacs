@@ -20,7 +20,7 @@
 (load "snamellit/rcirc")
 (load "snamellit/shell")
 
-;; all modes
+
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; emacs
@@ -41,7 +41,10 @@
 (autoload 'paredit-mode "paredit"
      "Minor mode for pseudo-structurally editing Lisp code."
      t)
-(add-hook 'emacs-lisp-mode-hook (lambda () (paredit-mode +1)))
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (show-paren-mode +1)))
 
 ; jasper
 (setq auto-mode-alist (cons '("\\.jr" . emacs-lisp-mode) auto-mode-alist))
@@ -63,5 +66,10 @@
        (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
 
 
-;; mustache
+; mustache
 (add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
+
+
+; jira
+(require 'jira)
+(setq jira-url "https://extranet.melexis.com/jira/rpc/xmlrpc")

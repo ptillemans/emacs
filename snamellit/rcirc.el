@@ -1,7 +1,7 @@
 ;; settings for rcirc IRC client
 
 ;; colorize names
-;(eval-after-load 'rcirc '(require 'rcirc-color))
+(eval-after-load 'rcirc '(require 'rcirc-color))
 
 ;; You can autoload, but at the end of this block we'll
 ;; connect to two networks anyway.
@@ -30,5 +30,4 @@
 (setq rcirc-default-full-name "peter tillemans")
 
 ;; Join these channels at startup.
-(setq rcirc-server-alist '(("irc.freenode.net" :channels ("#rcirc" "#clojure" "#cucumber" "#leiningen"))))
-
+(setq rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs" "#rcirc" "#clojure" "#cucumber" "#leiningen"))))

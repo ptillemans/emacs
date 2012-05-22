@@ -1,4 +1,4 @@
-defunkt/custom.el
+elpa
 url/*
 .DS_Store
 local.el
@@ -14,3 +14,4 @@ org-clock-save.el.orig
 swank
 /auto-save-list/.saves-6370-snamellit~
 /snamellit/markdown.el~
+var
