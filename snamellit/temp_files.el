@@ -1,6 +1,5 @@
 ; stolen from http://github.com/febuiles/dotemacs/tree/master/temp_files.el
-(defvar user-temporary-file-directory
-  (concat temporary-file-directory user-login-name "/"))
+(defvar user-temporary-file-directory "~/.emacs-autosaves/")
 (make-directory user-temporary-file-directory t)
 (setq backup-by-copying t)
 (setq backup-directory-alist

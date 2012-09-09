@@ -49,16 +49,6 @@
 ; jasper
 (setq auto-mode-alist (cons '("\\.jr" . emacs-lisp-mode) auto-mode-alist))
 
-; mode-compile
-(autoload 'mode-compile "mode-compile"
-   "Command to compile current buffer file based on the major mode" t)
-(global-set-key "\C-cc" 'mode-compile)
-
-(autoload 'mode-compile-kill "mode-compile"
- "Command to kill a compilation launched by `mode-compile'" t)
-(global-set-key "\C-ck" 'mode-compile-kill)
-
-
 ; yaml
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 (add-hook 'yaml-mode-hook
@@ -71,5 +61,5 @@
 
 
 ; jira
-(require 'jira)
-(setq jira-url "https://extranet.melexis.com/jira/rpc/xmlrpc")
+;(require 'jira)
+;(setq jira-url "https://extranet.melexis.com/jira/rpc/xmlrpc")

@@ -1,0 +1,3 @@
+[submodule "vendor/org-jira.el"]
+	path = vendor/org-jira.el
+	url = https://github.com/baohaojun/org-jira.git

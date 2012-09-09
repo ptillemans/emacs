@@ -9,6 +9,8 @@
 (load "snamellit/theme")
 (load "snamellit/temp_files")
 
+(vendor 'org-jira)
+
 (print "Loading settings done.")
 
 (when (file-exists-p "snamellit/private")

@@ -2,13 +2,7 @@
 (global-set-key "\C-x\C-b" 'buffer-menu)
 (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
 (global-set-key "\C-xg" 'magit-status)
-(global-set-key "\C-cP" 'defunkt-goto-config)
 (global-set-key "\C-R" 'replace-string)
-
-; Sane clipboard interaction
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
 
 ;; no printing!
 ;; no changing meta key!!
@@ -28,3 +22,9 @@
 ; comment and uncomment regions
 (global-set-key (kbd "C-/") 'comment-region)
 (global-set-key (kbd "C-?") 'uncomment-region)
+
+; launch mini helm
+(global-set-key "\C-ch" 'helm-mini)
+
+; expand region
+(global-set-key (kbd  "C-=") 'er/expand-region)
