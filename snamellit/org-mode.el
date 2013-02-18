@@ -49,6 +49,15 @@
 
 ;; Enable other modules
 
+; Timer module for pomodore
+(add-to-list 'org-modules 'org-timer)
+; set default time
+(setq org-timer-default-timer 25)
+; enable timer on clock in
+(add-hook 'org-clock-in-hook '(lambda ()
+      (if (not org-timer-current-timer)
+      (org-timer-set-timer '(16)))))
+
 ; Jira
 (setq org-jira-serv-alist nil)
 
