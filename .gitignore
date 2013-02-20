@@ -18,3 +18,5 @@ var
 eshell
 org-clock-save*
 bookmarks
+*.*~
+snamellit/repl-port

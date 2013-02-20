@@ -1,4 +1,3 @@
-(require 'cl)
 
 (setq tags-file-name ".TAGS")
 (setq-default tab-width 2)
@@ -6,14 +5,6 @@
 (setq mac-emulate-three-button-mouse nil)
 (prefer-coding-system 'utf-8)
 (setq gist-view-gist t)
-
-;; works in both aquamacs and carbon
-(when (functionp 'tool-bar-mode)
-  (tool-bar-mode -1))
-
-;; aquamacs specific
-(when (boundp 'aquamacs-version)
-  (one-buffer-one-frame-mode 0))
 
 ;; use aspell for spell correction
 (setq-default ispell-program-name "aspell")
@@ -34,6 +25,11 @@
     (let (( c (cons (car p) (cadr p))))
       (cons c (plist-to-alist (cddr p)))
       )))
+
+;; configure ido mode
+(setq ido-everywhere t)
+(setq ido-max-directory-size 100000)
+(setq ido-enable-flex-matching t)
 
 ;; add some useful paths to start external apps
 (defun extend-exec-path (s)

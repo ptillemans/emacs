@@ -1,38 +1,6 @@
+;; add the right mode to org files
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org_archive$" . org-mode))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cc" 'org-capture)
-
-;; Custom Key Bindings
-(global-set-key (kbd "<f12>") 'org-agenda)
-(global-set-key (kbd "S-<f12>") 'org-mobile-pullpush)
-(global-set-key (kbd "<f8>") 'org-cycle-agenda-files)
-(global-set-key (kbd "<f9> b") 'bbdb)
-(global-set-key (kbd "<f9> c") 'calendar)
-(global-set-key (kbd "<f9> f") 'boxquote-insert-file)
-(global-set-key (kbd "<f9> g") 'gnus)
-(global-set-key (kbd "<f9> i") 'info)
-(global-set-key (kbd "<f9> I") 'org-clock-in)
-(global-set-key (kbd "<f9> O") 'org-clock-out)
-(global-set-key (kbd "<f9> r") 'boxquote-region)
-(global-set-key (kbd "<f9> v") 'visible-mode)
-(global-set-key (kbd "C-<f9>") 'previous-buffer)
-(global-set-key (kbd "C-x n r") 'narrow-to-region)
-(global-set-key (kbd "C-<f10>") 'next-buffer)
-(global-set-key (kbd "<f11>") 'org-clock-goto)
-(global-set-key (kbd "C-<f11>") 'org-clock-in)
-(global-set-key (kbd "C-M-r") 'org-capture)
-(global-set-key (kbd "M-<f9>") (lambda ()
-                                 (interactive)
-                                 (unless (buffer-modified-p)
-                                   (kill-buffer (current-buffer)))
-                                 (delete-frame)))
-
-
-(global-font-lock-mode 1)
-
 
 ;; enable auto-fill-mode and spell checking
 (add-hook 'org-mode-hook 'turn-on-auto-fill)
@@ -49,15 +17,6 @@
 
 ;; Enable other modules
 
-; Timer module for pomodore
-(add-to-list 'org-modules 'org-timer)
-; set default time
-(setq org-timer-default-timer 25)
-; enable timer on clock in
-(add-hook 'org-clock-in-hook '(lambda ()
-      (if (not org-timer-current-timer)
-      (org-timer-set-timer '(16)))))
-
 ; Jira
 (setq org-jira-serv-alist nil)
 
@@ -66,11 +25,18 @@
 (setq org-agenda-files (quote ("~/org/" "~/org/melexis/")))
 
 ; Enable habit tracking (and a bunch of other modules)
-(setq org-modules (quote (org-bbdb org-bibtex org-crypt org-gnus org-id org-info org-jsinfo org-habit org-inlinetask org-irc org-mew org-mhe org-protocol org-rmail org-vm org-wl org-w3m)))
+;(setq org-modules (quote (org-bbdb org-bibtex org-crypt org-gnus org-id org-info org-jsinfo org-habit org-inlinetask org-irc org-mew org-mhe org-protocol org-rmail org-timer org-vm org-wl org-w3m)))
+;(message "org-modules : %s" org-modules)
+(eval-after-load "org"
+  (lambda ()
+    (add-to-list 'org-modules 'org-timer t)
+    (add-to-list 'org-modules 'org-habit t)))
+
 ; global STYLE property values for completion
 (setq org-global-properties (quote (("STYLE_ALL" . "habit"))))
 ; position the habit graph on the agenda to the right of the default
 (setq org-habit-graph-column 50)
+
 ; set up alert sound
 (setq org-clock-sound "/usr/share/sounds/ubuntu/stereo/message-new-instant.ogg")
 
@@ -98,13 +64,18 @@
       '(("Effort_ALL" . "0:10 0:30 1:00 2:00 3:00 4:00 6:00 8:00 16:00 24:00 32:00 40:00")))
 (setq org-columns-default-format "%80ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM")
 
-(require 'cl)
-
 ;; org-mobile integration and automation.
 ;;
 ;; wait 60 min between auto updates to avoid losing time
 ;; when "catching up"
 (setq  org-mobile-last-sync 0)
+
+(defun pti-set-difference (a b)
+  (delq nil
+   (mapcar
+    (lambda (x)
+      (when (not (and (member x a) (member x b))) x))
+    (append a b))))
 
 (defun open-buffer-names ()
   (mapcar 'buffer-name (buffer-list)))
@@ -112,7 +83,7 @@
 (defun restore-buffers (fn)
   (let ((old-open-buffers (open-buffer-names)))
     (funcall fn)
-    (dolist ( buffer-name (set-difference (open-buffer-names) old-open-buffers))
+    (dolist ( buffer-name (pti-set-difference (open-buffer-names) old-open-buffers))
       (kill-buffer buffer-name))))
 
 (defun org-mobile-pullpush nil nil
@@ -192,46 +163,48 @@
 
 ; Use IDO for both buffer and file completion and ido-everywhere to t
 (setq org-completion-use-ido t)
-(setq ido-everywhere t)
-(setq ido-max-directory-size 100000)
 (ido-mode (quote both))
 
 ;; Do not dim blocked tasks
 (setq org-agenda-dim-blocked-tasks nil)
 
 ;; Clocking setup
-
-;; Resume clocking tasks when emacs is restarted
+; Resume clocking tasks when emacs is restarted
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
-
-;; Small windows on my Eee PC displays only the end of long lists which isn't very useful
-(setq org-clock-history-length 10)
-;; Resume clocking task on clock-in if the clock is open
+; Resume clocking task on clock-in if the clock is open
 (setq org-clock-in-resume t)
-;; Do not change task states when clocking in
+; Do not change task states when clocking in
 (setq org-clock-in-switch-to-state nil)
-;; Separate drawers for clocking and logs
+; Separate drawers for clocking and logs
 (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
-;; Save clock data and state changes and notes in the LOGBOOK drawer
+; Save clock data and state changes and notes in the LOGBOOK drawer
 (setq org-clock-into-drawer t)
-;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
 (setq org-clock-out-remove-zero-time-clocks t)
-;; Clock out when moving task to a done state
+; Clock out when moving task to a done state
 (setq org-clock-out-when-done t)
-;; Save the running clock and all clock history when exiting Emacs, load it on startup
+; Save the running clock and all clock history when exiting Emacs, load it on startup
 (setq org-clock-persist (quote history))
-;; Enable auto clock resolution for finding open clocks
+; Enable auto clock resolution for finding open clocks
 (setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
-;; Include current clocking task in clock reports
+; Include current clocking task in clock reports
 (setq org-clock-report-include-clocking-task t)
-
-;; Agenda log mode items to display (clock time only by default)
+; Agenda log mode items to display (clock time only by default)
 (setq org-agenda-log-mode-items (quote (clock)))
-
-;; Agenda clock report parameters
+; Agenda clock report parameters
 (setq org-agenda-clockreport-parameter-plist
       (quote (:link t :maxlevel 5 :fileskip0 t :compact t)))
+
+
+; Support pomodoro workflow
+(add-to-list 'org-modules 'org-timer)
+(setq org-timer-default-timer 25)
+(add-hook 'org-clock-in-hook
+          '(lambda ()
+             (if (not org-timer-current-timer)
+                 (org-timer-set-timer))))
+
 
 ; Tags with fast selection keys
 (setq org-tag-alist (quote ((:startgroup)
@@ -340,12 +313,3 @@
       (quote (
               ("" "wallpaper" nil)
               ("" "bookman" nil))))
-
-;; Support pomodoro workflow
-
-(add-to-list 'org-modules 'org-timer)
-(setq org-timer-default-timer 25)
-(add-hook 'org-clock-in-hook
-          '(lambda ()
-             (if (not org-timer-current-timer)
-                 (org-timer-set-timer))))
