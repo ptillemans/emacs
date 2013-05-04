@@ -47,16 +47,25 @@
 (setq org-archive-mark-done t)
 (setq org-archive-location "%s_archive::* Archived Tasks")
 
+;; global key bindings
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+;; Many commands in Org work on the region if the region is active.
+(transient-mark-mode 1)
+
 ;; fix acces to tab key for yasnippet
-(defun yas/org-very-safe-expand ()
-  (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
+(defun yas-org-very-safe-expand ()
+  (let ((yas-fallback-behavior 'return-nil)) (yas-expand)))
 
 (add-hook 'org-mode-hook
           (lambda ()
-            (make-variable-buffer-local 'yas/trigger-key)
-            (setq yas/trigger-key [tab])
-            (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
-            (define-key yas/keymap [tab] 'yas/next-field)))
+            (make-variable-buffer-local 'yas-trigger-key)
+            (setq yas-trigger-key [tab])
+            (add-to-list 'org-tab-first-hook 'yas-org-very-safe-expand)
+            (define-key yas-keymap [tab] 'yas-next-field)))
 
 
 ;; Add support for effort etimation
@@ -307,7 +316,8 @@
               ("" "wasysym" t)
               ("" "latexsym" t)
               ("" "amssymb" t)
-              ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil) "\\tolerance=1000")))
+;;              ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil)
+              "\\tolerance=1000")))
 
 (setq org-export-latex-packages-alist
       (quote (

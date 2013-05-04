@@ -63,10 +63,14 @@
     clojure-test-mode
     coffee-mode
     evernote-mode
+    ess
+    ess-smart-underscore
     expand-region
+    elnode
     feature-mode
     helm
     gist
+    git-gutter
     groovy-mode
     haskell-mode
     inf-ruby
@@ -90,10 +94,12 @@
   "A list of packages to ensure are installed at launch.")
 
 (defun my-packages-installed-p ()
+  "Check if all packages mentioned in the my-packages list are installed"
   (loop for p in my-packages
         when (not (package-installed-p p)) do (return nil)
         finally (return t)))
 
+;; skip this if all packages are already installed
 (unless (my-packages-installed-p)
   ;; check for new packages (package versions)
   (message "%s" "Emacs Prelude is now refreshing its package database...")
@@ -103,3 +109,5 @@
   (dolist (p my-packages)
     (when (not (package-installed-p p))
       (package-install p))))
+
+(global-git-gutter-mode t)

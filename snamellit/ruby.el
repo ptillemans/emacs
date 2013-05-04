@@ -26,7 +26,9 @@
             (add-hook 'local-write-file-hooks
                       '(lambda()
                          (save-excursion
-                           (untabify (point-min) (point-max)))))
+                           (progn
+                             (untabify (point-min) (point-max))
+                             nil))))
             (set (make-local-variable 'indent-tabs-mode) 'nil)
             (set (make-local-variable 'tab-width) 2)
             (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)

@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: scenario
+# key: nsc
+# --
+  Scenario: ${1: scenario description}
+    Given ${2: preconditions, add more with And}
+    When ${3: event triggering the response}
+    Then ${4: postconditions, add more with And}
+
+  $0

@@ -8,14 +8,14 @@
  '(emulate-mac-french-keyboard-mode t)
  '(exec-path (quote ("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/local/bin" "/usr/X11/bin" "/usr/bin" "/bin" "/usr/sbin" "/sbin" "/usr/texbin" "/Users/pti/bin")))
  '(flyspell-use-meta-tab nil)
- '(jiralib-url "http://extranet.melexis.com/jira")
  '(ns-tool-bar-display-mode nil t)
  '(ns-tool-bar-size-mode nil t)
+ '(org-babel-js-cmd "nodejs")
  '(org-file-apps (quote ((auto-mode . emacs) ("\\.mm\\'" . default) ("\\.x?html?\\'" . default) ("\\.pdf\\'" . default))))
  '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/"))))
  '(table-cell-intersection-char 124)
  '(visual-line-mode nil t)
- '(yas/root-directory (quote ("~/.emacs.d/snamellit/snippets")) nil (yasnippet)))
+ '(yas-root-directory (quote ("~/.emacs.d/snamellit/snippets")) nil (yasnippet)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -1,3 +1,6 @@
 [submodule "vendor/org-jira.el"]
 	path = vendor/org-jira.el
 	url = https://github.com/baohaojun/org-jira.git
+[submodule "vendor/js3-mode"]
+	path = vendor/js3-mode
+	url = https://github.com/thomblake/js3-mode.git

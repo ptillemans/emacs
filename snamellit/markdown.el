@@ -8,7 +8,7 @@
 
 (defun my-markdown-tab ()
   (interactive)
-  (let ((yas/fallback-behavior 'return-nil)) (yas/expand))
+  (let ((yas-fallback-behavior 'return-nil)) (yas-expand))
   (markdown-cycle))
 
 (add-hook

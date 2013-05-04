@@ -59,7 +59,24 @@
 ; mustache
 (add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
 
+;; GNUS
+; make gmail the primary access
+(setq gnus-select-method '(nnimap "gmail"
+				  (nnimap-address "imap.gmail.com")
+				  (nnimap-server-port 993)
+				  (nnimap-stream ssl)))
 
-; jira
-;(require 'jira)
-;(setq jira-url "https://extranet.melexis.com/jira/rpc/xmlrpc")
+; configure to send emails
+(setq message-send-mail-function 'smtpmail-send-it
+      smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-auth-credentials '(("smtp.gmail.com" 587 "pti@melexis.com" nil))
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-local-domain "melexis.com")
+
+; Make Gnus NOT ignore [Gmail] mailboxes
+(setq gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+;; ESS
+(require 'ess-site)

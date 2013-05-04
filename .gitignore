@@ -20,3 +20,4 @@ org-clock-save*
 bookmarks
 *.*~
 snamellit/repl-port
+tramp
