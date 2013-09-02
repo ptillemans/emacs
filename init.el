@@ -6,3 +6,4 @@
 ;; make this file load other version-controlled files.
 (load "snamellit")
 (put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)

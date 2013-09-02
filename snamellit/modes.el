@@ -15,9 +15,10 @@
 
 (load "snamellit/org-mode")
 (load "snamellit/org2blog")
+;; (require 'org)
 
 (load "snamellit/gnus")
-(load "snamellit/rcirc")
+;;(load "snamellit/rcirc")
 (load "snamellit/shell")
 
 
@@ -26,7 +27,8 @@
 ;; emacs
 (define-key emacs-lisp-mode-map (kbd "A-r") 'eval-buffer)
 ;; Paredit overshadows the C-j bindings in lisp interaction mode.
-(define-key lisp-interaction-mode-map [S-return] 'eval-print-last-sexp)
+(eval-after-load "paredit"
+  #'(define-key paredit-mode-map (kbd "C-j") 'eval-last-sexp))
 
 ; bash
 (setq auto-mode-alist (cons '("\\.bashrc" . sh-mode) auto-mode-alist))
@@ -80,3 +82,29 @@
 
 ;; ESS
 (require 'ess-site)
+
+;; enable indication of changed lines in git controlled files
+(global-git-gutter-mode t)
+
+;; enable yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
+
+
+(print "modes.el done")
+
+;; multiple cursors
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+;; install some vendor extensions
+(vendor 'expand-region)
+(global-set-key (kbd "C-@") 'er/expand-region)
+
+;; enable autocompletion
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/dict")
+(require 'auto-complete-config)
+(ac-config-default)

@@ -1,4 +1,6 @@
 
+(eval-when-compile (require 'cl))
+
 (setq tags-file-name ".TAGS")
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
@@ -11,7 +13,7 @@
 (setq ispell-extra-args '("--sug-mode=ultra"))
 
 ;; start emacs-server
-(server-start)
+;; (server-start)
 
 ;; lose UI stuff
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -57,8 +59,11 @@
 
 (defvar my-packages
   '(ack-and-a-half
+    ac-nrepl
     auctex
+    auto-complete
     caml
+    cl-lib
     clojure-mode
     clojure-test-mode
     coffee-mode
@@ -77,6 +82,7 @@
     magit
     magithub
     markdown-mode
+    multiple-cursors
     nrepl
     paredit
     projectile
@@ -110,4 +116,5 @@
     (when (not (package-installed-p p))
       (package-install p))))
 
-(global-git-gutter-mode t)
+;; install vendor apps
+;;(vendor 'org-jira)

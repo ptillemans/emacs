@@ -261,8 +261,8 @@
    (js . t)))
 
 ;; Org Babel setup for fancy graphics etc
-(setq org-ditaa-jar-path "~/Dropbox/tools/ditaa0_9.jar")
-(setq org-plantuml-jar-path "~/Dropbox/tools/plantuml.jar")
+(setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
+(setq org-plantuml-jar-path "~/Dropbox/Tools/plantuml.jar")
 
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
 
@@ -275,7 +275,7 @@
 (setq org-confirm-babel-evaluate nil)
 
 ;; checklists
-(require 'org-checklist)
+;; (require 'org-checklist)
 
 
 (defun pti-catlines (lines)
@@ -283,25 +283,49 @@
 
 ;; Latex export options
 (setq org-export-latex-classes
-      (quote (("article" "\\documentclass[a4paper,11pt]{article}
+      (quote (
+
+("article" "\\documentclass[a4paper,11pt]{article}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} " ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}") ("\\paragraph{%s}" . "\\paragraph*{%s}") ("\\subparagraph{%s}" . "\\subparagraph*{%s}")) ("report" "\\documentclass[11pt]{report}
+\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+("\\paragraph{%s}" . "\\paragraph*{%s}")
+("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+
+("report" "\\documentclass[a4paper,11pt]{report}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} " ("\\part{%s}" . "\\part*{%s}") ("\\chapter{%s}" . "\\chapter*{%s}") ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}")) ("book" "\\documentclass[11pt]{book}
+\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+("\\part{%s}" . "\\part*{%s}")
+("\\chapter{%s}" . "\\chapter*{%s}")
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+
+("book" "\\documentclass[11pt]{book}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} " ("\\part{%s}" . "\\part*{%s}") ("\\chapter{%s}" . "\\chapter*{%s}") ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}") ("\\subsubsection{%s}" . "\\subsubsection*{%s}")) ("beamer" "\\documentclass{beamer}
+\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+("\\part{%s}" . "\\part*{%s}")
+("\\chapter{%s}" . "\\chapter*{%s}")
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+
+("beamer" "\\documentclass{beamer}
 [PACKAGES]
 [EXTRA]
 \\usetheme{Boadilla}
 \\usecolortheme{seagull}
 \\usefonttheme{structurebold}
 \\setbeamersize{sidebar width left=0.5in, sidebar width right=0.5in, text margin left=0.5in, text margin right=0.5in}
-\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{/home/pti/org/presentation_bg.pdf}} " org-beamer-sectioning))))
+\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{/home/pti/org/presentation_bg.pdf}} " org-beamer-sectioning)
+)))
 
-(setq org-export-latex-default-packages-alist
+(setq org-latex-default-packages-alist
       (quote (
               ("AUTO" "inputenc" t)
               ("T1" "fontenc" t)
@@ -316,10 +340,36 @@
               ("" "wasysym" t)
               ("" "latexsym" t)
               ("" "amssymb" t)
-;;              ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil)
-              "\\tolerance=1000")))
+              ("" "amstext" t)
+              ("" "titlesec" t)
+              ("" "microtype" t)
+              ("" "minted" t)
+              ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil)
+              "\\tolerance=1000
+\\titleformat{\\section}[hang]{\\scshape}{\\thesection}{2ex}{}[]
+\\titleformat{\\subsection}[hang]{\\scshape}{\\thesubsection}{2ex}{}[]
+\\usemintedstyle{emacs}
+\\newminted{common-lisp}{fontsize=\\footnotesize}
+")))
 
-(setq org-export-latex-packages-alist
+(setq org-latex-packages-alist
       (quote (
               ("" "wallpaper" nil)
-              ("" "bookman" nil))))
+              ("" "tgpagella" nil)
+)))
+
+
+;; Setup minted fancy listings
+(setq org-export-latex-listings 'minted)
+(setq org-export-latex-custom-lang-environments
+      '(
+        (emacs-lisp "common-lispcode")
+        ))
+(setq org-export-latex-minted-options
+      '(("frame" "lines")
+        ("fontsize" "\\scriptsize")
+        ("linenos" "")))
+(setq org-latex-to-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
