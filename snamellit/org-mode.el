@@ -258,7 +258,7 @@
    (sql . t)
    (sqlite . t)
    (clojure . t)
-   (js . t)))
+   (js . t)))`%
 
 ;; Org Babel setup for fancy graphics etc
 (setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
@@ -282,13 +282,13 @@
   (mapconcat 'identity lines "\n"))
 
 ;; Latex export options
-(setq org-export-latex-classes
+(setq org-latex-classes
       (quote (
 
 ("article" "\\documentclass[a4paper,11pt]{article}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
 ("\\section{%s}" . "\\section*{%s}")
 ("\\subsection{%s}" . "\\subsection*{%s}")
 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -298,7 +298,7 @@
 ("report" "\\documentclass[a4paper,11pt]{report}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
 ("\\part{%s}" . "\\part*{%s}")
 ("\\chapter{%s}" . "\\chapter*{%s}")
 ("\\section{%s}" . "\\section*{%s}")
@@ -308,7 +308,7 @@
 ("book" "\\documentclass[11pt]{book}
 [PACKAGES]
 [EXTRA]
-\\CenterWallPaper{1.0}{/home/pti/org/portrait.pdf} "
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
 ("\\part{%s}" . "\\part*{%s}")
 ("\\chapter{%s}" . "\\chapter*{%s}")
 ("\\section{%s}" . "\\section*{%s}")
@@ -322,7 +322,10 @@
 \\usecolortheme{seagull}
 \\usefonttheme{structurebold}
 \\setbeamersize{sidebar width left=0.5in, sidebar width right=0.5in, text margin left=0.5in, text margin right=0.5in}
-\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{/home/pti/org/presentation_bg.pdf}} " org-beamer-sectioning)
+\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{\\string~/org/presentation_bg.pdf}} "
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
 )))
 
 (setq org-latex-default-packages-alist
@@ -341,10 +344,10 @@
               ("" "latexsym" t)
               ("" "amssymb" t)
               ("" "amstext" t)
-              ("" "titlesec" t)
+              ("loadonly" "titlesec" t)
               ("" "microtype" t)
               ("" "minted" t)
-              ("colorlinks=true, linkcolor=blue, citecolor=blue, filecolor=blue, urlcolor=blue" "hyperref" nil)
+              ("colorlinks=tr" "hyperref" nil)
               "\\tolerance=1000
 \\titleformat{\\section}[hang]{\\scshape}{\\thesection}{2ex}{}[]
 \\titleformat{\\subsection}[hang]{\\scshape}{\\thesubsection}{2ex}{}[]
