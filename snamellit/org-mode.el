@@ -282,6 +282,7 @@
   (mapconcat 'identity lines "\n"))
 
 ;; Latex export options
+(require 'ox-latex)
 (setq org-latex-classes
       (quote (
 
@@ -322,7 +323,7 @@
 \\usetheme{Boadilla}
 \\usecolortheme{seagull}
 \\usefonttheme{structurebold}
-\\setbeamersize{sidebar width left=0.5in, sidebar width right=0.5in, text margin left=0.5in, text margin right=0.5in}
+\\setbeamersize{sidebar width left=0in, sidebar width right=0in, text margin left=0.5in, text margin right=0.5in}
 \\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{\\string~/org/presentation_bg.pdf}} "
 ("\\section{%s}" . "\\section*{%s}")
 ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -377,3 +378,6 @@
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+
+(require 'ox-beamer)
