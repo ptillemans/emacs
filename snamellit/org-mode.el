@@ -315,9 +315,10 @@
 ("\\subsection{%s}" . "\\subsection*{%s}")
 ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
 
-("beamer" "\\documentclass{beamer}
+("beamer" "\\documentclass[a4paper]{beamer}
 [PACKAGES]
 [EXTRA]
+\\geometry{paper=a4}
 \\usetheme{Boadilla}
 \\usecolortheme{seagull}
 \\usefonttheme{structurebold}
@@ -347,7 +348,7 @@
               ("loadonly" "titlesec" t)
               ("" "microtype" t)
               ("" "minted" t)
-              ("colorlinks=tr" "hyperref" nil)
+;;              ("colorlinks=tr" "hyperref" nil)
               "\\tolerance=1000
 \\titleformat{\\section}[hang]{\\scshape}{\\thesection}{2ex}{}[]
 \\titleformat{\\subsection}[hang]{\\scshape}{\\thesubsection}{2ex}{}[]
