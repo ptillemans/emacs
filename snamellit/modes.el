@@ -18,7 +18,7 @@
 ;; (require 'org)
 
 (load "snamellit/gnus")
-;;(load "snamellit/rcirc")
+(load "snamellit/rcirc")
 (load "snamellit/shell")
 
 
