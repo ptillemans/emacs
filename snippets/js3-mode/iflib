@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: iflib
+# key: iflib
+# --
+if($1) {
+  $("#question$2").show();
+};
+$0

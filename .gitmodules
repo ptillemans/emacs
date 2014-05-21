@@ -7,3 +7,6 @@
 [submodule "vendor/expand-region.el"]
 	path = vendor/expand-region.el
 	url = https://github.com/magnars/expand-region.el.git
+[submodule "habitrpg/habitrpg"]
+	path = habitrpg/habitrpg
+	url = http://github.com/ryjm/habitrpg.el.git

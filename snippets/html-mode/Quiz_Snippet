@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: Quiz_Snippet
+# key: Quiz
+# --
+      <div id="${1: question}">
+        <div class="question">$2</div>
+        <input type="radio" name="$1" value="a" />
+        <label>$3</label>
+        <input type="radio" name="$1" value="b" />
+        <label>$4</label>
+        <input type="radio" name="$1" value="c" />
+        <label>$5</label>
+        <input type="radio" name="$1" value="d" />
+        <label>$6</label>
+      </div>
+$0
