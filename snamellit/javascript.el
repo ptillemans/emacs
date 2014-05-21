@@ -50,3 +50,5 @@
              (define-key js3-mode-map (kbd "TAB") 'js3-tab-properly)
              (yas-minor-mode t)
              ))
+
+(add-hook 'js3-mode-hook 'progmodes-hooks)

@@ -47,3 +47,11 @@
       (when (not (member (car buffers) safe))
         (kill-buffer (car buffers))
         (setq buffers (cdr buffers))))))
+
+
+;; eshell extensions
+
+(defun eshell/ggpnp ()
+  (print (concat "Pulling from origin/" (magit-get-current-branch)))
+  (if (magit-run-git "pull" "origin" (magit-get-current-branch))
+    (magit-run-git "push" "origin" (magit-get-current-branch))))

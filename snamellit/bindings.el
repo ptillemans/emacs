@@ -28,3 +28,6 @@
 
 ; expand region
 (global-set-key (kbd  "C-=") 'er/expand-region)
+
+;; Quickly jump in document with ace-jump-mode
+(define-key global-map (kbd "C-`") 'ace-jump-mode)

@@ -11,3 +11,4 @@
   (setq coffee-debug-mode nil))
 
 (add-hook 'coffee-mode-hook (lambda () (defunkt-coffee-mode-hook)))
+(add-hook 'coffee-mode-hook 'progmodes-hooks)

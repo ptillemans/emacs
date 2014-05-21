@@ -15,6 +15,8 @@
          (inf-groovy-keys)
 ))
 
+(add-hook 'groovy-mode-hook 'progmodes-hooks)
+
 ;; can set groovy-home here, if not in environment
 (setq inferior-groovy-mode-hook
     '(lambda()

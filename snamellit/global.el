@@ -117,4 +117,27 @@
       (package-install p))))
 
 ;; install vendor apps
-;;(vendor 'org-jira)
+(vendor 'org-jira)
+
+;; untabify source code
+(defun untabify-buffer ()
+  "Untabify current buffer"
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(defun progmodes-hooks ()
+  "Hooks for programming modes"
+  (yas-minor-mode-on)
+  (add-hook 'before-save-hook 'progmodes-write-hooks))
+
+(defun progmodes-write-hooks ()
+  "Hooks which run on file write for programming modes"
+  (prog1 nil
+    (set-buffer-file-coding-system 'utf-8-unix)
+    (untabify-buffer)))
+
+
+(add-hook 'gams-mode-hook 'progmodes-hooks)
+(add-hook 'ess-mode-hook 'progmodes-hooks)
+
+(server-start)

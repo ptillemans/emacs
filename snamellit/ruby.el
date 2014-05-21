@@ -35,6 +35,8 @@
             (require 'ruby-electric)
             (ruby-electric-mode t)))
 
+(add-hook 'ruby-mode-hook 'progmodes-hooks)
+
 (defadvice ruby-do-run-w/compilation (before kill-buffer (name cmdlist))
   (let ((comp-buffer-name (format "*%s*" name)))
     (when (get-buffer comp-buffer-name)
