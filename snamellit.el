@@ -2,8 +2,8 @@
 (when (file-exists-p ".passwords") (load ".passwords"))
 
 (load "snamellit/lisp")
-(load "snamellit/global")
 (load "snamellit/defuns")
+(load "snamellit/global")
 (load "snamellit/bindings")
 (load "snamellit/modes")
 (load "snamellit/theme")

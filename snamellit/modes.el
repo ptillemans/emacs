@@ -15,7 +15,6 @@
 
 (load "snamellit/org-mode")
 (load "snamellit/org2blog")
-;; (require 'org)
 
 (load "snamellit/gnus")
 (load "snamellit/rcirc")

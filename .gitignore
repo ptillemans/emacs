@@ -20,4 +20,6 @@ org-clock-save*
 bookmarks
 *.*~
 snamellit/repl-port
-tramp
+tramp.mc-lists.el
+ac-comphist.dat
+request
