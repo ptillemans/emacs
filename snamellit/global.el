@@ -118,6 +118,7 @@
 
 ;; install vendor apps
 (vendor 'org-jira)
+(vendor 'scad)
 
 ;; untabify source code
 (defun untabify-buffer ()
