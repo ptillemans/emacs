@@ -129,7 +129,7 @@
 (defun progmodes-hooks ()
   "Hooks for programming modes"
   (yas-minor-mode-on)
-  (add-hook 'before-save-hook 'progmodes-write-hooks))
+  (add-hook 'before-save-hook 'progmodes-write-hooks nil 'local))
 
 (defun progmodes-write-hooks ()
   "Hooks which run on file write for programming modes"
