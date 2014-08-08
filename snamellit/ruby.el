@@ -1,5 +1,4 @@
 ; rinari
-(vendor 'rinari)
 (setq rinari-tags-file-name "TAGS")
 (add-hook 'rinari-minor-mode-hook
           (lambda ()
@@ -10,7 +9,6 @@
 (setq auto-mode-alist (cons '("\\.erb" . nxml-mode) auto-mode-alist))
 
 ; ruby
-(vendor 'ruby-hacks)
 (setq auto-mode-alist (cons '("Rakefile" . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("Capfile" . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.rake" . ruby-mode) auto-mode-alist))
@@ -36,6 +34,9 @@
             (ruby-electric-mode t)))
 
 (add-hook 'ruby-mode-hook 'progmodes-hooks)
+
+(add-hook 'ruby-mode-hook
+          (lambda () (rvm-activate-corresponding-ruby)))
 
 (defadvice ruby-do-run-w/compilation (before kill-buffer (name cmdlist))
   (let ((comp-buffer-name (format "*%s*" name)))
@@ -68,5 +69,30 @@
     (beginning-of-line)
     (search-forward "#" (point-at-eol) t)))
 
-; treetop
-(vendor 'treetop)
+
+(require 'ruby-additional)
+
+; rvm support
+(autoload 'rvm-use-default "../.emacs.d/vendor/rvm.el/rvm" "\
+use the rvm-default ruby as the current ruby version
+
+\(fn)" t nil)
+
+(autoload 'rvm-activate-corresponding-ruby "../.emacs.d/vendor/rvm.el/rvm" "\
+activate the corresponding ruby version for the file in the current buffer.
+This function searches for an .rvmrc file and activates the configured ruby.
+If no .rvmrc file is found, the default ruby is used insted.
+
+\(fn)" t nil)
+
+(autoload 'rvm-use "../.emacs.d/vendor/rvm.el/rvm" "\
+switch the current ruby version to any ruby, which is installed with rvm
+
+\(fn NEW-RUBY NEW-GEMSET)" t nil)
+
+(autoload 'rvm-open-gem "../.emacs.d/vendor/rvm.el/rvm" "\
+
+
+\(fn GEMHOME)" t nil)
+
+(provide 'rvm)

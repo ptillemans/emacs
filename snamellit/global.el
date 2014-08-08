@@ -13,11 +13,11 @@
 (setq ispell-extra-args '("--sug-mode=ultra"))
 
 ;; start emacs-server
-;; (server-start)
+(server-start)
 
 ;; lose UI stuff
 ;;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-;;(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 ;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 ;; Missing function in git emacs
@@ -50,8 +50,8 @@
 
 ;; enable marmalade package repository
 (require 'package)
-;;(add-to-list 'package-archives
-;;             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
@@ -70,6 +70,7 @@
     evernote-mode
     ess
     ess-smart-underscore
+    edit-server
     expand-region
     elnode
     feature-mode
@@ -79,8 +80,9 @@
     groovy-mode
     haskell-mode
     inf-ruby
+    inflections
+    log4j-mode
     magit
-    magithub
     markdown-mode
     multiple-cursors
     nrepl
@@ -89,6 +91,9 @@
     python
     sass-mode
     rainbow-mode
+    rinari
+    ruby-additional
+    ruby-electric
     scala-mode
     solarized-theme
     volatile-highlights
@@ -141,4 +146,7 @@
 (add-hook 'gams-mode-hook 'progmodes-hooks)
 (add-hook 'ess-mode-hook 'progmodes-hooks)
 
-(server-start)
+(edit-server-start)
+
+;; disable YAS in terminals
+(add-hook 'term-mode-hook (lambda () (yas-minor-mode -1)))
