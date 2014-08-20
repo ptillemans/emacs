@@ -1,4 +1,4 @@
-(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d/snamellit")
 
 ;; You're expected to populate .emacs.d/local.el
 ;; with your own code. This file is under .gitignore
@@ -7,3 +7,5 @@
 (load "snamellit")
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'set-goal-column 'disabled nil)
+(put 'narrow-to-region 'disabled nil)

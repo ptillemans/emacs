@@ -41,12 +41,6 @@
         (reject (cdr list) body)
       (cons (car list) (reject (cdr list) body)))))
 
-; enable proxy settings
-(defun melexis-proxy ()
-  (setq url-proxy-services '(("no_proxy" . "elex.be")
-                             ("http" . "proxy:3128")
-                             ("https" . "proxy:3128")))
-)
 
 
 ; sbcl settings to play with stumpwm

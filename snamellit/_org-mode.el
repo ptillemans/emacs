@@ -384,12 +384,12 @@
 
 
 ;; jira integration
-(require 'org-jira)
-(setq jiralib-url "https://jira.melexis.com/jira")
+;;(require 'org-jira)
+;;(setq jiralib-url "https://jira.melexis.com/jira")
 
 ;; org-mode to habitrpg integration
 (add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
-(require 'habitrpg)
+(vendor 'habitrpg)
 
 (add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
 ;; For adding tasks from org mode

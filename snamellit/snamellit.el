@@ -1,18 +1,16 @@
 
 (when (file-exists-p ".passwords") (load ".passwords"))
 
-(load "snamellit/lisp")
-(load "snamellit/defuns")
-(load "snamellit/global")
-(load "snamellit/bindings")
-(load "snamellit/modes")
-(load "snamellit/theme")
-(load "snamellit/temp_files")
+(load "defuns")
+(load "global")
+(load "bindings")
+(load "modes")
+(load "theme")
 
 (print "Loading settings done.")
 
-(when (file-exists-p "snamellit/private")
-  (load "snamellit/private"))
+(when (file-exists-p "private")
+  (load "private"))
 
 
 ; custom place to save customizations

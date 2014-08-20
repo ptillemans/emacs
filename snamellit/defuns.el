@@ -1,26 +1,11 @@
 
-(defun defunkt-ido-find-config ()
-  "Find an emacs config file."
-  (interactive)
-  (find-file
-   (concat "~/.emacs.d/snamellit/"
-           (ido-completing-read "Config file: "
-                                (directory-files "~/.emacs.d/snamellit/"
-                                                 nil
-                                                 "^[^.]")))))
+;; enable proxy settings at melexis
+(defun melexis-proxy ()
+  (setq url-proxy-services '(("no_proxy" . "elex.be")
+                             ("http" . "proxy:3128")
+                             ("https" . "proxy:3128")))
+)
 
-(defun defunkt-ido-find-project ()
-  "Find projects in default project folder."
-  (interactive)
-  (find-file
-   (concat "~/Projects/" (ido-completing-read "Project: "
-                                              (directory-files "~/Projects/" nil "^[^.]")))))
-
-(defun defunkt-goto-config ()
-  (interactive)
-  (find-file "~/.emacs.d/snamellit.el"))
-
-                                        ; for loading libraries in from the vendor directory
 (defun vendor (library)
   "Load a vendor extension.
 Vendor extensions are loaded in an opinionated way. They will be
@@ -38,15 +23,15 @@ it is executed afterwards to configure the vendor extension."
          (normal (concat "~/.emacs.d/vendor/" file))
          (lisp-normal (concat normal "lisp"))
          (suffix (concat normal ".el"))
-         (defunkt (concat "~/.emacs.d/snamellit/" file)))
+         (my-config (concat "~/.emacs.d/snamellit/_" file)))
     (cond
                                         ; needed for org-mode
      ((file-directory-p lisp-normal) (add-to-list 'load-path lisp-normal) (require library))
      ((file-directory-p normal) (add-to-list 'load-path normal) (require library))
      ((file-directory-p suffix) (add-to-list 'load-path suffix) (require library))
      ((file-exists-p suffix) (require library)))
-    (when (file-exists-p (concat defunkt ".el"))
-      (load defunkt))))
+    (when (file-exists-p (concat my-config ".el"))
+      (load my-config))))
 
 (defun gist-buffer-confirm (&optional private)
   "Gist a private buffer with confirmation."
