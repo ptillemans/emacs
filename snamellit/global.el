@@ -78,7 +78,7 @@
   '(
     (ack-and-a-half t)
     (ac-nrepl t)
-    ;;    (auctex t)
+    (auctex t)
     (alert t)
     (auto-complete t)
     (auto-complete-pcmp t)
@@ -145,6 +145,7 @@
     (ruby-electric t)
     (ruby-refactor t)
     (ruby-test-mode t)
+    (rvm t)
     (s t)
     (scala-mode t)
     (scss-mode t)
@@ -210,3 +211,11 @@
 ;; set a list of tag tables
 (setq tags-table-list
       '("~/.emacs.d"))
+
+
+; Load el4r, which loads Xiki
+(rvm-use "1.9.3" "")
+(add-to-list 'load-path "/Users/pti/.rvm/gems/ruby-1.9.3-p547/gems/trogdoro-el4r-1.0.10/data/emacs/site-lisp/")
+(require 'el4r)
+(el4r-boot)
+(el4r-troubleshooting-keys)
