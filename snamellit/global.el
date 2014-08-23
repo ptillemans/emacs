@@ -12,7 +12,6 @@
 (setq-default ispell-program-name "aspell")
 (setq ispell-extra-args '("--sug-mode=ultra"))
 
-;; start emacs-server
 (server-start)
 
 ;; lose UI stuff
@@ -48,9 +47,16 @@
       `((".*" ,user-temporary-file-directory t)))
 
 ;; configure ido mode
+(ido-mode 1)
 (setq ido-everywhere t)
 (setq ido-max-directory-size 100000)
 (setq ido-enable-flex-matching t)
+
+(eval-after-load "flx-ido"
+  '(progn
+     (flx-ido-mode 1)
+     ;; disable ido faces to see flx highlights.
+     (setq ido-use-faces nil)))
 
 ;; add some useful paths to start external apps
 (defun extend-exec-path (s)
@@ -99,6 +105,7 @@
     fakir               ;; faking bits of emacs
     feature-mode
     findr
+    flx-ido
     gntp
     helm
     gh
@@ -218,4 +225,7 @@
 ;(add-to-list 'load-path "/Users/pti/.rvm/gems/ruby-1.9.3-p547/gems/trogdoro-el4r-1.0.10/data/emacs/site-lisp/")
 ;(require 'el4r)
 ;(el4r-boot)
-;(el4r-troubleshooting-keys)
+                                        ;(el4r-troubleshooting-keys)
+
+;; garbage collection tuning
+(setq gc-cons-threshold 20000000)  ;; 20Mb instead of 800k
