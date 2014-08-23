@@ -1,7 +1,4 @@
 
-(require 'shell)
-
-
 ;; on the mac we need to tell the apps launched to use utf8
 ;; as the character encoding
 (defadvice ansi-term (after advise-ansi-term-coding-system)
@@ -16,7 +13,7 @@
 ;;
 ;;In this case create a folder ~/.terminfo and run
 ;;
-;; $ cd 
+;; $ cd
 ;; $ mkdir .terminfo
 ;; $ tic -o .terminfo ...
 ;; ...  /Applications/Emacs.app/Contents/Resources/etc/e/eterm-color.ti

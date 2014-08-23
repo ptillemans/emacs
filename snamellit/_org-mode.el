@@ -275,14 +275,11 @@
 (setq org-confirm-babel-evaluate nil)
 
 ;; checklists
-;; (require 'org-checklist)
-
 
 (defun pti-catlines (lines)
   (mapconcat 'identity lines "\n"))
 
 ;; Latex export options
-(require 'ox-latex)
 (setq org-latex-classes
       (quote (
 
@@ -380,12 +377,8 @@
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 
-(require 'ox-beamer)
-
-
 ;; jira integration
-;;(require 'org-jira)
-;;(setq jiralib-url "https://jira.melexis.com/jira")
+(setq jiralib-url "https://jira.melexis.com/jira")
 
 ;; org-mode to habitrpg integration
 (add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")

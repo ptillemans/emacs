@@ -30,7 +30,6 @@
             (set (make-local-variable 'indent-tabs-mode) 'nil)
             (set (make-local-variable 'tab-width) 2)
             (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
-            (require 'ruby-electric)
             (ruby-electric-mode t)))
 
 (add-hook 'ruby-mode-hook 'progmodes-hooks)
@@ -69,8 +68,6 @@
     (beginning-of-line)
     (search-forward "#" (point-at-eol) t)))
 
-
-(require 'ruby-additional)
 
 ; rvm support
 (autoload 'rvm-use-default "../.emacs.d/vendor/rvm.el/rvm" "\

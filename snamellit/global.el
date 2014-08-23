@@ -75,87 +75,86 @@
 ;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
 (defvar my-packages
-  "A list of packages to install for my config"
   '(
-    "ack-and-a-half"
-    "ac-nrepl"
-    "auctex"
-    "alert"
-    "auto-complete"
-    "auto-complete-pcmp"
-    "cider"         ;; clojure ide for emacs
-    "cl-lib"
-    "clojure-mode"
-    "coffee-mode"
-    "creole"
-    "dash"
-    "db"
-    "deferred"
-    "edit-server"
-    "elnode"
-    "epl"
-    "ess"
-    "ess-smart-underscore"
-    "expand-region"
-    "fakir"               ;; faking bits of emacs
-    "feature-mode"
-    "findr"
-    "gntp"
-    "helm"
-    "gh"
-    "gist"
-    "gntp"
-    "git-commit-mode"
-    "git-gutter"
-    "git-rebase-mode"
-    "groovy-mode          "
-    "haskell-mode"
-    "inf-ruby"
-    "inflections"
-    "jump"
-    "kv"
-    "log4j-mode"
-    "log4e"
-    "logito"
-    "magit"
-    "markdown-mode"
-    "metaweblog"
-    "multiple-cursors"
-    "noflet"
-    "nose"                ;; easy python tests
-    "org"
-    "org-ac"
-    "org-gcal"
-    "org-jira"
-    "org-mobile-sync"
-    "org-pandoc"
-    "org-pomodoro"
-    "org2blog"
-    "paredit"
-    "pcache"
-    "pkg-info"
-    "popup"
-    "projectile"          ;; navigate and manage projects
-    "rainbow-mode"
-    "request"
-    "request-deferred"
-    "rinari"
-    "rspec-mode"
-    "ruby-additional"
-    "ruby-compilation"
-    "ruby-electric"
-    "ruby-refactor"
-    "ruby-test-mode"
-    "rvm"
-    "s"
-    "scala-mode"
-    "scss-mode"
-    "solarized-theme"
-    "web"
-    "yasnippet"
-    "yaxception"
-    "xml-rpc"
-    "zenburn-theme"
+    ack-and-a-half
+    ac-nrepl
+    auctex
+    alert
+    auto-complete
+    auto-complete-pcmp
+    cider         ;; clojure ide for emacs
+    cl-lib
+    clojure-mode
+    coffee-mode
+    creole
+    dash
+    db
+    deferred
+    edit-server
+    elnode
+    epl
+    ess
+    ess-smart-underscore
+    expand-region
+    fakir               ;; faking bits of emacs
+    feature-mode
+    findr
+    gntp
+    helm
+    gh
+    gist
+    gntp
+    git-commit-mode
+    git-gutter
+    git-rebase-mode
+    groovy-mode
+    haskell-mode
+    inf-ruby
+    inflections
+    jump
+    kv
+    log4j-mode
+    log4e
+    logito
+    magit
+    markdown-mode
+    metaweblog
+    multiple-cursors
+    noflet
+    nose                ;; easy python test
+    org
+    org-ac
+    org-gcal
+    org-jira
+;    org-mobile-sync    ;; requires emacs 24.3.50
+    org-pandoc
+    org-pomodoro
+    org2blog
+    paredit
+    pcache
+    pkg-info
+    popup
+    projectile          ;; navigate and manage projects
+    rainbow-mode
+    request
+    request-deferred
+    rinari
+    rspec-mode
+    ruby-additional
+    ruby-compilation
+    ruby-electric
+    ruby-refactor
+    ruby-test-mode
+    rvm
+    s
+    scala-mode
+    scss-mode
+    solarized-theme
+    web
+    yasnippet
+    yaxception
+    xml-rpc
+    zenburn-theme
     ))
 
 (defun my-packages-installed-p (packages)
@@ -163,6 +162,9 @@
   (loop for p in packages
         when (not (package-installed-p p)) do (return nil)
         finally (return t)))
+
+(package-initialize)
+(setq package-enable-at-startup nil)
 
 ;; skip this if all packages are already installed
 (unless (my-packages-installed-p my-packages)
@@ -174,9 +176,6 @@
   (dolist (p my-packages)
     (when (not (package-installed-p p))
       (package-install p))))
-
-(setq package-enable-at-startup nil)
-(package-initialize)
 
 
 ;; install vendor apps
@@ -215,8 +214,8 @@
 
 
 ; Load el4r, which loads Xiki
-(rvm-use "1.9.3" "")
-(add-to-list 'load-path "/Users/pti/.rvm/gems/ruby-1.9.3-p547/gems/trogdoro-el4r-1.0.10/data/emacs/site-lisp/")
-(require 'el4r)
-(el4r-boot)
-(el4r-troubleshooting-keys)
+;(rvm-use "1.9.3" "")
+;(add-to-list 'load-path "/Users/pti/.rvm/gems/ruby-1.9.3-p547/gems/trogdoro-el4r-1.0.10/data/emacs/site-lisp/")
+;(require 'el4r)
+;(el4r-boot)
+;(el4r-troubleshooting-keys)

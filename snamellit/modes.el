@@ -2,8 +2,6 @@
 (load "_artist")
 (load "_css")
 (load "_clojure-mode")
-(load "_cucumber")
-(load "_dired")
 (load "_groovy")
 (load "_javascript")
 (load "_markdown")
@@ -78,21 +76,18 @@
 ; Make Gnus NOT ignore [Gmail] mailboxes
 (setq gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
-;; ESS
-(require 'ess-site)
-
 ;; enable indication of changed lines in git controlled files
-(global-git-gutter-mode t)
+(eval-after-load "git-gutter"
+  (global-git-gutter-mode t))
 
 ;; enable yasnippet
-(require 'yasnippet)
-(yas-global-mode 1)
+(eval-after-load "yasnippet"
+  (yas-global-mode 1))
 
 
 (print "modes.el done")
 
 ;; multiple cursors
-(require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
@@ -103,5 +98,4 @@
 (global-set-key (kbd "C-@") 'er/expand-region)
 
 ;; enable autocompletion
-;;(require 'auto-complete-config)
-;;(ac-config-default)
+;(ac-config-default)

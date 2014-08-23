@@ -1,5 +1,4 @@
 ; Dired
-(require 'dired)
 
 ; remap 'o' in dired mode to open a file
 (defun dired-open-mac ()
