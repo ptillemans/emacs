@@ -74,105 +74,106 @@
 ;; (add-to-list 'package-archives
 ;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
-(setq package-load-list
+(defvar my-packages
+  "A list of packages to install for my config"
   '(
-    (ack-and-a-half t)
-    (ac-nrepl t)
-    (auctex t)
-    (alert t)
-    (auto-complete t)
-    (auto-complete-pcmp t)
-    (cider t)         ;; clojure ide for emacs
-    (cl-lib t)
-    (clojure-mode t)
-    (coffee-mode t)
-    (creole t)
-    (dash t)
-    (db t)
-    (deferred t)
-    (edit-server t)
-    (elnode t)
-    (epl t)
-    (ess t)
-    (ess-smart-underscore t)
-    (expand-region t)
-    (fakir t)               ;; faking bits of emacs
-    (feature-mode t)
-    (findr t)
-    (gntp t)
-    (helm t)
-    (gh t)
-    (gist t)
-    (gntp t)
-    (git-commit-mode t)
-    (git-gutter t)
-    (git-rebase-mode t)
-    (groovy-mode           t)
-    (haskell-mode t)
-    (inf-ruby t)
-    (inflections t)
-    (jump t)
-    (kv t)
-    (log4j-mode t)
-    (log4e t)
-    (logito t)
-    (magit t)
-    (markdown-mode t)
-    (metaweblog t)
-    (multiple-cursors t)
-    (noflet t)
-    (nose t)                ;; easy python tests
-    (org t)
-    (org-ac t)
-    (org-gcal t)
-    (org-jira t)
-    (org-mobile-sync t)
-    (org-pandoc t)
-    (org-pomodoro t)
-    (org2blog t)
-    (paredit t)
-    (pcache t)
-    (pkg-info t)
-    (popup t)
-    (projectile t)          ;; navigate and manage projects
-    (rainbow-mode t)
-    (request t)
-    (request-deferred t)
-    (rinari t)
-    (rspec-mode t)
-    (ruby-additional t)
-    (ruby-compilation t)
-    (ruby-electric t)
-    (ruby-refactor t)
-    (ruby-test-mode t)
-    (rvm t)
-    (s t)
-    (scala-mode t)
-    (scss-mode t)
-    (solarized-theme t)
-    (web t)
-    (yasnippet t)
-    (yaxception t)
-    (xml-rpc t)
-    (zenburn-theme t)
+    "ack-and-a-half"
+    "ac-nrepl"
+    "auctex"
+    "alert"
+    "auto-complete"
+    "auto-complete-pcmp"
+    "cider"         ;; clojure ide for emacs
+    "cl-lib"
+    "clojure-mode"
+    "coffee-mode"
+    "creole"
+    "dash"
+    "db"
+    "deferred"
+    "edit-server"
+    "elnode"
+    "epl"
+    "ess"
+    "ess-smart-underscore"
+    "expand-region"
+    "fakir"               ;; faking bits of emacs
+    "feature-mode"
+    "findr"
+    "gntp"
+    "helm"
+    "gh"
+    "gist"
+    "gntp"
+    "git-commit-mode"
+    "git-gutter"
+    "git-rebase-mode"
+    "groovy-mode          "
+    "haskell-mode"
+    "inf-ruby"
+    "inflections"
+    "jump"
+    "kv"
+    "log4j-mode"
+    "log4e"
+    "logito"
+    "magit"
+    "markdown-mode"
+    "metaweblog"
+    "multiple-cursors"
+    "noflet"
+    "nose"                ;; easy python tests
+    "org"
+    "org-ac"
+    "org-gcal"
+    "org-jira"
+    "org-mobile-sync"
+    "org-pandoc"
+    "org-pomodoro"
+    "org2blog"
+    "paredit"
+    "pcache"
+    "pkg-info"
+    "popup"
+    "projectile"          ;; navigate and manage projects
+    "rainbow-mode"
+    "request"
+    "request-deferred"
+    "rinari"
+    "rspec-mode"
+    "ruby-additional"
+    "ruby-compilation"
+    "ruby-electric"
+    "ruby-refactor"
+    "ruby-test-mode"
+    "rvm"
+    "s"
+    "scala-mode"
+    "scss-mode"
+    "solarized-theme"
+    "web"
+    "yasnippet"
+    "yaxception"
+    "xml-rpc"
+    "zenburn-theme"
     ))
 
-;; (defun my-packages-installed-p ()
-;;   "Check if all packages mentioned in the my-packages list are installed"
-;;   (loop for p in my-packages
-;;         when (not (package-installed-p p)) do (return nil)
-;;         finally (return t)))
+(defun my-packages-installed-p (packages)
+  "Check if all packages mentioned in the my-packages list are installed"
+  (loop for p in packages
+        when (not (package-installed-p p)) do (return nil)
+        finally (return t)))
 
-;; ;; skip this if all packages are already installed
-;; (unless (my-packages-installed-p)
-;;   ;; check for new packages (package versions)
-;;   (message "%s" "Emacs Prelude is now refreshing its package database...")
-;;   (package-refresh-contents)
-;;   (message "%s" " done.")
-;;   ;; install the missing packages
-;;   (dolist (p my-packages)
-;;     (when (not (package-installed-p p))
-;;       (package-install p))))
+;; skip this if all packages are already installed
+(unless (my-packages-installed-p my-packages)
+  ;; check for new packages (package versions)
+  (message "%s" "Emacs is now refreshing its package database...")
+  (package-refresh-contents)
+  (message "%s" " done.")
+  ;; install the missing packages
+  (dolist (p my-packages)
+    (when (not (package-installed-p p))
+      (package-install p))))
 
 (setq package-enable-at-startup nil)
 (package-initialize)
