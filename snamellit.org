@@ -1,0 +1,1413 @@
+#+TITLE: Snamellit Emacs Configuration
+
+
+* Literate Emacs Configuration
+
+Emacs comes with org-mode installed standard, which allows us to
+create the emacs configuration in a well documented manner.
+
+* The basics
+
+** Package and Extension Management
+
+Emacs has a package management system we'll be using to load the extensions.
+
+*** Setup repositories
+
+By default emacs only comes with the elpa repository which is a bit conservative.
+
+Let's add the melpa repo to get the cutting-edge goodness.
+
+#+BEGIN_SRC emacs-lisp
+;; enable package repositories
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
+
+#+END_SRC
+
+#+RESULTS:
+
+*** Initialize Package Management
+
+By default emacs initializes the packages after the user's init
+scripts. The idea is that the variables are set before the package is
+loaded.
+
+However this also means we cannot call into the libraries.
+
+#+BEGIN_SRC emacs-lisp
+(package-initialize)
+#+END_SRC
+
+*** Add a helper to get libraries
+
+This helper routine will install the package if it is not yet
+installed and then *require* it so it is available for emacs.
+
+#+BEGIN_SRC emacs-lisp
+(defun require-packages (&rest packages)
+  (dolist (package packages)
+    (unless (package-installed-p package)
+      (package-install package))
+    (require package)))
+#+END_SRC
+
+*** 3rd party extension loader
+
+Not everything is nicely packaged up and available from the package
+repositories.
+
+Some extensions are available as a single file, some as git
+repositories with an elisp file with the same name as entry point.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; add the vendor extension path to the load path
+  (add-to-list 'load-path "~/.emacs.d/vendor")
+
+  (defun vendor (library)
+    "Load a vendor extension.
+  Vendor extensions are loaded in an opinionated way. They will be
+  present in ~/emacs.d/vendor folder. Either downloaded or as a git
+  submodule.
+
+  If it is a file with .el extension, or a folder with a file with
+  the same basename and extension .el, then this will be placed on
+  the load path and executed."
+
+    (let* ((file (symbol-name library))
+           (normal (concat "~/.emacs.d/vendor/" file))
+           (suffix (concat normal ".el")))
+      (cond
+       ((file-directory-p normal) (add-to-list 'load-path normal) (require library))
+       ((file-directory-p suffix) (add-to-list 'load-path suffix) (require library))
+       ((file-exists-p suffix) (require library)))))
+#+END_SRC
+
+
+
+**
+**
+**
+**
+**
+
+** Customization
+
+Emacs comes with an extensive system for customizing the system and
+the extra packages. The customization system collects this all in a
+*custom.el* elisp file. Let's store that with the rest of our personal
+preferences.
+
+#+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/snamellit/custom.el")
+(when (file-exists-p custom-file) (load custom-file))
+#+END_SRC
+
+** Theming
+
+I like the low contrast zenburn theme. Although I am also partial to
+solarized dark. So I install both packages and keep them ready and
+uncomment my current preference.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'zenburn-theme 'solarized-theme)
+  ;(load-theme 'solarized-dark t)
+  ;(load-theme 'solarized-light t)
+  (load-theme 'zenburn t)
+#+END_SRC
+
+I never use the toolbar, and seldom use the menu.
+
+The toolbar especially is a waste of space.
+
+I do like the scrollbars, not to use them for navigation, just to see
+where I am in the file. When I feel particularly hard-core, I
+sometimes tweak these settings.
+
+#+BEGIN_SRC
+;; lose UI stuff
+;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+#+END_SRC
+
+** Garbage Collection Tuning
+
+#+BEGIN_SRC emacs-lisp
+;; garbage collection tuning
+(setq gc-cons-threshold 20000000)  ;; 20Mb instead of 800k
+#+END_SRC
+
+** Temporary Files
+
+Emacs creates temp files and backups. Auto build watchers and version
+control tools and their users can get confused by this.
+
+Let's move these to a separate folder.
+
+#+BEGIN_SRC emacs-lisp
+;; set the temporary files in a separate folder to avoid creating junk in
+;; the work directories. Autobuilds and git will be happier.
+;;
+;; stolen from http://github.com/febuiles/dotemacs/tree/master/temp_files.el
+(defvar user-temporary-file-directory "~/.emacs-autosaves/")
+(make-directory user-temporary-file-directory t)
+(setq backup-by-copying t)
+(setq backup-directory-alist
+      `(("." . ,user-temporary-file-directory)
+        (,tramp-file-name-regexp nil)))
+(setq auto-save-list-file-prefix
+      (concat user-temporary-file-directory ".auto-saves-"))
+(setq auto-save-file-name-transforms
+      `((".*" ,user-temporary-file-directory t)))
+#+END_SRC
+
+** File Encodings
+
+I decided a very long time ago that I only want to deal with UTF-8.
+
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'utf-8)
+#+END_SRC
+
+* Editing Environment
+
+** General
+
+*** Whitespace handling
+
+**** Trailing white space
+
+One of the minor nuisances is that spaces tend to invisibly collect at
+the end of lines. Let's get rid of it before saving.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+**** Tabs in source code
+
+I like a tab-width of 2 by default. This is typically overriden by the
+minor modes of specific languages, but 2 is a sensible default.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default tab-width 2)
+#+END_SRC
+
+There is a debate over the use of tabs in source code. Some people
+argue for the use of tabs, others against.
+
+I consider tabs to be chaos spawn and thoroughly evil, so they need to
+be dealt with swiftly and severely.
+
+There is no way to have consistent formatting with tabs with multiple
+editors and multiple people. Combine that with different conventions
+of tab width in different environments and different ways to
+interpolate between tab positions and the chaos is complete.
+
+So I do not want that emacs insert tabs when indenting and just in
+case I replace all tabs with spaces before saving.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+(defun untabify-buffer ()
+  "Untabify current buffer"
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(add-hook 'before-save-hook 'untabify-buffer)
+#+END_SRC
+
+Note that in files relying on tabs, we must remove this hook
+again. Only *Makefiles* and tab separated files come to mind.
+
+*** Snippets
+
+Enable *yasnippet* globally
+
+#+BEGIN_SRC emacs-lisp
+(require-packages 'yasnippet)
+(eval-after-load "yasnippet"
+  '(yas-global-mode 1))
+#+END_SRC
+
+However snippets wreak havoc in terminals, especially with tab
+expansion. Let's disable it there.
+
+#+BEGIN_SRC
+;; disable YAS in terminals
+(add-hook 'term-mode-hook (lambda () (yas-minor-mode -1)))
+#+END_SRC
+
+*** Multiple Cursors
+
+A cool feature introduced by Sublime are multiple cursors.
+
+It did not take long before this was ported to emacs
+
+#+BEGIN_SRC emacs-lisp
+(require-packages 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+#+END_SRC
+
+*** Expand Region
+
+IntelliJ has a cool feature that a single keystroke switches the
+selected region from word --> sentence --> paragraph --> ... and back
+again. Similar for blocks in programming languages.
+
+#+BEGIN_SRC emacs-lisp
+(vendor 'expand-region)
+(global-set-key (kbd "C-@") 'er/expand-region)
+#+END_SRC
+
+*** Emacs Server
+In order to use emacs for quick and dirty edits it is useful to start
+the editing server in the background.
+
+This allows me to use emacs as an editor for commit messages without
+each time having the overhead of starting all the packages.
+
+#+BEGIN_SRC emacs-lisp
+(server-start)
+#+END_SRC
+
+*** Auto Completion
+
+#+BEGIN_SRC emacs-lisp
+(require-packages 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+#+RESULTS:
+| global-company-mode |
+
+*** Flex Matching : Ido mode
+
+Ido mode allows us to match entries in lists, like files, packages,
+by typing a few characters.
+
+I also enable ido everywhere and call in the help of the
+ido-ubiquitous package.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'flx-ido 'ido-ubiquitous)
+  (ido-mode 1)
+  (setq ido-everywhere t)
+  (setq ido-max-directory-size 100000)
+  (setq ido-enable-flex-matching t)
+
+  (flx-ido-mode 1)
+  ;; allow flx-ido-mode to highlight the matches
+  (setq ido-use-faces nil)
+#+END_SRC
+
+*** Rainbow Delimiters
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'rainbow-delimiters)
+
+
+#+END_SRC
+
+** Programming Languages
+
+*** Clojure
+
+
+**** Clojure language support
+
+Enable clojure-mode and add support for clojurescript.
+
+
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'clojure-mode)
+  (add-to-list 'auto-mode-alist '("\.cljs$" . clojure-mode))
+  (add-hook 'clojure-mode-hook 'paredit-mode)
+  (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+#+END_SRC
+
+#+RESULTS:
+| rainbow-delimiters-mode | paredit-mode | er/add-clojure-mode-expansions |
+
+**** Cider REPL integration
+
+Enable the Cider package to connect to the nRepl's of running clojure apps.
+
+Enable paredit and rainbow delimiters in the repl. We also let the
+clojure syntax highlighter work in the repl.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'cider)
+  (add-hook 'cider-repl-mode-hook 'paredit-mode)
+  (add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
+  (setq cider-repl-use-clojure-font-lock t)
+  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+#+END_SRC
+
+I also enabled the eldoc mode with cider.
+
+#+RESULTS:
+: t
+
+*** Groovy
+
+See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on the groovy website]].
+
+#+BEGIN_SRC emacs-lisp
+;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
+(autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
+(add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
+(add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
+
+;;; make Groovy mode electric by default.
+(add-hook 'groovy-mode-hook
+          '(lambda ()
+             (require 'groovy-electric)
+             (groovy-electric-mode)))
+#+END_SRC
+
+*** Javascript
+
+For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'js2-mode 'js2-refactor)
+
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+  (js2r-add-keybindings-with-prefix "C-c C-m")
+
+#+END_SRC
+
+To customize how it works: *M-x customize-group RET js2-mode RET*.
+
+I also enabled the js2-refactor package.
+
+**** Live Browser Interaction with skewer-mode
+
+For live interaction there is *skewer-mode* which is
+installed. Installation is done in the integration section as it is
+also used by CSS and HTML modes.
+
+The keybindings for evaluating expressions in the browser are just
+like the Lisp modes. These are provided by the minor mode skewer-mode.
+
+ - C-x C-e: Evaluate the form before the point and display the result
+   in the minibuffer. If given a prefix argument, insert the result
+   into the current buffer.
+ - C-M-x: Evaluate the top-level form around the point.
+ - C-c C-k: Load the current buffer.
+ - C-c C-z: Select the REPL buffer.
+
+The result of the expression is echoed in the minibuffer.
+
+*** Lisp
+
+**** Paredit Mode
+
+Paredit allows you to enter lisp code where it is actually impossible
+to write syntax errors. With all the parentheses in lisp this is
+actually one of the killer apps in Emacs.
+
+Enable it when editing emacs lisp and also enable highlighting parens.
+
+#+BEGIN_SRC emacs-lisp
+(autoload 'paredit-mode "paredit"
+     "Minor mode for pseudo-structurally editing Lisp code."
+     t)
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (paredit-mode +1)
+            (show-paren-mode +1)))
+#+END_SRC
+
+#+RESULTS:
+| lambda | nil | (paredit-mode 1) | (show-paren-mode 1) |
+
+
+
+*** TODO Python
+
+This is very 'light' for python development. Especially with plone
+there is ample room for more support here.
+
+**** TODO Electric newlines
+
+Indent after a new line.
+
+#+BEGIN_SRC emacs-lisp
+  ;; indent after newline
+  (add-hook 'python-mode-hook
+            '(lambda ()
+               (define-key python-mode-map "\C-m" 'newline-and-indent)))
+#+END_SRC
+
+However, this seems so _cuddly_ that there must be a better way
+
+**** Python unit testing with nose
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'nose)
+#+END_SRC
+*** TODO Ruby
+
+**** TODO Enable some electric features
+
+TODO : split this in multiple sections to explain the use of the different packages
+
+Enable electric mode and reindent after a newline.
+
+Also force tab settings just in case.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'ruby-electric 'ruby-additional 'ruby-compilation 'ruby-refactor 'ruby-test-mode)
+
+  ; where'd this go?
+  (defun ruby-reindent-then-newline-and-indent ()
+    "Reindents the current line then creates an indented newline."
+    (interactive "*")
+    (newline)
+    (save-excursion
+      (end-of-line 0)
+      (indent-according-to-mode)
+      (delete-region (point) (progn (skip-chars-backward " \t") (point))))
+    (when (ruby-previous-line-is-comment)
+        (insert "# "))
+    (indent-according-to-mode))
+
+  (defun ruby-previous-line-is-comment ()
+    "Returns `t' if the previous line is a Ruby comment."
+    (save-excursion
+      (forward-line -1)
+      (ruby-line-is-comment)))
+
+  (defun ruby-line-is-comment ()
+    "Returns `t' if the current line is a Ruby comment."
+    (save-excursion
+      (beginning-of-line)
+      (search-forward "#" (point-at-eol) t)))
+
+  (add-hook 'ruby-mode-hook
+            (lambda ()
+              (set (make-local-variable 'indent-tabs-mode) 'nil)
+              (set (make-local-variable 'tab-width) 2)
+              (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
+              (ruby-electric-mode t)))
+#+END_SRC
+
+**** Add ruby support to popular file types
+
+#+BEGIN_SRC emacs-lisp
+  ; ruby
+  (setq auto-mode-alist (cons '("Rakefile" . ruby-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("Capfile" . ruby-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.rake" . ruby-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.god" . ruby-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.ru" . ruby-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.gemspec" . ruby-mode) auto-mode-alist))
+#+END_SRC
+
+**** DONE Integrate with RVM
+
+I use RVM to manage my ruby versions independently from the
+system. This eases cross machine development and cross project
+dependencies.
+
+#+BEGIN_SRC emacs-lisp
+
+  (require-packages 'rvm)
+
+  (add-hook 'ruby-mode-hook
+            (lambda () (rvm-activate-corresponding-ruby)))
+#+END_SRC
+
+By setting the corresponding ruby, the live interaction will see the
+same ruby environment as the project I am working on.
+
+**** Testing with RSpec
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'rspec-mode)
+#+END_SRC
+
+***** Additional snippets for RSpec
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'rspec-mode
+   '(rspec-install-snippets))
+#+END_SRC
+
+***** RSpec mode and ZSH and RVM
+
+If you use ZSH and RVM, you may encounter problems running the
+specs. It may be so that an older version of Ruby, than the one you
+specified in .rvmrc, is used. This is because ZSH runs a small script
+each time a shell is created, which modifies the $PATH. The problem is
+that it prepends some default paths, such as /usr/bin, which contains
+another ruby binary.
+
+What you can do to solve this is to use BASH for running the
+specs. This piece of code does the job:
+
+
+#+BEGIN_SRC emacs-lisp
+  (defadvice rspec-compile (around rspec-compile-around)
+    "Use BASH shell for running the specs because of ZSH issues."
+    (let ((shell-file-name "/bin/bash"))
+      ad-do-it))
+
+  (ad-activate 'rspec-compile)
+#+END_SRC
+
+*** TODO Scala
+
+this is very sparse.
+
+OTOH I do very little scala atm, so I'll look at it later.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'scala-mode)
+#+END_SRC
+
+*** Shell
+
+
+**** Configure ansi shell
+
+Enable ansi color and tell apps to use utf-8.
+
+#+BEGIN_SRC emacs-lisp
+  ;; on the mac we need to tell the apps launched to use utf8
+  ;; as the character encoding
+  (defadvice ansi-term (after advise-ansi-term-coding-system)
+      (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  (ad-activate 'ansi-term)
+
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+END_SRC
+
+Note:
+
+on the Mac, it is possible that the eterm-color terminfo is
+missing.
+
+This causes the lines in zsh to start with '4m' and generally
+the terminal behaves weird when wrapping.
+
+In this case create a folder ~/.terminfo and run
+
+#+BEGIN_SRC sh
+  cd
+  mkdir .terminfo
+  tic -o .terminfo /Applications/Emacs.app/Contents/Resources/etc/e/eterm-color.ti
+#+END_SRC
+
+on the command line.
+
+after restarting the ansi-shell the terminal will behave a lot
+better
+
+**** Tell launched apps to use utf-8
+
+#+BEGIN_SRC emacs-lisp
+  ;; on the mac we need to tell the apps launched to use utf8
+  ;; as the character encoding
+  (defadvice ansi-term (after advise-ansi-term-coding-system)
+      (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+  (ad-activate 'ansi-term)
+#+END_SRC
+
+**** Allow history to work in  shell
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'shell
+    '(progn
+       (define-key shell-mode-map [up] 'comint-previous-input)
+       (define-key shell-mode-map [down] 'comint-next-input)
+       (define-key shell-mode-map "\C-p" 'comint-previous-input)
+       (define-key shell-mode-map "\C-n" 'comint-next-input)))
+#+END_SRC
+
+** Web Development
+
+*** Web Templates
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'web-mode)
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+#+END_SRC
+
+#+RESULTS:
+
+**** Shortcuts for web-mode
+
+***** General
+
+C-c C-; comment / uncomment line(s)
+C-c C-f toggle folding on a tag/block
+C-c C-i indent entire buffer
+C-c C-m mark and expand
+C-c C-s insert snippet
+C-c C-w toggle display of invalid whitespaces
+
+***** DOM
+
+C-c C-d d show tag mismatch
+C-c C-d e replace HTML entities
+C-c C-d n normalize
+C-c C-d q replace dumb quotes
+C-c C-d t traverse dom tree
+C-c C-d x xpath
+
+***** Block
+
+C-c C-b c block close
+C-c C-b b block beginning
+C-c C-b e block end
+C-c C-b p previous block
+C-c C-b n next block
+C-c C-b k block kill
+C-c C-b s block select
+
+***** HTML element
+
+C-c / element close
+C-c C-e b element beginning
+C-c C-e c element clone
+C-c C-e d child element (down)
+C-c C-e e element end
+C-c C-e i select element content (inner)
+C-c C-e k element kill
+C-c C-e n next element
+C-c C-e p previous element
+C-c C-e r rename element
+C-c C-e s select element
+C-c C-e u parent element (up)
+C-c C-e u element vanish
+
+***** HTML tag
+
+C-c C-t a sort attributes
+C-c C-t b tag beginning
+C-c C-t e tag end
+C-c C-t m fetch matching tag (also available for active blocks)
+C-c C-t s select tag
+C-c C-t p previous tag
+C-c C-t n next tag
+
+***** HTML attribute
+
+C-c C-a b attribute beginning
+C-c C-a e attribute end
+C-c C-a s attribute select
+C-c C-a t attribute transpose
+C-c C-a n attribute next
+
+
+*** CSS
+
+Set tabwidth to my preferred 2 spaces for CSS.
+
+#+BEGIN_SRC emacs-lisp
+(setq css-mode-indent-depth 2)
+#+END_SRC
+
+#+RESULTS:
+: 2
+
+**** Live browser integration
+
+Send CSS declarations directly to the browser using *skewer-mode*
+(installed in the integration section).
+
+ - C-x C-e: Load the declaration at the point.
+ - C-M-x: Load the entire rule around the point.
+ - C-c C-k: Load the current buffer as a stylesheet.
+
+*** Sass
+
+Load SCSS mode for Sassy support
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'scss-mode)
+#+END_SRC
+
+*** Rails
+**** Rinari is no a Rails IDE
+
+Another cute acronym.
+
+#+BEGIN_SRC emacs-lisp
+  ; rinari
+  (setq rinari-tags-file-name "TAGS")
+  (add-hook 'rinari-minor-mode-hook
+            (lambda ()
+              (define-key rinari-minor-mode-map (kbd "A-r") 'rinari-test)))
+#+END_SRC
+
+**** Enable ruby support in rails templates
+
+#+BEGIN_SRC emacs-lisp
+  ; rhtml
+  (setq auto-mode-alist (cons '("\\.html\\.erb" . nxml-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.erb" . nxml-mode) auto-mode-alist))
+#+END_SRC
+
+*** Mustache
+
+Map mustache files to template mode
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
+#+END_SRC
+
+** Content Creation
+
+*** Org Mode
+
+**** Org Mobile
+
+Org Mobile allows me to take my org files on my iPhone.
+
+It exchanges the files in both directions using Dropbox.
+
+#+BEGIN_SRC emacs-lisp
+  ;; Set to the name of the file where new notes will be stored
+  (setq org-mobile-inbox-for-pull "~/org/flagged.org")
+  ;; Set to <your Dropbox root directory>/MobileOrg.
+  (setq org-mobile-directory "~/Dropbox/MobileOrg")
+  (setq org-mobile-files (quote (org-agenda-files "~/org/todo.org" "~/org/emacs.org" "~/org/pfus.org")))
+
+  ;; org-mobile integration and automation.
+  ;;
+  ;; wait 60 min between auto updates to avoid losing time
+  ;; when "catching up"
+  (setq  org-mobile-last-sync 0)
+
+  (defun pti-set-difference (a b)
+    (delq nil
+     (mapcar
+      (lambda (x)
+        (when (not (and (member x a) (member x b))) x))
+      (append a b))))
+
+  (defun open-buffer-names ()
+    (mapcar 'buffer-name (buffer-list)))
+
+  (defun restore-buffers (fn)
+    (let ((old-open-buffers (open-buffer-names)))
+      (funcall fn)
+      (dolist ( buffer-name (pti-set-difference (open-buffer-names) old-open-buffers))
+        (kill-buffer buffer-name))))
+
+  (defun org-mobile-pullpush nil nil
+    ( if (> (- (float-time) org-mobile-last-sync) 3600)
+       (progn
+          (restore-buffers 'org-mobile-pull)
+          (restore-buffers 'org-mobile-push)
+          (setq org-mobile-last-sync (float-time))))
+  )
+
+  ;; sync at start, finish and in between 2x p hr
+  ;(add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
+  ;(add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
+  ;(run-at-time "00:29" 7200 'org-mobile-pullpush)
+#+END_SRC
+
+**** Org mode TODO Keywords
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
+                                  (sequence "WAITING(w@/!)" "SOMEDAY(s!)" "|" "CANCELLED(c@/!)" "PHONE")
+                                  (sequence "OPEN(O!)" "|" "CLOSED(C!)"))))
+
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("SOMEDAY" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("OPEN" :foreground "blue" :weight bold)
+                ("CLOSED" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold))))
+
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED"
+                 ("CANCELLED" . t))
+                ("WAITING"
+                 ("WAITING" . t))
+                ("SOMEDAY"
+                 ("WAITING" . t))
+                (done
+                 ("WAITING"))
+                ("TODO"
+                 ("WAITING")
+                 ("CANCELLED"))
+                ("NEXT"
+                 ("WAITING"))
+                ("DONE"
+                 ("WAITING")
+                 ("CANCELLED")))))
+
+#+END_SRC
+
+
+**** Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
+#+BEGIN_SRC emacs-lisp
+
+(setq org-capture-templates
+    (quote (("t" "todo" entry (file "~/org/refile.org")
+             "* TODO %?\n%U\n%a\n  %i" :clock-in t :clock-resume t)
+            ("n" "note" entry (file "~/org/refile.org")
+             "* %? :NOTE:\n%U\n%a\n  %i" :clock-in t :clock-resume t)
+            ("j" "Journal" entry (file+datetree "~/org/diary.org")
+             "* %?\n%U\n  %i" :clock-in t :clock-resume t)
+            ("w" "org-protocol" entry (file "~/org/refile.org")
+             "* TODO Review %c\n%U\n  %i" :immediate-finish t)
+            ("p" "Phone call" entry (file "~/org/refile.org")
+             "* PHONE %? :PHONE:\n%U\n  %i\n" :clock-in t :clock-resume t)
+            ("h" "Habit" entry (file "~/org/refile.org")
+             "* TODO %?\n%U\n%a\nSCHEDULED: %t\n:PROPERTIES:\n:STYLE: habit\n:END:\n  %i"))))
+
+#+END_SRC
+
+
+**** Refile targets
+#+BEGIN_SRC emacs-lisp
+
+; Targets include this file and any file contributing to the agenda - up to 2 levels deep
+(setq org-refile-targets (quote ((nil :maxlevel . 2)
+                                 (org-agenda-files :maxlevel . 2))))
+
+; Targets start with the file name - allows creating level 1 tasks
+(setq org-refile-use-outline-path (quote file))
+
+; Targets complete directly with IDO
+(setq org-outline-path-complete-in-steps nil)
+
+; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+#+END_SRC
+
+**** Use IDO for for org
+#+BEGIN_SRC emacs-lisp
+
+(setq org-completion-use-ido t)
+#+END_SRC
+
+**** Do not dim blocked tasks
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-dim-blocked-tasks nil)
+#+END_SRC
+
+**** Clocking setup
+#+BEGIN_SRC emacs-lisp
+
+; Resume clocking tasks when emacs is restarted
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
+; Resume clocking task on clock-in if the clock is open
+(setq org-clock-in-resume t)
+; Do not change task states when clocking in
+(setq org-clock-in-switch-to-state nil)
+; Separate drawers for clocking and logs
+(setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
+; Save clock data and state changes and notes in the LOGBOOK drawer
+(setq org-clock-into-drawer t)
+; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+(setq org-clock-out-remove-zero-time-clocks t)
+; Clock out when moving task to a done state
+(setq org-clock-out-when-done t)
+; Save the running clock and all clock history when exiting Emacs, load it on startup
+(setq org-clock-persist (quote history))
+; Enable auto clock resolution for finding open clocks
+(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+; Include current clocking task in clock reports
+(setq org-clock-report-include-clocking-task t)
+; Agenda log mode items to display (clock time only by default)
+(setq org-agenda-log-mode-items (quote (clock)))
+; Agenda clock report parameters
+(setq org-agenda-clockreport-parameter-plist
+      (quote (:link t :maxlevel 5 :fileskip0 t :compact t)))
+
+
+#+END_SRC
+
+**** Support pomodoro workflow
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'org-modules 'org-timer)
+(setq org-timer-default-timer 25)
+(add-hook 'org-clock-in-hook
+          '(lambda ()
+             (if (not org-timer-current-timer)
+                 (org-timer-set-timer))))
+#+END_SRC
+
+
+**** Tags with fast selection keys
+#+BEGIN_SRC emacs-lisp
+
+(setq org-tag-alist (quote ((:startgroup)
+                            ("@errand" . ?e)
+                            ("@office" . ?o)
+                            ("@home" . ?h)
+                            (:endgroup)
+                            ("PHONE" . ?p)
+                            ("QUOTE" . ?q)
+                            ("WAITING" . ?w)
+                            ("PERSONAL" . ?P)
+                            ("WORK" . ?W)
+                            ("ORG" . ?O)
+                            ("SNAMELLIT" . ?S)
+                            ("MELEXIS" . ?M)
+                            ("crypt" . ?E)
+                            ("NOTE" . ?n)
+                            ("CANCELLED" . ?C)
+                            ("FLAGGED" . ??))))
+
+; Allow setting single tags without the menu
+(setq org-fast-tag-selection-single-key (quote expert))
+
+; For tag searches ignore tasks with scheduled and deadline dates
+(setq org-agenda-tags-todo-honor-ignore-options t)
+#+END_SRC
+
+
+**** Org Babel load support for different languages
+
+#+BEGIN_SRC emacs-lisp
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (dot . t)
+   (ditaa . t)
+   (R . t)
+   (python . t)
+   (ruby . t)
+   (gnuplot . t)
+   (clojure . t)
+   (sh . t)
+   (org . t)
+   (plantuml . t)
+   (latex . t)
+   (sql . t)
+   (sqlite . t)
+   (clojure . t)
+   (js . t)))`%
+
+; set language support using customize. Does not get picked up here.
+
+; Do not prompt to confirm evaluation
+; This may be dangerous - make sure you understand the consequences
+; of setting this -- see the docstring for details
+(setq org-confirm-babel-evaluate nil)
+
+#+END_SRC
+
+**** Org Babel setup for fancy graphics etc
+
+#+BEGIN_SRC emacs-lisp
+(setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
+(setq org-plantuml-jar-path "~/Dropbox/Tools/plantuml.jar")
+
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+#+END_SRC
+
+
+**** checklists
+
+#+BEGIN_SRC emacs-lisp
+(defun pti-catlines (lines)
+  (mapconcat 'identity lines "\n"))
+
+#+END_SRC
+
+
+**** Latex export options
+
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-classes
+      (quote (
+
+("article" "\\documentclass[a4paper,11pt]{article}
+[PACKAGES]
+[EXTRA]
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+("\\paragraph{%s}" . "\\paragraph*{%s}")
+("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+
+("report" "\\documentclass[a4paper,11pt]{report}
+[PACKAGES]
+[EXTRA]
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
+("\\part{%s}" . "\\part*{%s}")
+("\\chapter{%s}" . "\\chapter*{%s}")
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+
+("book" "\\documentclass[11pt]{book}
+[PACKAGES]
+[EXTRA]
+\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
+("\\part{%s}" . "\\part*{%s}")
+("\\chapter{%s}" . "\\chapter*{%s}")
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+
+("beamer" "\\documentclass[a4paper]{beamer}
+[PACKAGES]
+[EXTRA]
+\\geometry{paper=a4}
+\\usetheme{Boadilla}
+\\usecolortheme{seagull}
+\\usefonttheme{structurebold}
+\\setbeamersize{sidebar width left=0in, sidebar width right=0in, text margin left=0.5in, text margin right=0.5in}
+\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{\\string~/org/presentation_bg.pdf}} "
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+)))
+
+(setq org-latex-default-packages-alist
+      (quote (
+              ("AUTO" "inputenc" t)
+              ("T1" "fontenc" t)
+              ("" "fixltx2e" nil)
+              ("" "graphicx" t)
+              ("" "longtable" nil)
+              ("" "float" nil)
+              ("" "wrapfig" nil)
+              ("" "soul" t)
+              ("" "textcomp" t)
+              ("" "marvosym" t)
+              ("" "wasysym" t)
+              ("" "latexsym" t)
+              ("" "amssymb" t)
+              ("" "amstext" t)
+              ("loadonly" "titlesec" t)
+              ("" "microtype" t)
+              ("" "minted" t)
+;;              ("colorlinks=tr" "hyperref" nil)
+              "\\tolerance=1000
+\\titleformat{\\section}[hang]{\\scshape}{\\thesection}{2ex}{}[]
+\\titleformat{\\subsection}[hang]{\\scshape}{\\thesubsection}{2ex}{}[]
+\\usemintedstyle{emacs}
+\\newminted{common-lisp}{fontsize=\\footnotesize}
+")))
+
+(setq org-latex-packages-alist
+      (quote (
+              ("" "wallpaper" nil)
+              ("" "tgpagella" nil)
+)))
+
+
+;; Setup minted fancy listings
+(setq org-export-latex-listings 'minted)
+(setq org-export-latex-custom-lang-environments
+      '(
+        (emacs-lisp "common-lispcode")
+        ))
+(setq org-export-latex-minted-options
+      '(("frame" "lines")
+        ("fontsize" "\\scriptsize")
+        ("linenos" "")))
+(setq org-latex-to-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+#+END_SRC
+
+
+**** jira integration
+#+BEGIN_SRC emacs-lisp
+(setq jiralib-url "https://jira.melexis.com/jira")
+#+END_SRC
+
+**** org-mode to habitrpg integration
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
+(vendor 'habitrpg)
+
+(add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
+;; For adding tasks from org mode
+(global-set-key (kbd "C-c C-x h") 'habitrpg-add)
+;; Status buffer - use C-h m to see the keybindings
+;; C-c C-c - upvote task or buy reward
+;; C-c C-d - downvote task
+;; t - bring up manage menu, which adds or deletes tasks
+(global-set-key (kbd "<f9> a") 'habitrpg-status)
+;; Continuously update a habit attache to a clocking task
+(add-hook 'org-clock-in-hook 'habitrpg-clock-in)
+(add-hook 'org-clock-out-hook 'habitrpg-clock-out)
+;; List of habits to check for when clocking a task
+(add-to-list 'hrpg-tags-list "PROGRAMMING")
+(add-to-list 'hrpg-tags-list "WORK")
+(setq habitrpg-api-user "21954734-2247-476e-9a8a-ad6b65b12f2d")
+(setq habitrpg-api-token "776b6076-9ebd-4b84-b116-d472bc25641f")
+#+END_SRC
+
+*** Markdown
+
+**** Support markdown files
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'markdown-mode)
+
+  (setq auto-mode-alist (cons '("\\.markdown" . markdown-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+
+
+#+END_SRC
+
+**** Modify TAB behavior for markdown
+
+Markdown mode and Yasnippet fight for the tab key.
+
+Markdown cycles the indentation and yasnippet wants to expand
+snippets.
+
+This code will try to expand a snippet and if this fails it does the
+markdown cycling.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun my-markdown-tab ()
+  (interactive)
+  (let ((yas-fallback-behavior 'return-nil)) (yas-expand))
+  (markdown-cycle))
+
+(add-hook
+ 'markdown-mode-hook
+ '(lambda ()
+    (define-key markdown-mode-map (kbd "A-r") 'markdown-preview)
+    (define-key markdown-mode-map (kbd "<tab>") 'my-markdown-tab)
+    (outline-minor-mode)))
+
+#+END_SRC
+
+Notice also that the *A-r* shortcut shows a preview of the document in the browser.
+
+*** ASCII art with Artist
+
+Artist mode allows to create fancy ASCII art.
+
+Add ido support to select operations and settinngs
+
+#+BEGIN_SRC emacs-lisp
+  ;;; integrate ido with artist-mode
+  (defun artist-ido-select-operation (type)
+    "Use ido to select a drawing operation in artist-mode"
+    (interactive (list (ido-completing-read "Drawing operation: "
+                                            (list "Pen" "Pen Line" "line" "straight line" "rectangle"
+                                                  "square" "poly-line" "straight poly-line" "ellipse"
+                                                  "circle" "text see-thru" "text-overwrite" "spray-can"
+                                                  "erase char" "erase rectangle" "vaporize line" "vaporize lines"
+                                                  "cut rectangle" "cut square" "copy rectangle" "copy square"
+                                                  "paste" "flood-fill"))))
+    (artist-select-operation type))
+
+  (defun artist-ido-select-settings (type)
+    "Use ido to select a setting to change in artist-mode"
+    (interactive (list (ido-completing-read "Setting: "
+                                            (list "Set Fill" "Set Line" "Set Erase" "Spray-size" "Spray-chars"
+                                                  "Rubber-banding" "Trimming" "Borders"))))
+    (if (equal type "Spray-size")
+        (artist-select-operation "spray set size")
+      (call-interactively (artist-fc-get-fn-from-symbol
+                           (cdr (assoc type '(("Set Fill" . set-fill)
+                                              ("Set Line" . set-line)
+                                              ("Set Erase" . set-erase)
+                                              ("Rubber-banding" . rubber-band)
+                                              ("Trimming" . trimming)
+                                              ("Borders" . borders)
+                                              ("Spray-chars" . spray-chars))))))))
+  (add-hook 'artist-mode-init-hook
+            (lambda ()
+              (define-key artist-mode-map (kbd "C-c C-a C-o") 'artist-ido-select-operation)
+              (define-key artist-mode-map (kbd "C-c C-a C-c") 'artist-ido-select-settings)))
+
+#+END_SRC
+
+*** HTML and SGML
+
+**** Live browser integration
+
+Send HTML elements directly to the browser using *skewer-mode*
+(installed in the integration section).
+
+C-M-x: Load the HTML tag immediately around the point.
+
+*** Yaml files
+
+Enable yaml mode for yaml files and remap return to indent on a new
+line.
+
+#+BEGIN_SRC
+(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-hook 'yaml-mode-hook
+    '(lambda ()
+       (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+#+END_SRC
+
+*** 3D Modelling with SCAD
+
+There is a programming language like 3D modeller which is popular in
+the 3D printing world. I downloaded an extension for it in the
+*vendor* directory.
+
+#+BEGIN_SRC emacs-lisp
+(vendor 'scad)
+#+END_SRC
+
+** Programming Tools
+
+*** Version Control
+
+*** Project Support
+
+Projectile offers project support like searching files in the current project.
+
+A project is essentially a folder structure below a root which is
+identified by the presence of a magic file, typically a build file, or
+VCS folder.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'projectile)
+  (projectile-global-mode)
+#+END_SRC
+
+
+*** Makefiles
+
+Makefiles rely on tabs to show the difference between targets and
+commands.
+
+This is stupid and ugly, but so be it. So we have to relax our
+*spaces-no-tabs* rule to respect it's syntax.
+
+#+BEGIN_SRC emacs-lisp
+  ;; leave tabs in the file
+  (remove-hook 'before-save-hook 'untabify-buffer)
+#+END_SRC
+
+* Applications
+** Dired File Manager
+
+By default emacs dumps a directory listing in another buffer when the
+keycode for directory listing ( C-x C-r )is pressed. However emacs
+comes with a full fledged file manager. This is far more useful under
+this code
+
+#+BEGIN_SRC emacs-lisp
+; prefer dired over dumping dir list to buffer
+(global-set-key "\C-x\C-d" 'dired)
+#+END_SRC
+
+#+RESULTS:
+: dired
+
+
+** IRC client
+
+** News and Mail reading
+
+** Web Server with Elnode
+
+Elnode is an implementation of an event driven server a la node.
+
+#+BEGIN_SRC emacs-lisp
+(require-packages 'elnode)
+#+END_SRC
+
+* Integration with other systems
+
+** Integration with host system
+
+*** Consistent search path for programs
+
+A particular pain point is that graphical apps do not have the same
+path setup as the command lines in the terminal, because the rc files
+have not yet run.
+
+We can get the path by executing the user configured shell and
+printing the path.
+
+I usually use *zsh* on my machines, but sometimes on remote machines I
+use the default *bash* shell. This way works both ways.
+
+#+BEGIN_SRC emacs-lisp
+  (defun set-exec-path-from-shell-PATH ()
+    (let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
+      (setenv "PATH" path-from-shell)
+      (setq exec-path (split-string path-from-shell path-separator))))
+
+  ;; when running in a GUI reset path from an initialized shell
+  (when window-system (set-exec-path-from-shell-PATH))
+
+
+#+END_SRC
+
+Similarly the apps when started in a graphical environment lack a
+current directory. Let's start in the home folder.
+
+#+BEGIN_SRC emacs-lisp
+(cd "~")
+#+END_SRC
+
+*** OSX quirks
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+*** Browser Integration
+
+**** Skewer mode
+
+Provides live interaction with JavaScript, CSS, and HTML in a web
+browser. Expressions are sent on-the-fly from an editing buffer to be
+evaluated in the browser, just like Emacs does with an inferior Lisp
+process in Lisp modes.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'skewer-mode)
+  (skewer-setup)
+#+END_SRC
+
+**** Enable emacs to edit textareas
+
+There are browser plugins to allow emacs to be used to edit textareas.
+
+This use a server running in emacs to interact with.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'edit-server)
+  (edit-server-start)
+#+END_SRC

@@ -1,15 +1,6 @@
-[submodule "vendor/org-jira.el"]
-	path = vendor/org-jira.el
-	url = https://github.com/baohaojun/org-jira.git
-[submodule "vendor/js3-mode"]
-	path = vendor/js3-mode
-	url = https://github.com/thomblake/js3-mode.git
 [submodule "vendor/expand-region.el"]
 	path = vendor/expand-region.el
 	url = https://github.com/magnars/expand-region.el.git
 [submodule "vendor/habitrpg"]
 	path = vendor/habitrpg
 	url = http://github.com/ryjm/habitrpg.el.git
-[submodule "vendor/rvm.el"]
-	path = vendor/rvm.el
-	url = https://github.com/senny/rvm.el.git
