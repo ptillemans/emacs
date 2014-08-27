@@ -1,6 +1,5 @@
 #+TITLE: Snamellit Emacs Configuration
 
-
 * Literate Emacs Configuration
 
 Emacs comes with org-mode installed standard, which allows us to
@@ -175,11 +174,11 @@ I decided a very long time ago that I only want to deal with UTF-8.
 
 * Editing Environment
 
-** General
+* General
 
-*** Whitespace handling
+** Whitespace handling
 
-**** Trailing white space
+*** Trailing white space
 
 One of the minor nuisances is that spaces tend to invisibly collect at
 the end of lines. Let's get rid of it before saving.
@@ -188,7 +187,9 @@ the end of lines. Let's get rid of it before saving.
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-**** Tabs in source code
+*** TODO Tabs in source code
+
+TODO: figure out an overridable way to untabify buffers.
 
 I like a tab-width of 2 by default. This is typically overriden by the
 minor modes of specific languages, but 2 is a sensible default.
@@ -212,19 +213,26 @@ So I do not want that emacs insert tabs when indenting and just in
 case I replace all tabs with spaces before saving.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default indent-tabs-mode nil)
-(defun untabify-buffer ()
-  "Untabify current buffer"
-  (interactive)
-  (untabify (point-min) (point-max)))
+  (setq-default indent-tabs-mode nil)
+  (defun untabify-buffer ()
+    "Untabify current buffer"
+    (interactive)
+    (save-excursion
+      (untabify (point-min) (point-max)))
+    nil)
 
-(add-hook 'before-save-hook 'untabify-buffer)
+  (defun add-untabify-before-save ()
+    "Add an untabify action to the local write content hook"
+    (add-hook 'write-content-hook 'untabify-buffer nil t))
 #+END_SRC
+
+#+RESULTS:
+: add-untabify-before-save
 
 Note that in files relying on tabs, we must remove this hook
 again. Only *Makefiles* and tab separated files come to mind.
 
-*** Snippets
+** Snippets
 
 Enable *yasnippet* globally
 
@@ -242,7 +250,7 @@ expansion. Let's disable it there.
 (add-hook 'term-mode-hook (lambda () (yas-minor-mode -1)))
 #+END_SRC
 
-*** Multiple Cursors
+** Multiple Cursors
 
 A cool feature introduced by Sublime are multiple cursors.
 
@@ -256,7 +264,7 @@ It did not take long before this was ported to emacs
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 #+END_SRC
 
-*** Expand Region
+** Expand Region
 
 IntelliJ has a cool feature that a single keystroke switches the
 selected region from word --> sentence --> paragraph --> ... and back
@@ -267,7 +275,7 @@ again. Similar for blocks in programming languages.
 (global-set-key (kbd "C-@") 'er/expand-region)
 #+END_SRC
 
-*** Emacs Server
+** Emacs Server
 In order to use emacs for quick and dirty edits it is useful to start
 the editing server in the background.
 
@@ -278,7 +286,7 @@ each time having the overhead of starting all the packages.
 (server-start)
 #+END_SRC
 
-*** Auto Completion
+** Auto Completion
 
 #+BEGIN_SRC emacs-lisp
 (require-packages 'company)
@@ -288,7 +296,7 @@ each time having the overhead of starting all the packages.
 #+RESULTS:
 | global-company-mode |
 
-*** Flex Matching : Ido mode
+** Flex Matching : Ido mode
 
 Ido mode allows us to match entries in lists, like files, packages,
 by typing a few characters.
@@ -308,7 +316,7 @@ ido-ubiquitous package.
   (setq ido-use-faces nil)
 #+END_SRC
 
-*** Rainbow Delimiters
+** Rainbow Delimiters
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'rainbow-delimiters)
@@ -316,12 +324,43 @@ ido-ubiquitous package.
 
 #+END_SRC
 
-** Programming Languages
+** Comment Regions
 
-*** Clojure
+Global mapping to comment and uncommenting
+
+#+BEGIN_SRC emacs-lisp
+; comment and uncomment regions
+(global-set-key (kbd "C-/") 'comment-region)
+(global-set-key (kbd "C-?") 'uncomment-region)
+#+END_SRC
+
+#+RESULTS:
+: uncomment-region
+
+** Expand Region
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd  "C-=") 'er/expand-region)
+#+END_SRC
+
+#+RESULTS:
+: er/expand-region
+
+** Quickly jump in document with ace-jump-mode
+
+#+BEGIN_SRC emacs-lisp
+(define-key global-map (kbd "C-`") 'ace-jump-mode)
+#+END_SRC
+
+#+RESULTS:
+: ace-jump-mode
+
+* Programming Languages
+
+** Clojure
 
 
-**** Clojure language support
+*** Clojure language support
 
 Enable clojure-mode and add support for clojurescript.
 
@@ -332,12 +371,13 @@ Enable clojure-mode and add support for clojurescript.
   (add-to-list 'auto-mode-alist '("\.cljs$" . clojure-mode))
   (add-hook 'clojure-mode-hook 'paredit-mode)
   (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'clojure-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
 #+RESULTS:
 | rainbow-delimiters-mode | paredit-mode | er/add-clojure-mode-expansions |
 
-**** Cider REPL integration
+*** Cider REPL integration
 
 Enable the Cider package to connect to the nRepl's of running clojure apps.
 
@@ -357,24 +397,25 @@ I also enabled the eldoc mode with cider.
 #+RESULTS:
 : t
 
-*** Groovy
+** Groovy
 
 See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on the groovy website]].
 
 #+BEGIN_SRC emacs-lisp
-;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
-(autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
-(add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
-(add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
+  ;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
+  (autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
+  (add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
+  (add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
 
-;;; make Groovy mode electric by default.
-(add-hook 'groovy-mode-hook
-          '(lambda ()
-             (require 'groovy-electric)
-             (groovy-electric-mode)))
+  ;;; make Groovy mode electric by default.
+  (add-hook 'groovy-mode-hook
+            '(lambda ()
+               (require 'groovy-electric)
+               (groovy-electric-mode)
+               (add-untabify-before-save))
 #+END_SRC
 
-*** Javascript
+** Javascript
 
 For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
 
@@ -386,13 +427,15 @@ For javascript, Steve Yegge's js2-mode is recommended over the version shipped w
 
   (js2r-add-keybindings-with-prefix "C-c C-m")
 
+  (add-hook 'js2-mode-hook 'add-untabify-before-save)
+
 #+END_SRC
 
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
 I also enabled the js2-refactor package.
 
-**** Live Browser Interaction with skewer-mode
+*** Live Browser Interaction with skewer-mode
 
 For live interaction there is *skewer-mode* which is
 installed. Installation is done in the integration section as it is
@@ -410,9 +453,9 @@ like the Lisp modes. These are provided by the minor mode skewer-mode.
 
 The result of the expression is echoed in the minibuffer.
 
-*** Lisp
+** Lisp
 
-**** Paredit Mode
+*** Paredit Mode
 
 Paredit allows you to enter lisp code where it is actually impossible
 to write syntax errors. With all the parentheses in lisp this is
@@ -421,26 +464,51 @@ actually one of the killer apps in Emacs.
 Enable it when editing emacs lisp and also enable highlighting parens.
 
 #+BEGIN_SRC emacs-lisp
-(autoload 'paredit-mode "paredit"
-     "Minor mode for pseudo-structurally editing Lisp code."
-     t)
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (paredit-mode +1)
-            (show-paren-mode +1)))
+  (autoload 'paredit-mode "paredit"
+       "Minor mode for pseudo-structurally editing Lisp code."
+       t)
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (paredit-mode +1)
+              (show-paren-mode +1)
+              (add-untabify-before-save)))
+
 #+END_SRC
 
 #+RESULTS:
 | lambda | nil | (paredit-mode 1) | (show-paren-mode 1) |
 
 
-
-*** TODO Python
+** TODO Python
 
 This is very 'light' for python development. Especially with plone
 there is ample room for more support here.
 
-**** TODO Electric newlines
+On the other hand the include python mode works quite well out of the box.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook 'add-untabify-before-save)
+#+END_SRC
+*** Shortcuts
+
+
+- C-c C-p:   Run python repl
+- C-c C-c:   Execute current buffer in python
+- C-c C-v:   Syntax check with pyflakes
+
+- C-c <:     Indent left
+- C-c >:     Indent right
+
+Skeletons :
+- C-c C-t c: class
+- C-c C-t d: function definition
+- C-c C-t f: for loop
+- C-c C-t i: if statement
+- C-c C-t m: import
+- C-c C-t t: try catch
+- C-c C-t w: while loop
+
+*** TODO Kind of Electric newlines
 
 Indent after a new line.
 
@@ -453,14 +521,17 @@ Indent after a new line.
 
 However, this seems so _cuddly_ that there must be a better way
 
-**** Python unit testing with nose
+The standard C-j electric newline does not seem to do what I want. It behaves weird.
+
+*** Python unit testing with nose
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'nose)
 #+END_SRC
-*** TODO Ruby
 
-**** TODO Enable some electric features
+** TODO Ruby
+
+*** TODO Enable some electric features
 
 TODO : split this in multiple sections to explain the use of the different packages
 
@@ -469,42 +540,43 @@ Enable electric mode and reindent after a newline.
 Also force tab settings just in case.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'ruby-electric 'ruby-additional 'ruby-compilation 'ruby-refactor 'ruby-test-mode)
+    (require-packages 'ruby-electric 'ruby-additional 'ruby-compilation 'ruby-refactor 'ruby-test-mode)
 
-  ; where'd this go?
-  (defun ruby-reindent-then-newline-and-indent ()
-    "Reindents the current line then creates an indented newline."
-    (interactive "*")
-    (newline)
-    (save-excursion
-      (end-of-line 0)
-      (indent-according-to-mode)
-      (delete-region (point) (progn (skip-chars-backward " \t") (point))))
-    (when (ruby-previous-line-is-comment)
-        (insert "# "))
-    (indent-according-to-mode))
+    ; where'd this go?
+    (defun ruby-reindent-then-newline-and-indent ()
+      "Reindents the current line then creates an indented newline."
+      (interactive "*")
+      (newline)
+      (save-excursion
+        (end-of-line 0)
+        (indent-according-to-mode)
+        (delete-region (point) (progn (skip-chars-backward " \t") (point))))
+      (when (ruby-previous-line-is-comment)
+          (insert "# "))
+      (indent-according-to-mode))
 
-  (defun ruby-previous-line-is-comment ()
-    "Returns `t' if the previous line is a Ruby comment."
-    (save-excursion
-      (forward-line -1)
-      (ruby-line-is-comment)))
+    (defun ruby-previous-line-is-comment ()
+      "Returns `t' if the previous line is a Ruby comment."
+      (save-excursion
+        (forward-line -1)
+        (ruby-line-is-comment)))
 
-  (defun ruby-line-is-comment ()
-    "Returns `t' if the current line is a Ruby comment."
-    (save-excursion
-      (beginning-of-line)
-      (search-forward "#" (point-at-eol) t)))
+    (defun ruby-line-is-comment ()
+      "Returns `t' if the current line is a Ruby comment."
+      (save-excursion
+        (beginning-of-line)
+        (search-forward "#" (point-at-eol) t)))
 
-  (add-hook 'ruby-mode-hook
-            (lambda ()
-              (set (make-local-variable 'indent-tabs-mode) 'nil)
-              (set (make-local-variable 'tab-width) 2)
-              (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
-              (ruby-electric-mode t)))
+    (add-hook 'ruby-mode-hook
+              (lambda ()
+                (set (make-local-variable 'indent-tabs-mode) 'nil)
+                (set (make-local-variable 'tab-width) 2)
+                (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
+                (ruby-electric-mode t)
+                (add-untabify-before-save)))
 #+END_SRC
 
-**** Add ruby support to popular file types
+*** Add ruby support to popular file types
 
 #+BEGIN_SRC emacs-lisp
   ; ruby
@@ -516,7 +588,7 @@ Also force tab settings just in case.
   (setq auto-mode-alist (cons '("\\.gemspec" . ruby-mode) auto-mode-alist))
 #+END_SRC
 
-**** DONE Integrate with RVM
+*** DONE Integrate with RVM
 
 I use RVM to manage my ruby versions independently from the
 system. This eases cross machine development and cross project
@@ -533,20 +605,20 @@ dependencies.
 By setting the corresponding ruby, the live interaction will see the
 same ruby environment as the project I am working on.
 
-**** Testing with RSpec
+*** Testing with RSpec
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'rspec-mode)
 #+END_SRC
 
-***** Additional snippets for RSpec
+**** Additional snippets for RSpec
 
 #+BEGIN_SRC emacs-lisp
   (eval-after-load 'rspec-mode
    '(rspec-install-snippets))
 #+END_SRC
 
-***** RSpec mode and ZSH and RVM
+**** RSpec mode and ZSH and RVM
 
 If you use ZSH and RVM, you may encounter problems running the
 specs. It may be so that an older version of Ruby, than the one you
@@ -568,7 +640,7 @@ specs. This piece of code does the job:
   (ad-activate 'rspec-compile)
 #+END_SRC
 
-*** TODO Scala
+** TODO Scala
 
 this is very sparse.
 
@@ -576,12 +648,16 @@ OTOH I do very little scala atm, so I'll look at it later.
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'scala-mode)
+  (add-hook 'scala-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
-*** Shell
+** Shell
 
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'shell-mode-hook 'add-untabify-before-save)
+#+END_SRC
 
-**** Configure ansi shell
+*** Configure ansi shell
 
 Enable ansi color and tell apps to use utf-8.
 
@@ -616,7 +692,7 @@ on the command line.
 after restarting the ansi-shell the terminal will behave a lot
 better
 
-**** Tell launched apps to use utf-8
+*** Tell launched apps to use utf-8
 
 #+BEGIN_SRC emacs-lisp
   ;; on the mac we need to tell the apps launched to use utf8
@@ -626,7 +702,7 @@ better
   (ad-activate 'ansi-term)
 #+END_SRC
 
-**** Allow history to work in  shell
+*** Allow history to work in  shell
 
 #+BEGIN_SRC emacs-lisp
   (eval-after-load 'shell
@@ -637,9 +713,9 @@ better
        (define-key shell-mode-map "\C-n" 'comint-next-input)))
 #+END_SRC
 
-** Web Development
+* Web Development
 
-*** Web Templates
+** Web Templates
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'web-mode)
@@ -647,16 +723,16 @@ better
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+  (add-hook 'web-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
 #+RESULTS:
 
-**** Shortcuts for web-mode
+*** Shortcuts for web-mode
 
-***** General
+**** General
 
 C-c C-; comment / uncomment line(s)
 C-c C-f toggle folding on a tag/block
@@ -665,7 +741,7 @@ C-c C-m mark and expand
 C-c C-s insert snippet
 C-c C-w toggle display of invalid whitespaces
 
-***** DOM
+**** DOM
 
 C-c C-d d show tag mismatch
 C-c C-d e replace HTML entities
@@ -674,7 +750,7 @@ C-c C-d q replace dumb quotes
 C-c C-d t traverse dom tree
 C-c C-d x xpath
 
-***** Block
+**** Block
 
 C-c C-b c block close
 C-c C-b b block beginning
@@ -684,7 +760,7 @@ C-c C-b n next block
 C-c C-b k block kill
 C-c C-b s block select
 
-***** HTML element
+**** HTML element
 
 C-c / element close
 C-c C-e b element beginning
@@ -700,7 +776,7 @@ C-c C-e s select element
 C-c C-e u parent element (up)
 C-c C-e u element vanish
 
-***** HTML tag
+**** HTML tag
 
 C-c C-t a sort attributes
 C-c C-t b tag beginning
@@ -710,7 +786,7 @@ C-c C-t s select tag
 C-c C-t p previous tag
 C-c C-t n next tag
 
-***** HTML attribute
+**** HTML attribute
 
 C-c C-a b attribute beginning
 C-c C-a e attribute end
@@ -719,18 +795,20 @@ C-c C-a t attribute transpose
 C-c C-a n attribute next
 
 
-*** CSS
+** CSS
 
 Set tabwidth to my preferred 2 spaces for CSS.
 
 #+BEGIN_SRC emacs-lisp
-(setq css-mode-indent-depth 2)
+  (setq css-mode-indent-depth 2)
+
+  (add-hook 'css-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
 #+RESULTS:
 : 2
 
-**** Live browser integration
+*** Live browser integration
 
 Send CSS declarations directly to the browser using *skewer-mode*
 (installed in the integration section).
@@ -739,16 +817,18 @@ Send CSS declarations directly to the browser using *skewer-mode*
  - C-M-x: Load the entire rule around the point.
  - C-c C-k: Load the current buffer as a stylesheet.
 
-*** Sass
+** Sass
 
 Load SCSS mode for Sassy support
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'scss-mode)
+
+  (add-hook 'scss-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
-*** Rails
-**** Rinari is no a Rails IDE
+** Rails
+*** Rinari is no a Rails IDE
 
 Another cute acronym.
 
@@ -760,27 +840,37 @@ Another cute acronym.
               (define-key rinari-minor-mode-map (kbd "A-r") 'rinari-test)))
 #+END_SRC
 
-**** Enable ruby support in rails templates
+*** Enable ruby support in rails templates
 
 #+BEGIN_SRC emacs-lisp
   ; rhtml
-  (setq auto-mode-alist (cons '("\\.html\\.erb" . nxml-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.erb" . nxml-mode) auto-mode-alist))
+  (add-to-list 'auto-mode-alist '("\\.html\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 #+END_SRC
 
-*** Mustache
+** Mustache
 
 Map mustache files to template mode
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.mustache$" . tpl-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 #+END_SRC
 
-** Content Creation
+** Plone
 
-*** Org Mode
+*** Support .zcml config files
 
-**** Org Mobile
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.zcml$" . nxml-mode))
+#+END_SRC
+
+#+RESULTS:
+
+* Content Creation
+
+** Org Mode
+
+*** Org Mobile
 
 Org Mobile allows me to take my org files on my iPhone.
 
@@ -829,7 +919,7 @@ It exchanges the files in both directions using Dropbox.
   ;(run-at-time "00:29" 7200 'org-mobile-pullpush)
 #+END_SRC
 
-**** Org mode TODO Keywords
+*** Org mode TODO Keywords
 
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
@@ -868,7 +958,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
+*** Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
 #+BEGIN_SRC emacs-lisp
 
 (setq org-capture-templates
@@ -888,7 +978,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** Refile targets
+*** Refile targets
 #+BEGIN_SRC emacs-lisp
 
 ; Targets include this file and any file contributing to the agenda - up to 2 levels deep
@@ -905,19 +995,19 @@ It exchanges the files in both directions using Dropbox.
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
 #+END_SRC
 
-**** Use IDO for for org
+*** Use IDO for for org
 #+BEGIN_SRC emacs-lisp
 
 (setq org-completion-use-ido t)
 #+END_SRC
 
-**** Do not dim blocked tasks
+*** Do not dim blocked tasks
 
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-dim-blocked-tasks nil)
 #+END_SRC
 
-**** Clocking setup
+*** Clocking setup
 #+BEGIN_SRC emacs-lisp
 
 ; Resume clocking tasks when emacs is restarted
@@ -950,7 +1040,7 @@ It exchanges the files in both directions using Dropbox.
 
 #+END_SRC
 
-**** Support pomodoro workflow
+*** Support pomodoro workflow
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'org-modules 'org-timer)
@@ -962,7 +1052,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** Tags with fast selection keys
+*** Tags with fast selection keys
 #+BEGIN_SRC emacs-lisp
 
 (setq org-tag-alist (quote ((:startgroup)
@@ -991,7 +1081,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** Org Babel load support for different languages
+*** Org Babel load support for different languages
 
 #+BEGIN_SRC emacs-lisp
 
@@ -1023,7 +1113,7 @@ It exchanges the files in both directions using Dropbox.
 
 #+END_SRC
 
-**** Org Babel setup for fancy graphics etc
+*** Org Babel setup for fancy graphics etc
 
 #+BEGIN_SRC emacs-lisp
 (setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
@@ -1033,7 +1123,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** checklists
+*** checklists
 
 #+BEGIN_SRC emacs-lisp
 (defun pti-catlines (lines)
@@ -1042,7 +1132,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** Latex export options
+*** Latex export options
 
 #+BEGIN_SRC emacs-lisp
 (setq org-latex-classes
@@ -1144,12 +1234,12 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-**** jira integration
+*** jira integration
 #+BEGIN_SRC emacs-lisp
 (setq jiralib-url "https://jira.melexis.com/jira")
 #+END_SRC
 
-**** org-mode to habitrpg integration
+*** org-mode to habitrpg integration
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
@@ -1173,9 +1263,9 @@ It exchanges the files in both directions using Dropbox.
 (setq habitrpg-api-token "776b6076-9ebd-4b84-b116-d472bc25641f")
 #+END_SRC
 
-*** Markdown
+** Markdown
 
-**** Support markdown files
+*** Support markdown files
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'markdown-mode)
@@ -1186,7 +1276,7 @@ It exchanges the files in both directions using Dropbox.
 
 #+END_SRC
 
-**** Modify TAB behavior for markdown
+*** Modify TAB behavior for markdown
 
 Markdown mode and Yasnippet fight for the tab key.
 
@@ -1214,7 +1304,7 @@ markdown cycling.
 
 Notice also that the *A-r* shortcut shows a preview of the document in the browser.
 
-*** ASCII art with Artist
+** ASCII art with Artist
 
 Artist mode allows to create fancy ASCII art.
 
@@ -1255,42 +1345,73 @@ Add ido support to select operations and settinngs
 
 #+END_SRC
 
-*** HTML and SGML
+** HTML and SGML
 
-**** Live browser integration
+*** Live browser integration
 
 Send HTML elements directly to the browser using *skewer-mode*
 (installed in the integration section).
 
 C-M-x: Load the HTML tag immediately around the point.
+** Xml files
 
-*** Yaml files
+*** Autoloading
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list
+   'auto-mode-alist
+   (cons (concat "\\." (regexp-opt '("xml" "xsd" "sch" "rng" "xslt" "svg" "rss") t) "\\'")
+         'nxml-mode))
+
+  (setq magic-mode-alist
+        (cons '("<＼＼?xml " . nxml-mode)
+              magic-mode-alist))
+
+  (fset 'xml-mode 'nxml-mode)
+
+#+END_SRC
+
+** Yaml files
 
 Enable yaml mode for yaml files and remap return to indent on a new
 line.
 
-#+BEGIN_SRC
-(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
-(add-hook 'yaml-mode-hook
-    '(lambda ()
-       (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+  (add-hook 'yaml-mode-hook
+      '(lambda ()
+         (define-key yaml-mode-map "\C-m" 'newline-and-indent)
+         (add-untabify-before-save)
+  ))
 #+END_SRC
 
-*** 3D Modelling with SCAD
+** 3D Modelling with SCAD
 
 There is a programming language like 3D modeller which is popular in
 the 3D printing world. I downloaded an extension for it in the
 *vendor* directory.
 
 #+BEGIN_SRC emacs-lisp
-(vendor 'scad)
+  (vendor 'scad)
+  (add-hook 'scad-mode 'add-untabify-before-save)
 #+END_SRC
 
-** Programming Tools
+* Programming Tools
 
-*** Version Control
+** Version Control
 
-*** Project Support
+Map magit-status so it is only 1 global keystroke away.
+
+ - C-x g:  magit-status
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-xg" 'magit-status)
+#+END_SRC
+
+#+RESULTS:
+: magit-status
+
+** Project Support
 
 Projectile offers project support like searching files in the current project.
 
@@ -1298,13 +1419,16 @@ A project is essentially a folder structure below a root which is
 identified by the presence of a magic file, typically a build file, or
 VCS folder.
 
+- C-c p f :   Search file in project
+- C-c p p :   Switch project
+
 #+BEGIN_SRC emacs-lisp
   (require-packages 'projectile)
   (projectile-global-mode)
 #+END_SRC
 
 
-*** Makefiles
+** Makefiles
 
 Makefiles rely on tabs to show the difference between targets and
 commands.
@@ -1313,8 +1437,8 @@ This is stupid and ugly, but so be it. So we have to relax our
 *spaces-no-tabs* rule to respect it's syntax.
 
 #+BEGIN_SRC emacs-lisp
-  ;; leave tabs in the file
-  (remove-hook 'before-save-hook 'untabify-buffer)
+  ;; leave tabs in the file do not add the untabify hook here
+
 #+END_SRC
 
 * Applications
@@ -1334,9 +1458,68 @@ this code
 : dired
 
 
-** IRC client
+** Rcirc IRC client
 
-** News and Mail reading
+#+BEGIN_SRC emacs-lisp
+  ; settings for rcirc IRC client
+
+  ;; colorize names
+  ;;(eval-after-load 'rcirc '(require 'rcirc-color))
+
+  ;; You can autoload, but at the end of this block we'll
+  ;; connect to two networks anyway.
+
+  ;; Don't print /away messages.
+  ;; This does not require rcirc to be loaded already,
+  ;; since rcirc doesn't define a 301 handler (yet).
+  (defun rcirc-handler-301 (process cmd sender args)
+    "/away message handler.")
+
+  ;; Turn on spell checking.
+  ;(add-hook 'rcirc-mode-hook (lambda ()
+  ;                            (flyspell-mode 1)))
+
+  ;; Keep input line at bottom.
+  (add-hook 'rcirc-mode-hook
+            (lambda ()
+              (set (make-local-variable 'scroll-conservatively)
+                   8192)))
+
+
+  (setq rcirc-authinfo '(("freenode" nickserv "snamellit" "snowball")))
+  (setq rcirc-default-nick "snamellit")
+  (setq rcirc-default-user-name "snamellit")
+  (setq rcirc-default-full-name "peter tillemans")
+
+  ;; Join these channels at startup.
+  (setq rcirc-server-alist
+        '(("irc.freenode.net"
+           :channels ("#emacs"
+                      "#rcirc"
+                      "#clojure"
+                      "#cucumber"
+                      "#leiningen"
+                      "#ubuntu-bugs"))))
+#+END_SRC
+
+** Gnus News and Mail reading
+
+#+BEGIN_SRC emacs-lisp
+(setq gnus-select-method '(nntp "newsgroups.telenet.be"))
+
+(setq gnus-secondary-select-methods '((nnimap "gmail-melexis"
+                                               (nnimap-address "imap.gmail.com")
+                                               (nnimap-server-port 993)
+                                               (nnimap-stream ssl))))
+
+(setq message-send-mail-function 'smtpmail-send-it
+      smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-auth-credentials '(("smtp.gmail.com" 587 "pti@melexis.com" nil))
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-local-domain "melexis.com")
+#+END_SRC
 
 ** Web Server with Elnode
 
@@ -1410,4 +1593,12 @@ This use a server running in emacs to interact with.
 #+BEGIN_SRC emacs-lisp
   (require-packages 'edit-server)
   (edit-server-start)
+#+END_SRC
+
+** with GitHub
+
+Gist buffer, always useful for collab.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
 #+END_SRC

@@ -25,3 +25,6 @@ ac-comphist.dat
 request
 .mc-lists.el
 TAGS
+snamellit.el
+*.notes
+projectile-bookmarks.eld
