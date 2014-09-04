@@ -9,10 +9,7 @@
    (quote
     ("d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
  '(fci-rule-color "#073642")
- '(js3-indent-level 4)
  '(magit-use-overlays nil)
- '(max-lisp-eval-depth 20000)
- '(max-specpdl-size 30000)
  '(multi-term-scroll-show-maximum-output t)
  '(org-agenda-files
    (quote

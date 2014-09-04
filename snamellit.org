@@ -99,7 +99,6 @@ repositories with an elisp file with the same name as entry point.
           (require library)))))
 #+END_SRC
 
-
 ** Customization
 
 Emacs comes with an extensive system for customizing the system and
@@ -111,6 +110,19 @@ preferences.
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
 (when (file-exists-p custom-file) (load custom-file))
 #+END_SRC
+
+** Private information in separate file
+
+Some things cannot be shared to the repo's so we also load a private
+file which is added to the .gitignore file.
+
+Here oauth keys and other private details can be stored.
+
+#+BEGIN_SRC emacs-lisp
+(setq private-file "~/.emacs.d/snamellit/private.el")
+(when (file-exists-p private-file) (load private-file))
+#+END_SRC
+
 
 ** Theming
 
@@ -376,6 +388,22 @@ This was very frustrating and a time waster. So unbind this key.
 #+BEGIN_SRC emacs-lisp
 (global-unset-key (kbd "s-x"))
 #+END_SRC
+
+** Emacs Lisp limits
+
+Stock emacs has defaults which are rather small for historical reasons.
+
+The max-lisp-eval-depth limits the recursion. Enlarging it allows to
+use the tail-recursion pattern which are not optimized in emacs-lisp.
+
+The max-specpdl-size limits the number of variable-binding and
+unwind-protects.
+
+#+BEGIN_SRC emacs-lisp
+  (setq max-lisp-eval-depth 20000)
+  (setq max-specpdl-size 30000)
+#+END_SRC
+
 
 
 * Programming Languages
@@ -1163,10 +1191,33 @@ It exchanges the files in both directions using Dropbox.
 
 *** Latex export options
 
+Org mode has great support to create nice looking documents and
+presentations using the LaTeX typesetting system.
+
 #+BEGIN_SRC emacs-lisp
   (require 'ox-latex)
   (require 'ox-beamer)
+#+END_SRC
 
+To export an org file as a pdf several shortcuts are very useful:
+
+- C-c C-e l o  : generate and show a pdf document
+- C-c C-e l O  : generate and show a pdf presentation
+
+There is a user friendly menu which is actived by C-c C-e and helps
+the user with the other options.
+
+Note that for presentations in is not enough of indicating the beamer
+class to use. You also need to use the special export commands or the
+files end up as ugly documents instead of nice presentations.
+
+**** Add support for Melexis classes
+
+In order to simplify the creation of good looking documents for use in
+Melexis I created a number of extensions of the standard latex
+classes.
+
+#+BEGIN_SRC emacs-lisp
   (add-to-list 'org-latex-classes
                '("mlx-article" "\\documentclass{mlx-article}
     [NO-DEFAULT-PACKAGES]
@@ -1215,44 +1266,34 @@ It exchanges the files in both directions using Dropbox.
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
+#+END_SRC
+
+**** Source Code Highlighting
+
+Since I deal with a lot of source-code I like to have it nicely formatted.
+One of the best ways is to use the minted option which uses the python
+*pygmentize* script. This program must be installed and on the
+standard search path.
+
+#+END_BEGIN emacs-lisp
   ;; Setup minted fancy listings
-  (setq org-export-latex-listings 'minted)
-  (setq org-export-latex-custom-lang-environments
+  (setq org-latex-listings 'minted)
+  (setq org-latex-custom-lang-environments
         '(
           (emacs-lisp "common-lispcode")
           ))
-  (setq org-export-latex-minted-options
+  (setq org-latex-minted-options
         '(("frame" "lines")
           ("fontsize" "\\scriptsize")
           ("linenos" "")))
+
+  ;; Add -shell-escape to enable pygmentize to be called
   (setq org-latex-pdf-process
         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
 #+END_SRC
 
-#+RESULTS:
-| pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f | pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f | pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f |
-
-**** Syntax Highligting
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-export-latex-listings 'minted)
-  (setq org-export-latex-custom-lang-environments
-        '(
-         (emacs-lisp "common-lispcode")
-          ))
-  (setq org-export-latex-minted-options
-        '(("frame" "lines")
-          ("fontsize" "\\scriptsize")
-          ("linenos" "")))
-  (setq org-latex-to-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
-#+END_SRC
 
 *** jira integration
 #+BEGIN_SRC emacs-lisp
@@ -1266,19 +1307,25 @@ It exchanges the files in both directions using Dropbox.
 (vendor 'habitrpg)
 
 (add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
+
 ;; For adding tasks from org mode
 (global-set-key (kbd "C-c C-x h") 'habitrpg-add)
+
 ;; Status buffer - use C-h m to see the keybindings
 ;; C-c C-c - upvote task or buy reward
 ;; C-c C-d - downvote task
 ;; t - bring up manage menu, which adds or deletes tasks
 (global-set-key (kbd "<f9> a") 'habitrpg-status)
+
 ;; Continuously update a habit attache to a clocking task
 (add-hook 'org-clock-in-hook 'habitrpg-clock-in)
 (add-hook 'org-clock-out-hook 'habitrpg-clock-out)
+
 ;; List of habits to check for when clocking a task
 (add-to-list 'hrpg-tags-list "PROGRAMMING")
 (add-to-list 'hrpg-tags-list "WORK")
+
+;; user login information
 (setq habitrpg-api-user "21954734-2247-476e-9a8a-ad6b65b12f2d")
 (setq habitrpg-api-token "776b6076-9ebd-4b84-b116-d472bc25641f")
 #+END_SRC
