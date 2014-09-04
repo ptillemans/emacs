@@ -28,3 +28,5 @@ TAGS
 snamellit.el
 *.notes
 projectile-bookmarks.eld
+/snamellit.pdf
+/snamellit.tex

@@ -1,4 +1,11 @@
 #+TITLE: Snamellit Emacs Configuration
+#+DATE: <2014-09-02 Tue>
+#+OPTIONS: texht:t
+#+LATEX_CLASS: mlx-article
+#+LATEX_CLASS_OPTIONS: [12pt]
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+
 
 * Literate Emacs Configuration
 
@@ -9,11 +16,13 @@ create the emacs configuration in a well documented manner.
 
 ** Package and Extension Management
 
-Emacs has a package management system we'll be using to load the extensions.
+Emacs has a package management system we'll be using to load the
+extensions.
 
 *** Setup repositories
 
-By default emacs only comes with the elpa repository which is a bit conservative.
+By default emacs only comes with the elpa repository which is a bit
+conservative.
 
 Let's add the melpa repo to get the cutting-edge goodness.
 
@@ -63,35 +72,33 @@ repositories with an elisp file with the same name as entry point.
 
 #+BEGIN_SRC emacs-lisp
 
-  ;; add the vendor extension path to the load path
-  (add-to-list 'load-path "~/.emacs.d/vendor")
+    ;; add the vendor extension path to the load path
+    (add-to-list 'load-path "~/.emacs.d/vendor")
 
-  (defun vendor (library)
-    "Load a vendor extension.
-  Vendor extensions are loaded in an opinionated way. They will be
-  present in ~/emacs.d/vendor folder. Either downloaded or as a git
-  submodule.
+    (defun vendor (library)
+      "Load a vendor extension.
+    Vendor extensions are loaded in an opinionated way. They will be
+    present in ~/emacs.d/vendor folder. Either downloaded or as a git
+    submodule.
 
-  If it is a file with .el extension, or a folder with a file with
-  the same basename and extension .el, then this will be placed on
-  the load path and executed."
+    If it is a file with .el extension, or a folder with a file with
+    the same basename and extension .el, then this will be placed on
+    the load path and executed."
 
-    (let* ((file (symbol-name library))
-           (normal (concat "~/.emacs.d/vendor/" file))
-           (suffix (concat normal ".el")))
-      (cond
-       ((file-directory-p normal) (add-to-list 'load-path normal) (require library))
-       ((file-directory-p suffix) (add-to-list 'load-path suffix) (require library))
-       ((file-exists-p suffix) (require library)))))
+      (let* ((file (symbol-name library))
+             (normal (concat "~/.emacs.d/vendor/" file))
+             (suffix (concat normal ".el")))
+        (cond
+         ((file-directory-p normal)
+          (add-to-list 'load-path normal)
+          (require library))
+         ((file-directory-p suffix)
+          (add-to-list 'load-path suffix)
+          (require library))
+         ((file-exists-p suffix)
+          (require library)))))
 #+END_SRC
 
-
-
-**
-**
-**
-**
-**
 
 ** Customization
 
@@ -126,7 +133,7 @@ I do like the scrollbars, not to use them for navigation, just to see
 where I am in the file. When I feel particularly hard-core, I
 sometimes tweak these settings.
 
-#+BEGIN_SRC
+#+BEGIN_SRC emacs-lisp
 ;; lose UI stuff
 ;(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -148,20 +155,21 @@ control tools and their users can get confused by this.
 Let's move these to a separate folder.
 
 #+BEGIN_SRC emacs-lisp
-;; set the temporary files in a separate folder to avoid creating junk in
-;; the work directories. Autobuilds and git will be happier.
-;;
-;; stolen from http://github.com/febuiles/dotemacs/tree/master/temp_files.el
-(defvar user-temporary-file-directory "~/.emacs-autosaves/")
-(make-directory user-temporary-file-directory t)
-(setq backup-by-copying t)
-(setq backup-directory-alist
-      `(("." . ,user-temporary-file-directory)
-        (,tramp-file-name-regexp nil)))
-(setq auto-save-list-file-prefix
-      (concat user-temporary-file-directory ".auto-saves-"))
-(setq auto-save-file-name-transforms
-      `((".*" ,user-temporary-file-directory t)))
+  ;; set the temporary files in a separate folder to avoid creating junk
+  ;; in the work directories. Autobuilds and git will be happier.
+  ;;
+  ;; stolen from
+  ;; http://github.com/febuiles/dotemacs/tree/master/temp_files.el
+  (defvar user-temporary-file-directory "~/.emacs-autosaves/")
+  (make-directory user-temporary-file-directory t)
+  (setq backup-by-copying t)
+  (setq backup-directory-alist
+        `(("." . ,user-temporary-file-directory)
+          (,tramp-file-name-regexp nil)))
+  (setq auto-save-list-file-prefix
+        (concat user-temporary-file-directory ".auto-saves-"))
+  (setq auto-save-file-name-transforms
+        `((".*" ,user-temporary-file-directory t)))
 #+END_SRC
 
 ** File Encodings
@@ -245,7 +253,7 @@ Enable *yasnippet* globally
 However snippets wreak havoc in terminals, especially with tab
 expansion. Let's disable it there.
 
-#+BEGIN_SRC
+#+BEGIN_SRC emacs-lisp
 ;; disable YAS in terminals
 (add-hook 'term-mode-hook (lambda () (yas-minor-mode -1)))
 #+END_SRC
@@ -355,6 +363,21 @@ Global mapping to comment and uncommenting
 #+RESULTS:
 : ace-jump-mode
 
+** Move kill-region away from s-x
+
+On the macbook pro there are 4 rather small keys next to each other,
+Fn, Ctrl, Option and Cmd. Unfortunately Cmd-x is very easily typed by
+me instead of Option-x to launch a command. This usually coincides
+with a sizable chunk of text dissappearing as it is mapped to
+*kill_region*.
+
+This was very frustrating and a time waster. So unbind this key.
+
+#+BEGIN_SRC emacs-lisp
+(global-unset-key (kbd "s-x"))
+#+END_SRC
+
+
 * Programming Languages
 
 ** Clojure
@@ -412,7 +435,7 @@ See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on 
             '(lambda ()
                (require 'groovy-electric)
                (groovy-electric-mode)
-               (add-untabify-before-save))
+               (add-untabify-before-save)))
 #+END_SRC
 
 ** Javascript
@@ -881,7 +904,12 @@ It exchanges the files in both directions using Dropbox.
   (setq org-mobile-inbox-for-pull "~/org/flagged.org")
   ;; Set to <your Dropbox root directory>/MobileOrg.
   (setq org-mobile-directory "~/Dropbox/MobileOrg")
-  (setq org-mobile-files (quote (org-agenda-files "~/org/todo.org" "~/org/emacs.org" "~/org/pfus.org")))
+  (setq org-mobile-files
+        (quote
+         (org-agenda-files
+          "~/org/todo.org"
+          "~/org/emacs.org"
+          "~/org/pfus.org")))
 
   ;; org-mobile integration and automation.
   ;;
@@ -902,7 +930,8 @@ It exchanges the files in both directions using Dropbox.
   (defun restore-buffers (fn)
     (let ((old-open-buffers (open-buffer-names)))
       (funcall fn)
-      (dolist ( buffer-name (pti-set-difference (open-buffer-names) old-open-buffers))
+      (dolist ( buffer-name
+                (pti-set-difference (open-buffer-names) old-open-buffers))
         (kill-buffer buffer-name))))
 
   (defun org-mobile-pullpush nil nil
@@ -1004,7 +1033,7 @@ It exchanges the files in both directions using Dropbox.
 *** Do not dim blocked tasks
 
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-dim-blocked-tasks nil)
+(setq org-agenda-dim-blocked-tasks t)
 #+END_SRC
 
 *** Clocking setup
@@ -1135,104 +1164,95 @@ It exchanges the files in both directions using Dropbox.
 *** Latex export options
 
 #+BEGIN_SRC emacs-lisp
-(setq org-latex-classes
-      (quote (
+  (require 'ox-latex)
+  (require 'ox-beamer)
 
-("article" "\\documentclass[a4paper,11pt]{article}
-[PACKAGES]
-[EXTRA]
-\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+  (add-to-list 'org-latex-classes
+               '("mlx-article" "\\documentclass{mlx-article}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-("report" "\\documentclass[a4paper,11pt]{report}
-[PACKAGES]
-[EXTRA]
-\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
-("\\part{%s}" . "\\part*{%s}")
-("\\chapter{%s}" . "\\chapter*{%s}")
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+  (add-to-list 'org-latex-classes
+               '("mlx-report" "\\documentclass{mlx-report}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-("book" "\\documentclass[11pt]{book}
-[PACKAGES]
-[EXTRA]
-\\CenterWallPaper{1.0}{\\string~/org/portrait.pdf} "
-("\\part{%s}" . "\\part*{%s}")
-("\\chapter{%s}" . "\\chapter*{%s}")
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+  (add-to-list 'org-latex-classes
+               '("mlx-report" "\\documentclass{mlx-report}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-("beamer" "\\documentclass[a4paper]{beamer}
-[PACKAGES]
-[EXTRA]
-\\geometry{paper=a4}
-\\usetheme{Boadilla}
-\\usecolortheme{seagull}
-\\usefonttheme{structurebold}
-\\setbeamersize{sidebar width left=0in, sidebar width right=0in, text margin left=0.5in, text margin right=0.5in}
-\\usebackgroundtemplate{\\includegraphics[width=\\paperwidth]{\\string~/org/presentation_bg.pdf}} "
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-)))
+  (add-to-list 'org-latex-classes
+               '("mlx-book" "\\documentclass{mlx-book}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-(setq org-latex-default-packages-alist
-      (quote (
-              ("AUTO" "inputenc" t)
-              ("T1" "fontenc" t)
-              ("" "fixltx2e" nil)
-              ("" "graphicx" t)
-              ("" "longtable" nil)
-              ("" "float" nil)
-              ("" "wrapfig" nil)
-              ("" "soul" t)
-              ("" "textcomp" t)
-              ("" "marvosym" t)
-              ("" "wasysym" t)
-              ("" "latexsym" t)
-              ("" "amssymb" t)
-              ("" "amstext" t)
-              ("loadonly" "titlesec" t)
-              ("" "microtype" t)
-              ("" "minted" t)
-;;              ("colorlinks=tr" "hyperref" nil)
-              "\\tolerance=1000
-\\titleformat{\\section}[hang]{\\scshape}{\\thesection}{2ex}{}[]
-\\titleformat{\\subsection}[hang]{\\scshape}{\\thesubsection}{2ex}{}[]
-\\usemintedstyle{emacs}
-\\newminted{common-lisp}{fontsize=\\footnotesize}
-")))
+  (add-to-list 'org-latex-classes
+               '("mlx-beamer" "\\documentclass{mlx-beamer}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-(setq org-latex-packages-alist
-      (quote (
-              ("" "wallpaper" nil)
-              ("" "tgpagella" nil)
-)))
-
-
-;; Setup minted fancy listings
-(setq org-export-latex-listings 'minted)
-(setq org-export-latex-custom-lang-environments
-      '(
-        (emacs-lisp "common-lispcode")
-        ))
-(setq org-export-latex-minted-options
-      '(("frame" "lines")
-        ("fontsize" "\\scriptsize")
-        ("linenos" "")))
-(setq org-latex-to-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  ;; Setup minted fancy listings
+  (setq org-export-latex-listings 'minted)
+  (setq org-export-latex-custom-lang-environments
+        '(
+          (emacs-lisp "common-lispcode")
+          ))
+  (setq org-export-latex-minted-options
+        '(("frame" "lines")
+          ("fontsize" "\\scriptsize")
+          ("linenos" "")))
+  (setq org-latex-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
 #+END_SRC
 
+#+RESULTS:
+| pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f | pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f | pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f |
+
+**** Syntax Highligting
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-export-latex-listings 'minted)
+  (setq org-export-latex-custom-lang-environments
+        '(
+         (emacs-lisp "common-lispcode")
+          ))
+  (setq org-export-latex-minted-options
+        '(("frame" "lines")
+          ("fontsize" "\\scriptsize")
+          ("linenos" "")))
+  (setq org-latex-to-pdf-process
+        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+#+END_SRC
 
 *** jira integration
 #+BEGIN_SRC emacs-lisp
@@ -1601,4 +1621,4 @@ Gist buffer, always useful for collab.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
-#+END_SRC
+#+END_
