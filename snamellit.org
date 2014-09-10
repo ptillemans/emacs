@@ -1,7 +1,7 @@
 #+TITLE: Snamellit Emacs Configuration
 #+DATE: <2014-09-02 Tue>
 #+OPTIONS: texht:t
-#+LATEX_CLASS: mlx-article
+#+LATEX_CLASS: snm-article
 #+LATEX_CLASS_OPTIONS: [12pt]
 #+LATEX_HEADER:
 #+LATEX_HEADER_EXTRA:
@@ -27,11 +27,13 @@ conservative.
 Let's add the melpa repo to get the cutting-edge goodness.
 
 #+BEGIN_SRC emacs-lisp
-;; enable package repositories
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-;; (add-to-list 'package-archives
-;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
+  ;; enable package repositories
+  (add-to-list
+   'package-archives
+   '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  ;; (add-to-list
+  ;;  'package-archives
+  ;;  '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
 #+END_SRC
 
@@ -167,7 +169,7 @@ control tools and their users can get confused by this.
 Let's move these to a separate folder.
 
 #+BEGIN_SRC emacs-lisp
-  ;; set the temporary files in a separate folder to avoid creating junk
+  ;; set the temporary files in a separate folder to avoid junk
   ;; in the work directories. Autobuilds and git will be happier.
   ;;
   ;; stolen from
@@ -381,7 +383,7 @@ On the macbook pro there are 4 rather small keys next to each other,
 Fn, Ctrl, Option and Cmd. Unfortunately Cmd-x is very easily typed by
 me instead of Option-x to launch a command. This usually coincides
 with a sizable chunk of text dissappearing as it is mapped to
-*kill_region*.
+*kill-region*.
 
 This was very frustrating and a time waster. So unbind this key.
 
@@ -424,9 +426,6 @@ Enable clojure-mode and add support for clojurescript.
   (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'clojure-mode-hook 'add-untabify-before-save)
 #+END_SRC
-
-#+RESULTS:
-| rainbow-delimiters-mode | paredit-mode | er/add-clojure-mode-expansions |
 
 *** Cider REPL integration
 
@@ -888,7 +887,10 @@ Another cute acronym.
   (setq rinari-tags-file-name "TAGS")
   (add-hook 'rinari-minor-mode-hook
             (lambda ()
-              (define-key rinari-minor-mode-map (kbd "A-r") 'rinari-test)))
+              (define-key
+                rinari-minor-mode-map
+                (kbd "A-r")
+                'rinari-test)))
 #+END_SRC
 
 *** Enable ruby support in rails templates
@@ -921,67 +923,33 @@ Map mustache files to template mode
 
 ** Org Mode
 
-*** Org Mobile
+*** Global keybindings
 
-Org Mobile allows me to take my org files on my iPhone.
-
-It exchanges the files in both directions using Dropbox.
+In order to use org mode effectively we need easy access from anywhere
+in emacs.
 
 #+BEGIN_SRC emacs-lisp
-  ;; Set to the name of the file where new notes will be stored
-  (setq org-mobile-inbox-for-pull "~/org/flagged.org")
-  ;; Set to <your Dropbox root directory>/MobileOrg.
-  (setq org-mobile-directory "~/Dropbox/MobileOrg")
-  (setq org-mobile-files
-        (quote
-         (org-agenda-files
-          "~/org/todo.org"
-          "~/org/emacs.org"
-          "~/org/pfus.org")))
-
-  ;; org-mobile integration and automation.
-  ;;
-  ;; wait 60 min between auto updates to avoid losing time
-  ;; when "catching up"
-  (setq  org-mobile-last-sync 0)
-
-  (defun pti-set-difference (a b)
-    (delq nil
-     (mapcar
-      (lambda (x)
-        (when (not (and (member x a) (member x b))) x))
-      (append a b))))
-
-  (defun open-buffer-names ()
-    (mapcar 'buffer-name (buffer-list)))
-
-  (defun restore-buffers (fn)
-    (let ((old-open-buffers (open-buffer-names)))
-      (funcall fn)
-      (dolist ( buffer-name
-                (pti-set-difference (open-buffer-names) old-open-buffers))
-        (kill-buffer buffer-name))))
-
-  (defun org-mobile-pullpush nil nil
-    ( if (> (- (float-time) org-mobile-last-sync) 3600)
-       (progn
-          (restore-buffers 'org-mobile-pull)
-          (restore-buffers 'org-mobile-push)
-          (setq org-mobile-last-sync (float-time))))
-  )
-
-  ;; sync at start, finish and in between 2x p hr
-  ;(add-hook 'after-init-hook (lambda () (restore-buffers 'org-mobile-pull)))
-  ;(add-hook 'kill-emacs-hook (lambda () (restore-buffers 'org-mobile-push)))
-  ;(run-at-time "00:29" 7200 'org-mobile-pullpush)
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
+
+#+RESULTS:
+: org-iswitchb
 
 *** Org mode TODO Keywords
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
-                                  (sequence "WAITING(w@/!)" "SOMEDAY(s!)" "|" "CANCELLED(c@/!)" "PHONE")
-                                  (sequence "OPEN(O!)" "|" "CLOSED(C!)"))))
+  (setq
+   org-todo-keywords
+   (quote
+    ((sequence "TODO(t)" "NEXT(n)"
+               "|" "DONE(d!/!)")
+     (sequence "WAITING(w@/!)" "SOMEDAY(s!)"
+               "|" "CANCELLED(c@/!)" "PHONE")
+     (sequence "OPEN(O!)"
+               "|" "CLOSED(C!)"))))
 
   (setq org-todo-keyword-faces
         (quote (("TODO" :foreground "red" :weight bold)
@@ -1014,42 +982,102 @@ It exchanges the files in both directions using Dropbox.
 
 #+END_SRC
 
+*** enable autofill mode
 
-*** Capture templates for: TODO tasks, Notes, appointments, phone calls, and org-protocol
+Enable autofill in org-buffers to help with keeping the t
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'fill-column-indicator)
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (auto-fill-mode)
+     (fci-mode)))
+  (setq fci-rule-width 1)
+  (setq fci-rule-color "cornsilk4")
+#+END_SRC
+
+#+RESULTS:
+: cornsilk4
+
+*** Capture templates
+
+Add some templates for quick capture of things to organize.
+
+The global keycode to add a thing is
+
+- C-c c
+
+This shows a nice menu with things to add. When choosing one of the
+things a fill in template is provided.
+
+- C-c C-c will file it once it is done.
+- C-c C-w finalize by refiling it.
+- C-c C-k abort the capture process.
+
 #+BEGIN_SRC emacs-lisp
 
-(setq org-capture-templates
-    (quote (("t" "todo" entry (file "~/org/refile.org")
-             "* TODO %?\n%U\n%a\n  %i" :clock-in t :clock-resume t)
-            ("n" "note" entry (file "~/org/refile.org")
-             "* %? :NOTE:\n%U\n%a\n  %i" :clock-in t :clock-resume t)
-            ("j" "Journal" entry (file+datetree "~/org/diary.org")
-             "* %?\n%U\n  %i" :clock-in t :clock-resume t)
-            ("w" "org-protocol" entry (file "~/org/refile.org")
-             "* TODO Review %c\n%U\n  %i" :immediate-finish t)
-            ("p" "Phone call" entry (file "~/org/refile.org")
-             "* PHONE %? :PHONE:\n%U\n  %i\n" :clock-in t :clock-resume t)
-            ("h" "Habit" entry (file "~/org/refile.org")
-             "* TODO %?\n%U\n%a\nSCHEDULED: %t\n:PROPERTIES:\n:STYLE: habit\n:END:\n  %i"))))
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
 #+END_SRC
+
+The following template are provided:
+
+- todo: a todo in refile.org
+- note: a note in refile.org
+- journal: a note in diary.org
+- review: a review todo in refile.org
+- phone: a phonec call
+- habit: a habit entry
+
+#+BEGIN_SRC emacs-lisp
+
+
+#+END_SRC
+
+#+RESULTS:
+| t | todo         | entry | (file ~/org/refile.org)         | (concat * TODO %?\n %U\n %a\n   %i)                                                         | :clock-in         | t | :clock-resume | t |
+| n | note         | entry | (file ~/org/refile.org)         | (concat * %? :NOTE:\n %U\n %a\n)                                                            |                   |   |               |   |
+| j | Journal      | entry | (file+datetree ~/org/diary.org) | (concat * %?\n %U\n   %i)                                                                   | :clock-in         | t | :clock-resume | t |
+| w | org-protocol | entry | (file ~/org/refile.org)         | (concat * TODO Review %c\n %U\n   %i)                                                       | :immediate-finish | t |               |   |
+| p | Phone call   | entry | (file ~/org/refile.org)         | (concat * PHONE %? :PHONE:\n %U\n   %i\n)                                                   | :clock-in         | t | :clock-resume | t |
+| h | Habit        | entry | (file ~/org/refile.org)         | (concat * TODO %?\n %U\n %a\n :SCHEDULED: %t\n :PROPERTIES:\n :STYLE: habit\n :END:\n   %i) |                   |   |               |   |
+
+In these entries, the first string is the key to reach the template,
+the second is a short description. Then follows the type of the entry
+and a definition of the target location for storing the note. Finally,
+the template itself, a string with %-escapes to fill in information
+based on time and context.
+
+When you call M-x org-capture, Org will prompt for a key to select the
+template (if you have more than one template) and then prepare the
+buffer
+
+During expansion of the template, special %-escapes1 allow dynamic
+insertion of content. Here is a small selection of the possibilities,
+consult the manual for more.
+
+- %a          annotation, the link created with org-store-link
+- %i          initial content, region when capture is called with C-u.
+- %t          timestamp, date only
+- %T          timestamp with date and time
+- %u, %U      like the above, but inactive timestamps
 
 
 *** Refile targets
 #+BEGIN_SRC emacs-lisp
+  ; Targets include this file and any file contributing to the agenda
+  ; up to 2 levels deep
+  (setq org-refile-targets (quote ((nil :maxlevel . 2)
+                                   (org-agenda-files :maxlevel . 2))))
 
-; Targets include this file and any file contributing to the agenda - up to 2 levels deep
-(setq org-refile-targets (quote ((nil :maxlevel . 2)
-                                 (org-agenda-files :maxlevel . 2))))
+  ; Targets start with the file name - allows creating level 1 tasks
+  (setq org-refile-use-outline-path (quote file))
 
-; Targets start with the file name - allows creating level 1 tasks
-(setq org-refile-use-outline-path (quote file))
+  ; Targets complete directly with IDO
+  (setq org-outline-path-complete-in-steps nil)
 
-; Targets complete directly with IDO
-(setq org-outline-path-complete-in-steps nil)
-
-; Allow refile to create parent tasks with confirmation
-(setq org-refile-allow-creating-parent-nodes (quote confirm))
+  ; Allow refile to create parent tasks with confirmation
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
 #+END_SRC
 
 *** Use IDO for for org
@@ -1067,32 +1095,44 @@ It exchanges the files in both directions using Dropbox.
 *** Clocking setup
 #+BEGIN_SRC emacs-lisp
 
-; Resume clocking tasks when emacs is restarted
-(setq org-clock-persist 'history)
-(org-clock-persistence-insinuate)
-; Resume clocking task on clock-in if the clock is open
-(setq org-clock-in-resume t)
-; Do not change task states when clocking in
-(setq org-clock-in-switch-to-state nil)
-; Separate drawers for clocking and logs
-(setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
-; Save clock data and state changes and notes in the LOGBOOK drawer
-(setq org-clock-into-drawer t)
-; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
-(setq org-clock-out-remove-zero-time-clocks t)
-; Clock out when moving task to a done state
-(setq org-clock-out-when-done t)
-; Save the running clock and all clock history when exiting Emacs, load it on startup
-(setq org-clock-persist (quote history))
-; Enable auto clock resolution for finding open clocks
-(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
-; Include current clocking task in clock reports
-(setq org-clock-report-include-clocking-task t)
-; Agenda log mode items to display (clock time only by default)
-(setq org-agenda-log-mode-items (quote (clock)))
-; Agenda clock report parameters
-(setq org-agenda-clockreport-parameter-plist
-      (quote (:link t :maxlevel 5 :fileskip0 t :compact t)))
+  ; Resume clocking tasks when emacs is restarted
+  (setq org-clock-persist 'history)
+  (org-clock-persistence-insinuate)
+  ; Resume clocking task on clock-in if the clock is open
+  (setq org-clock-in-resume t)
+  ; Do not change task states when clocking in
+  (setq org-clock-in-switch-to-state nil)
+  ; Separate drawers for clocking and logs
+  (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
+
+  ;; Save clock data and state changes and notes in the LOGBOOK drawer
+  (setq org-clock-into-drawer t)
+
+  ;; Sometimes I change tasks I'm clocking quickly - this removes
+  ;; clocked tasks with 0:00 duration
+  (setq org-clock-out-remove-zero-time-clocks t)
+
+  ;; Clock out when moving task to a done state
+  (setq org-clock-out-when-done t)
+
+  ;; Save the running clock and all clock history when exiting Emacs,
+  ;; load it on startup
+  (setq org-clock-persist
+        (quote history))
+
+  ;; Enable auto clock resolution for finding open clocks
+  (setq org-clock-auto-clock-resolution
+        (quote when-no-clock-is-running))
+
+  ;; Include current clocking task in clock reports
+  (setq org-clock-report-include-clocking-task t)
+
+  ;; Agenda log mode items to display (clock time only by default)
+  (setq org-agenda-log-mode-items (quote (clock)))
+
+  ;; Agenda clock report parameters
+  (setq org-agenda-clockreport-parameter-plist
+        (quote (:link t :maxlevel 5 :fileskip0 t :compact t)))
 
 
 #+END_SRC
@@ -1137,8 +1177,46 @@ It exchanges the files in both directions using Dropbox.
 (setq org-agenda-tags-todo-honor-ignore-options t)
 #+END_SRC
 
+***
+***
+***
+***
+***
+***
+***
+***
 
-*** Org Babel load support for different languages
+
+*** checklists
+
+#+BEGIN_SRC emacs-lisp
+(defun pti-catlines (lines)
+  (mapconcat 'identity lines "\n"))
+
+#+END_SRC
+
+
+*** Calendar
+**** Calendar files
+
+#+BEGIN_SRC emacs-lisp
+  (setq
+   org-agenda-files
+   (quote
+    ("/Users/pti/org/google_calendar.org"
+     "/Users/pti/org/diary.org"
+     "/Users/pti/org/flagged.org"
+     "/Users/pti/org/index.org"
+     "/Users/pti/org/personal.org"
+     "/Users/pti/org/refile.org"
+     "/Users/pti/org/snamellit.org"
+     "/Users/pti/org/todo.org"
+     "/Users/pti/org/ubuntu.org")))
+#+END_SRC
+
+
+*** Org Babel
+**** Org Babel load support for different languages
 
 #+BEGIN_SRC emacs-lisp
 
@@ -1170,7 +1248,7 @@ It exchanges the files in both directions using Dropbox.
 
 #+END_SRC
 
-*** Org Babel setup for fancy graphics etc
+**** Org Babel setup for fancy graphics etc
 
 #+BEGIN_SRC emacs-lisp
 (setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
@@ -1180,16 +1258,7 @@ It exchanges the files in both directions using Dropbox.
 #+END_SRC
 
 
-*** checklists
-
-#+BEGIN_SRC emacs-lisp
-(defun pti-catlines (lines)
-  (mapconcat 'identity lines "\n"))
-
-#+END_SRC
-
-
-*** Latex export options
+*** Latex Support S
 
 Org mode has great support to create nice looking documents and
 presentations using the LaTeX typesetting system.
@@ -1210,6 +1279,78 @@ the user with the other options.
 Note that for presentations in is not enough of indicating the beamer
 class to use. You also need to use the special export commands or the
 files end up as ugly documents instead of nice presentations.
+
+
+**** Add support for Snamellit classes
+
+In order to simplify the creation of good looking documents for
+Snamellit, I created a number of extensions of the standard latex
+classes.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-latex-classes
+               '("snm-article" "\\documentclass{snm-article}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("snm-report" "\\documentclass{snm-report}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("snm-report" "\\documentclass{snm-report}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("snm-book" "\\documentclass{snm-book}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\part{%s}" . "\\part*{%s}")
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("snm-beamer" "\\documentclass{snm-beamer}
+    [NO-DEFAULT-PACKAGES]
+    [NO-PACKAGES]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+#+END_SRC
+
+#+RESULTS:
+| snm-beamer  | \documentclass{snm-beamer}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]  | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |                                      |                                            |
+| snm-book    | \documentclass{snm-book}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]    | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| snm-report  | \documentclass{snm-report}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]  | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| snm-article | \documentclass{snm-article}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES] | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| mlx-beamer  | \documentclass{mlx-beamer}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]  | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |                                      |                                            |
+| mlx-book    | \documentclass{mlx-book}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]    | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-report  | \documentclass{mlx-report}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES]  | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-article | \documentclass{mlx-article}\n  [NO-DEFAULT-PACKAGES]\n  [NO-PACKAGES] | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| beamer      | \documentclass[presentation]{beamer}                                  | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |                                      |                                            |
+| article     | \documentclass[11pt]{article}                                         | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| report      | \documentclass[11pt]{report}                                          | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| book        | \documentclass[11pt]{book}                                            | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
 
 **** Add support for Melexis classes
 
@@ -1275,7 +1416,7 @@ One of the best ways is to use the minted option which uses the python
 *pygmentize* script. This program must be installed and on the
 standard search path.
 
-#+END_BEGIN emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;; Setup minted fancy listings
   (setq org-latex-listings 'minted)
   (setq org-latex-custom-lang-environments
@@ -1288,19 +1429,94 @@ standard search path.
           ("linenos" "")))
 
   ;; Add -shell-escape to enable pygmentize to be called
-  (setq org-latex-pdf-process
-        '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-          "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (let ((cmd (mapconcat
+              'identity
+              '("pdflatex"
+                "-shell-escape"
+                "-interaction nonstopmode"
+                "-output-directory %o"
+                "%f")
+              " ")))
+    (setq
+     org-latex-pdf-process
+     ;; run command 3x to update indexes and such
+     (list cmd cmd cmd)))
 #+END_SRC
+*** Integration with other systems
+**** Org Mobile
 
+Org Mobile allows me to take my org files on my iPhone.
 
-*** jira integration
+It exchanges the files in both directions using Dropbox.
+
 #+BEGIN_SRC emacs-lisp
-(setq jiralib-url "https://jira.melexis.com/jira")
+  ;; Set to the name of the file where new notes will be stored
+  (setq org-mobile-inbox-for-pull "~/org/flagged.org")
+  ;; Set to <your Dropbox root directory>/Apps/MobileOrg.
+  (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+  (setq org-mobile-files
+        (quote
+         (org-agenda-files
+          "~/org/todo.org"
+          "~/org/emacs.org"
+          "~/org/pfus.org")))
+
+  ;; org-mobile integration and automation.
+  ;;
+  ;; wait 60 min between auto updates to avoid losing time
+  ;; when "catching up"
+  (setq  org-mobile-last-sync 0)
+
+  (defun pti-set-difference (a b)
+    (delq nil
+     (mapcar
+      (lambda (x)
+        (when (not (and (member x a) (member x b))) x))
+      (append a b))))
+
+  (defun open-buffer-names ()
+    (mapcar 'buffer-name (buffer-list)))
+
+  (defun restore-buffers (fn)
+    (let ((old-open-buffers (open-buffer-names)))
+      (funcall fn)
+      (dolist ( buffer-name
+                (pti-set-difference (open-buffer-names)
+                                    old-open-buffers))
+        (kill-buffer buffer-name))))
+
+  (defun org-mobile-pullpush nil nil
+    ( if (> (- (float-time) org-mobile-last-sync) 3600)
+       (progn
+          (restore-buffers 'org-mobile-pull)
+          (restore-buffers 'org-mobile-push)
+          (setq org-mobile-last-sync (float-time))))
+  )
+
+  ;; sync at start, finish and in between 2x p hr
+  (add-hook 'after-init-hook
+            (lambda ()
+              (restore-buffers 'org-mobile-pull)))
+  (add-hook 'kill-emacs-hook
+            (lambda ()
+              (restore-buffers 'org-mobile-push)))
+  (run-at-time "00:29" 7200 'org-mobile-pullpush)
 #+END_SRC
 
-*** org-mode to habitrpg integration
+#+RESULTS:
+: [nil 21518 11692 0 7200 org-mobile-pullpush nil nil 0]
+
+**** jira integration
+#+BEGIN_SRC emacs-lisp
+  (setq jiralib-url "https://jira.melexis.com/jira")
+  (setq org-jira-working-dir "~/org/melexis/jira")
+
+#+END_SRC
+
+#+RESULTS:
+: ~/org/melexis/jira
+
+**** org-mode to habitrpg integration
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
@@ -1325,10 +1541,45 @@ standard search path.
 (add-to-list 'hrpg-tags-list "PROGRAMMING")
 (add-to-list 'hrpg-tags-list "WORK")
 
-;; user login information
-(setq habitrpg-api-user "21954734-2247-476e-9a8a-ad6b65b12f2d")
-(setq habitrpg-api-token "776b6076-9ebd-4b84-b116-d472bc25641f")
 #+END_SRC
+
+**** org-protocol handlers with browsers
+
+Load the handlers for the browser protocol extenders.
+
+This allows emacsclient to do interesting stuff with URL protocols
+
+e.g.
+
+#+BEGIN_SRC bash
+$ macsclient org-protocol://store-link:...
+                    ...//http:%2F%2Flocalhost%2Findex.html/The%20title
+#+END_SRC
+
+Stores a link to *http://localhost/index.html* in the kill ring to be
+pasted in as a org-link, or as text.
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-protocol)
+#+END_SRC
+
+#+RESULTS:
+: org-protocol
+
+The problem is that on the Mac you apparently need to use a special
+app to trigger emacsclient in order to register the URL handler. And
+this app does not work with the homebrew emacs version.
+
+It does work for Aquamacs and this program has the emacs bin directory
+with the emacsclient in the *Contents/MacOS/* folder next to the Emacs
+binary.
+
+When we create a symbolic link from /usr/local/Cellar/emacs/HEAD/bin
+to /Applications/Emacs.app/Contents/MacOS/bin, and then another link
+from /Applications/Emacs.app to /Applications/Aquamacs.app then the
+EmacsClient.app does not know the difference.
+
+This was successfully tested on Firefox.
 
 ** Markdown
 
@@ -1369,7 +1620,8 @@ markdown cycling.
 
 #+END_SRC
 
-Notice also that the *A-r* shortcut shows a preview of the document in the browser.
+Notice also that the *A-r* shortcut shows a preview of the document in
+the browser.
 
 ** ASCII art with Artist
 
@@ -1381,34 +1633,45 @@ Add ido support to select operations and settinngs
   ;;; integrate ido with artist-mode
   (defun artist-ido-select-operation (type)
     "Use ido to select a drawing operation in artist-mode"
-    (interactive (list (ido-completing-read "Drawing operation: "
-                                            (list "Pen" "Pen Line" "line" "straight line" "rectangle"
-                                                  "square" "poly-line" "straight poly-line" "ellipse"
-                                                  "circle" "text see-thru" "text-overwrite" "spray-can"
-                                                  "erase char" "erase rectangle" "vaporize line" "vaporize lines"
-                                                  "cut rectangle" "cut square" "copy rectangle" "copy square"
-                                                  "paste" "flood-fill"))))
+    (interactive
+     (list
+      (ido-completing-read
+       "Drawing operation: "
+       (list "Pen" "Pen Line" "line" "straight line" "rectangle"
+             "square" "poly-line" "straight poly-line" "ellipse"
+             "circle" "text see-thru" "text-overwrite" "spray-can"
+             "erase char" "erase rectangle" "vaporize line"
+             "vaporize lines" "cut rectangle" "cut square"
+             "copy rectangle" "copy square" "paste" "flood-fill"))))
     (artist-select-operation type))
 
   (defun artist-ido-select-settings (type)
     "Use ido to select a setting to change in artist-mode"
-    (interactive (list (ido-completing-read "Setting: "
-                                            (list "Set Fill" "Set Line" "Set Erase" "Spray-size" "Spray-chars"
-                                                  "Rubber-banding" "Trimming" "Borders"))))
+    (interactive
+     (list
+      (ido-completing-read
+       "Setting: "
+       (list "Set Fill" "Set Line" "Set Erase" "Spray-size"
+             "Spray-chars" "Rubber-banding" "Trimming" "Borders"))))
     (if (equal type "Spray-size")
         (artist-select-operation "spray set size")
-      (call-interactively (artist-fc-get-fn-from-symbol
-                           (cdr (assoc type '(("Set Fill" . set-fill)
-                                              ("Set Line" . set-line)
-                                              ("Set Erase" . set-erase)
-                                              ("Rubber-banding" . rubber-band)
-                                              ("Trimming" . trimming)
-                                              ("Borders" . borders)
-                                              ("Spray-chars" . spray-chars))))))))
+      (call-interactively
+       (artist-fc-get-fn-from-symbol
+        (cdr
+         (assoc type
+                '(("Set Fill" . set-fill)
+                  ("Set Line" . set-line)
+                  ("Set Erase" . set-erase)
+                  ("Rubber-banding" . rubber-band)
+                  ("Trimming" . trimming)
+                  ("Borders" . borders)
+                  ("Spray-chars" . spray-chars))))))))
   (add-hook 'artist-mode-init-hook
             (lambda ()
-              (define-key artist-mode-map (kbd "C-c C-a C-o") 'artist-ido-select-operation)
-              (define-key artist-mode-map (kbd "C-c C-a C-c") 'artist-ido-select-settings)))
+              (define-key artist-mode-map
+                (kbd "C-c C-a C-o") 'artist-ido-select-operation)
+              (define-key artist-mode-map
+                (kbd "C-c C-a C-c") 'artist-ido-select-settings)))
 
 #+END_SRC
 
@@ -1427,11 +1690,15 @@ C-M-x: Load the HTML tag immediately around the point.
 #+BEGIN_SRC emacs-lisp
   (add-to-list
    'auto-mode-alist
-   (cons (concat "\\." (regexp-opt '("xml" "xsd" "sch" "rng" "xslt" "svg" "rss") t) "\\'")
-         'nxml-mode))
+   (cons
+    (concat
+     "\\."
+     (regexp-opt '("xml" "xsd" "sch" "rng" "xslt" "svg" "rss") t)
+     "\\'")
+    'nxml-mode))
 
   (setq magic-mode-alist
-        (cons '("<＼＼?xml " . nxml-mode)
+        (cons '("<\\?xml " . nxml-mode)
               magic-mode-alist))
 
   (fset 'xml-mode 'nxml-mode)
@@ -1480,7 +1747,8 @@ Map magit-status so it is only 1 global keystroke away.
 
 ** Project Support
 
-Projectile offers project support like searching files in the current project.
+Projectile offers project support like searching files in the current
+project.
 
 A project is essentially a folder structure below a root which is
 identified by the presence of a magic file, typically a build file, or
@@ -1552,12 +1820,6 @@ this code
               (set (make-local-variable 'scroll-conservatively)
                    8192)))
 
-
-  (setq rcirc-authinfo '(("freenode" nickserv "snamellit" "snowball")))
-  (setq rcirc-default-nick "snamellit")
-  (setq rcirc-default-user-name "snamellit")
-  (setq rcirc-default-full-name "peter tillemans")
-
   ;; Join these channels at startup.
   (setq rcirc-server-alist
         '(("irc.freenode.net"
@@ -1572,22 +1834,32 @@ this code
 ** Gnus News and Mail reading
 
 #+BEGIN_SRC emacs-lisp
-(setq gnus-select-method '(nntp "newsgroups.telenet.be"))
+  (setq gnus-select-method '(nntp "newsgroups.telenet.be"))
 
-(setq gnus-secondary-select-methods '((nnimap "gmail-melexis"
-                                               (nnimap-address "imap.gmail.com")
-                                               (nnimap-server-port 993)
-                                               (nnimap-stream ssl))))
+  (setq gnus-secondary-select-methods
+        '((nnimap "gmail-melexis"
+                  (nnimap-address "imap.gmail.com")
+                  (nnimap-server-port 993)
+                  (nnimap-stream ssl))))
 
-(setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
-      smtpmail-auth-credentials '(("smtp.gmail.com" 587 "pti@melexis.com" nil))
-      smtpmail-default-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      smtpmail-local-domain "melexis.com")
+  (setq message-send-mail-function 'smtpmail-send-it)
+
 #+END_SRC
 
+Note that in private.el are the mail accounts like:
+
+#+BEGIN_SRC emacs-lisp
+  ;; gnus email personal config
+  (setq smtpmail-starttls-credentials '(("XXXX.XXXXX.XXX" 587
+                                         nil nil))
+        smtpmail-auth-credentials '(("XXXX.XXXXX.XXX" 587
+                                     "XXX@XXXXXXXX.XXX" nil))
+        smtpmail-default-smtp-server "XXXX.XXXXX.XXX"
+        smtpmail-smtp-server "XXXX.XXXXX.XXX"
+        smtpmail-smtp-service 587
+        smtpmail-local-domain "XXXXXXX.XXX")
+
+#+END_SRC
 ** Web Server with Elnode
 
 Elnode is an implementation of an event driven server a la node.
@@ -1668,4 +1940,4 @@ Gist buffer, always useful for collab.
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
-#+END_
+#+END_SRC

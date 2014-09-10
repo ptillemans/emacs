@@ -13,8 +13,7 @@
  '(multi-term-scroll-show-maximum-output t)
  '(org-agenda-files
    (quote
-    ("/Users/pti/org/google_calendar.org" "/Users/pti/org/beamer_example.org" "/Users/pti/org/cnc_ta.org" "/Users/pti/org/diary.org" "/Users/pti/org/emacs.org" "/Users/pti/org/flagged.org" "/Users/pti/org/index.org" "/Users/pti/org/notes.org" "/Users/pti/org/personal.org" "/Users/pti/org/pfus.org" "/Users/pti/org/play_ground.org" "/Users/pti/org/refile.org" "/Users/pti/org/snamellit.org" "/Users/pti/org/todo.org" "/Users/pti/org/ubuntu.org" "/Users/pti/org/vismaps.org" "/Users/pti/org/melexis/bin9_solution.org" "/Users/pti/org/melexis/dev_process.org" "/Users/pti/org/melexis/eeb-blueprints.org" "/Users/pti/org/melexis/globalit.org" "/Users/pti/org/melexis/licensies.org" "/Users/pti/org/melexis/melexis.org" "/Users/pti/org/melexis/middleware.org" "/Users/pti/org/melexis/o3.org" "/Users/pti/org/melexis/p_and_t.org" "/Users/pti/org/melexis/plm.org" "/Users/pti/org/melexis/robust_services.org" "/Users/pti/org/melexis/vcs_roadmap.org" "/Users/pti/org/melexis/vismaps.org" "/Users/pti/org/melexis/workshop-20120306.org")))
- '(org-latex-listings (quote minted))
+    ("/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/flagged.org" "/Users/pti/org/index.org" "/Users/pti/org/personal.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
  '(org-return-follows-link t)
  '(org-structure-template-alist
    (quote
