@@ -1,4 +1,4 @@
-#+TITLE: Snamellit Emacs Configuration
+
 #+DATE: <2014-09-02 Tue>
 #+OPTIONS: texht:t
 #+LATEX_CLASS: snm-article
@@ -137,6 +137,7 @@ uncomment my current preference.
   ;(load-theme 'solarized-dark t)
   ;(load-theme 'solarized-light t)
   (load-theme 'zenburn t)
+
 #+END_SRC
 
 I never use the toolbar, and seldom use the menu.
@@ -742,6 +743,16 @@ on the command line.
 after restarting the ansi-shell the terminal will behave a lot
 better
 
+Note that the ansi term buffer uses 2 modes :
+
+- C-c C-k  :  character mode
+- C-c C-j  :  line mode
+
+While in line mode the buffer behaves more as a real text buffer and
+allows copy pasting stuff. In character mode it behaves more like a
+real terminal, with the keybindings used in the terminal, but it is
+more isolated from the rest of emacs.
+
 *** Tell launched apps to use utf-8
 
 #+BEGIN_SRC emacs-lisp
@@ -1209,10 +1220,12 @@ consult the manual for more.
      "/Users/pti/org/index.org"
      "/Users/pti/org/personal.org"
      "/Users/pti/org/refile.org"
-     "/Users/pti/org/snamellit.org"
      "/Users/pti/org/todo.org"
-     "/Users/pti/org/ubuntu.org")))
+     )))
 #+END_SRC
+
+#+RESULTS:
+| /Users/pti/org/google_calendar.org | /Users/pti/org/diary.org | /Users/pti/org/flagged.org | /Users/pti/org/index.org | /Users/pti/org/personal.org | /Users/pti/org/refile.org | /Users/pti/org/todo.org |
 
 
 *** Org Babel
@@ -1798,12 +1811,6 @@ this code
 #+BEGIN_SRC emacs-lisp
   ; settings for rcirc IRC client
 
-  ;; colorize names
-  ;;(eval-after-load 'rcirc '(require 'rcirc-color))
-
-  ;; You can autoload, but at the end of this block we'll
-  ;; connect to two networks anyway.
-
   ;; Don't print /away messages.
   ;; This does not require rcirc to be loaded already,
   ;; since rcirc doesn't define a 301 handler (yet).
@@ -1811,8 +1818,8 @@ this code
     "/away message handler.")
 
   ;; Turn on spell checking.
-  ;(add-hook 'rcirc-mode-hook (lambda ()
-  ;                            (flyspell-mode 1)))
+  (add-hook 'rcirc-mode-hook (lambda ()
+                             (flyspell-mode 1)))
 
   ;; Keep input line at bottom.
   (add-hook 'rcirc-mode-hook
@@ -1828,8 +1835,17 @@ this code
                       "#clojure"
                       "#cucumber"
                       "#leiningen"
-                      "#ubuntu-bugs"))))
+                      "#ubuntu-bugs"))
+          ("irc.geekshed.net"
+           :channels ("#jupiterbroadcasting"))))
+
+
 #+END_SRC
+
+When starting *rcirc* it will open connections to the servers listed
+in the *rcirc-server-alist* and open a buffer for each of the channels
+listed.
+
 
 ** Gnus News and Mail reading
 

@@ -13,7 +13,7 @@
  '(multi-term-scroll-show-maximum-output t)
  '(org-agenda-files
    (quote
-    ("/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/flagged.org" "/Users/pti/org/index.org" "/Users/pti/org/personal.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
+    ("~/Projects/plone-lldb/lld.org" "~/org/melexis/melexis.org" "/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/flagged.org" "/Users/pti/org/index.org" "/Users/pti/org/personal.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
  '(org-return-follows-link t)
  '(org-structure-template-alist
    (quote
@@ -103,4 +103,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(term ((t (:background "#3f3f3f" :foreground "#dcdccc")))))
