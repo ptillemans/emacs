@@ -1,0 +1,7 @@
+#+TITLE:JIRA interface
+
+The current integration with jira is based on jiralib, which uses the
+deprecated SOAP calls.
+
+
+*

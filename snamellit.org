@@ -132,11 +132,15 @@ I like the low contrast zenburn theme. Although I am also partial to
 solarized dark. So I install both packages and keep them ready and
 uncomment my current preference.
 
+Note: zenburn is incompatible with ansiterm and insist on displaying
+the content on a light background. I fixed it once, but it is broken
+again so I switched back to solarized.
+
 #+BEGIN_SRC emacs-lisp
   (require-packages 'zenburn-theme 'solarized-theme)
-  ;(load-theme 'solarized-dark t)
+  (load-theme 'solarized-dark t)
   ;(load-theme 'solarized-light t)
-  (load-theme 'zenburn t)
+  ;(load-theme 'zenburn t)
 
 #+END_SRC
 
@@ -196,6 +200,16 @@ I decided a very long time ago that I only want to deal with UTF-8.
 #+END_SRC
 
 * Editing Environment
+
+** Vi emulation
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'evil)
+  (evil-mode 1)
+#+END_SRC
+
+#+RESULTS:
+: t
 
 * General
 
@@ -529,6 +543,46 @@ Enable it when editing emacs lisp and also enable highlighting parens.
 #+RESULTS:
 | lambda | nil | (paredit-mode 1) | (show-paren-mode 1) |
 
+** Elixir
+
+Elixir has good tooling in emacs.
+
+*elixir-mode* is actively maintained to add language support to emacs.
+
+*alchemist* contains the elixir tooling integration. It provides
+access to the *iex* shell, adds interactive help based on iex so it is
+always accurate with the installed elixir, and of course support for
+the *mix* build system.
+
+The older *elixir-mix* package has been included in *alchemist* and is
+now considered obsolete : it is no longer maintained.
+
+There is a snippet collection in *elixir-yasnippets*
+
+#+BEGIN_SRC emacs-lisp
+  ;; elixir-mode : basic elixir editing support
+  ;; elixir-yasnippets : predefined elixir snippets
+  ;; alchemist : mix and other elixir tool integration
+  ;; Note : elixir-mix is included in alchemist and obsolete now
+  (require-packages 'alchemist 'elixir-mode 'elixir-yasnippets)
+
+  ;; add a hook to compile on save
+  (defun elixir-mode-compile-on-save ()
+    "Elixir mode compile files on save."
+      (and (file-exists (buffer-file-name))
+           (file-exists (elixir-mode-compiled-file-name))
+               (elixir-cos-mode t)))
+  (add-hook 'elixir-mode-hook 'elixir-mode-compile-on-save)
+
+
+  ;; enable to let mix run the test suite on save
+  (setq alchemist-hooks-test-on-save t)
+
+#+END_SRC
+
+#+RESULTS:
+| elixir-mode-compile-on-save | alchemist-mode-hook |
+
 
 ** TODO Python
 
@@ -775,7 +829,6 @@ more isolated from the rest of emacs.
 #+END_SRC
 
 * Web Development
-
 ** Web Templates
 
 #+BEGIN_SRC emacs-lisp
@@ -854,7 +907,6 @@ C-c C-a e attribute end
 C-c C-a s attribute select
 C-c C-a t attribute transpose
 C-c C-a n attribute next
-
 
 ** CSS
 
@@ -1210,22 +1262,13 @@ consult the manual for more.
 *** Calendar
 **** Calendar files
 
-#+BEGIN_SRC emacs-lisp
-  (setq
-   org-agenda-files
-   (quote
-    ("/Users/pti/org/google_calendar.org"
-     "/Users/pti/org/diary.org"
-     "/Users/pti/org/flagged.org"
-     "/Users/pti/org/index.org"
-     "/Users/pti/org/personal.org"
-     "/Users/pti/org/refile.org"
-     "/Users/pti/org/todo.org"
-     )))
-#+END_SRC
+Calendar files are set in the variable org-agenda-files.
 
-#+RESULTS:
-| /Users/pti/org/google_calendar.org | /Users/pti/org/diary.org | /Users/pti/org/flagged.org | /Users/pti/org/index.org | /Users/pti/org/personal.org | /Users/pti/org/refile.org | /Users/pti/org/todo.org |
+However it is best to let this be managed with custom.el.
+
+- C-c [ : add current file to front of the list
+- C-c ] : remove the file of the list
+- C-c a t : show current todo list over all the files.
 
 
 *** Org Babel
@@ -1530,6 +1573,19 @@ It exchanges the files in both directions using Dropbox.
 : ~/org/melexis/jira
 
 **** org-mode to habitrpg integration
+
+This module ties org mode to habitrpg.
+
+Whenever a tast changes status it is added to habitrpg. This is easy
+and automatic.
+
+Tag (in org-mode) your habits and dailys with *hrpghabit*, *hrpgdaily*,
+and *hrpgreward* to get them in the corresponding categories.
+
+- f9 a  : display habitrpg status
+- C-c C-x h : copy a task to habitrpg manually
+
+Clocking in and out is also supported.
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
