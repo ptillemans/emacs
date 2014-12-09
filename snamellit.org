@@ -134,11 +134,14 @@ uncomment my current preference.
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'zenburn-theme 'solarized-theme)
-  ;(load-theme 'solarized-dark t)
+  (load-theme 'solarized-dark t)
   ;(load-theme 'solarized-light t)
-  (load-theme 'zenburn t)
+  ;(load-theme 'zenburn t)
 
 #+END_SRC
+
+#+RESULTS:
+: t
 
 I never use the toolbar, and seldom use the menu.
 
