@@ -199,6 +199,20 @@ I decided a very long time ago that I only want to deal with UTF-8.
 (prefer-coding-system 'utf-8)
 #+END_SRC
 
+** Tramp remote editing
+
+Change default mode from 'scp' to 'ssh' as this is faster.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq tramp-default-method "ssh")
+
+#+END_SRC
+
+#+RESULTS:
+: ssh
+
+
 * Editing Environment
 
 ** Smart Mode line
@@ -2233,3 +2247,54 @@ Gist buffer, always useful for collab.
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-c\C-g" 'gist-buffer-confirm)
 #+END_SRC
+
+** with Postgresql
+
+The default implementation of *postgresql* in org-babel is not
+consistent with the documentation on the web.
+
+In fact it only uses the *cmdline* parameter and ignores the *dbhost*,
+*dbuser*, *dbpassword* and *database* parameters. There is no real
+reason not to support it, but it just does not.
+
+I patched it once, but forgot to send the patch upstream.
+
+Currently the workaround consists of adding all this information to
+the *cmdline*  parameter.
+
+e.g.
+
+#+BEGIN_SRC org
+  ,#+name: get-risk-data
+  ,#+header: :engine postgresql
+  ,#+header: :cmdline -h postgresql.colo.elex.be -Ujira jira
+  ,#+BEGIN_SRC sql
+      select
+           p.pname
+         , p.pkey || '-' || i.issuenum as pkey
+         , rio.customvalue as riv
+      ...
+  ,#+END_SRC
+#+END_SRC
+
+Note that there is no password in the configuration, just the way I
+like it.
+
+Actually the passwords are in a file *~/.pgpass* which contains lines
+in the following format:
+
+: hostname:portnumber:database:username:password
+
+You can use * as a wildcard for databases, probably for other fields
+too but I do not know if this makes much sense in practice.
+
+e.g.
+
+#+BEGIN_EXAMPLE
+localhost:5432:*:pti:secret
+postgresql-test.colo.elex.be:5432:spagobi:spagobi:verysecret
+postgresql.colo.elex.be:5432:*:jira:moresecret
+#+END_EXAMPLE
+
+This avoids the passwords to be in plain sight in the files which
+would be a pain if parts of them are ever exported and published.

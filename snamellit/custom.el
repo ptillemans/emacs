@@ -37,6 +37,9 @@
  '(org-agenda-files
    (quote
     ("/Users/pti/org/flagged.org" "~/org/melexis/projects/pos/point-of-sales.org" "~/org/snamellit/snm_general.org" "~/org/notes.org" "~/org/melexis/management/brecht.org" "~/org/melexis/melexis.org" "/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/index.org" "/Users/pti/org/personal.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
+ '(org-jira-serv-alist
+   (quote
+    ((melexis password wqsXSbjSthVqr78Y username pti url\  https://jira\.melexis\.com/jira))))
  '(org-return-follows-link t)
  '(org-structure-template-alist
    (quote
