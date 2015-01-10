@@ -1,4 +1,3 @@
-
 #+DATE: <2014-09-02 Tue>
 #+OPTIONS: texht:t
 #+LATEX_CLASS: snm-article
@@ -144,6 +143,9 @@ again so I switched back to solarized.
 
 #+END_SRC
 
+#+RESULTS:
+: t
+
 I never use the toolbar, and seldom use the menu.
 
 The toolbar especially is a waste of space.
@@ -229,13 +231,41 @@ The vi emulation can really benefit from the powerline port.
 
 ** Vi emulation
 
+Install evil mode as it is a very capable Vi emulation and allows
+emacs to be used on the ipad.
+
+However this clashes with org-mode, notably the tab handling, so
+reset the keybindings with *evil-org* package.
+
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'evil)
+  (require-packages 'evil-leader 'evil 'evil-org)
   (evil-mode 1)
 #+END_SRC
 
 #+RESULTS:
 : t
+
+the evil-org package provides following evil keybinding in Org
+
+- gh    : go up a heading
+- gj    : previous heading on same level
+- gk    : next heading on same level
+- gl    : go down the next visible level
+- t     : create a todo item
+- T     : convert heading to todo item
+- H or ^: begin of line
+- L or $: end of line
+- > / < : promote/demote item
+- -     : cycle list bullet
+- TAB   : cycle org collapse nodes
+
+with leader :
+
+- t     : show todo tree
+- a     : agenda
+- c     : archive subtree
+- l     : open links
+- o     : update clocks
 
 ** Helm autocompletion mode
 
@@ -667,7 +697,7 @@ Enable clojure-mode and add support for clojurescript.
 
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'clojure-mode)
+(require-packages 'paredit 'clojure-mode)
 (add-to-list 'auto-mode-alist '("\.cljs$" . clojure-mode))
 (add-hook 'clojure-mode-hook 'paredit-mode)
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
@@ -1219,6 +1249,13 @@ Map mustache files to template mode
 * Content Creation
 
 ** Org Mode
+
+#+BEGIN_SRC emacs-lisp
+(setq xxorg-directory "~/org")
+#+END_SRC
+
+#+RESULTS:
+: ~/or*g
 
 *** Global keybindings
 
