@@ -1860,61 +1860,63 @@ Org Mobile allows me to take my org files on my iPhone.
 It exchanges the files in both directions using Dropbox.
 
 #+BEGIN_SRC emacs-lisp
-;; Set to the name of the file where new notes will be stored
-(setq org-mobile-inbox-for-pull "~/org/flagged.org")
-;; Set to <your Dropbox root directory>/Apps/MobileOrg.
-(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-(setq org-mobile-files
-    (quote
-     (org-agenda-files
-      "~/org/todo.org"
-      "~/org/emacs.org"
-      "~/org/pfus.org")))
+  ;; Set to the name of the file where new notes will be stored
+  (setq org-mobile-inbox-for-pull "~/org/flagged.org")
+  ;; Set to <your Dropbox root directory>/Apps/MobileOrg.
+  (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+  (setq org-mobile-files
+      (quote
+       (org-agenda-files
+        "~/org/todo.org"
+        "~/org/emacs.org"
+        "~/org/pfus.org")))
 
-;; org-mobile integration and automation.
-;;
-;; wait 60 min between auto updates to avoid losing time
-;; when "catching up"
-(setq  org-mobile-last-sync 0)
+  ;; org-mobile integration and automation.
+  ;;
+  ;; wait 60 min between auto updates to avoid losing time
+  ;; when "catching up"
+  (setq  org-mobile-last-sync 0)
 
-(defun pti-set-difference (a b)
-(delq nil
- (mapcar
-  (lambda (x)
-    (when (not (and (member x a) (member x b))) x))
-  (append a b))))
+  (defun pti-set-difference (a b)
+  (delq nil
+   (mapcar
+    (lambda (x)
+      (when (not (and (member x a) (member x b))) x))
+    (append a b))))
 
-(defun open-buffer-names ()
-(mapcar 'buffer-name (buffer-list)))
+  (defun open-buffer-names ()
+  (mapcar 'buffer-name (buffer-list)))
 
-(defun restore-buffers (fn)
-(let ((old-open-buffers (open-buffer-names)))
-  (funcall fn)
-  (dolist ( buffer-name
-            (pti-set-difference (open-buffer-names)
-                                old-open-buffers))
-    (kill-buffer buffer-name))))
+  (defun restore-buffers (fn)
+  (let ((old-open-buffers (open-buffer-names)))
+    (funcall fn)
+    (dolist ( buffer-name
+              (pti-set-difference (open-buffer-names)
+                                  old-open-buffers))
+      (kill-buffer buffer-name))))
 
-(defun org-mobile-pullpush nil nil
-( if (> (- (float-time) org-mobile-last-sync) 3600)
-   (progn
-      (restore-buffers 'org-mobile-pull)
-      (restore-buffers 'org-mobile-push)
-      (setq org-mobile-last-sync (float-time))))
-)
+  (defun org-mobile-pullpush nil nil
+  ( if (> (- (float-time) org-mobile-last-sync) 3600)
+     (progn
+        (restore-buffers 'org-mobile-pull)
+        (restore-buffers 'org-mobile-push)
+        (setq org-mobile-last-sync (float-time))))
+  )
 
-;; sync at start, finish and in between 2x p hr
-(add-hook 'after-init-hook
-        (lambda ()
-          (restore-buffers 'org-mobile-pull)))
-(add-hook 'kill-emacs-hook
-        (lambda ()
-          (restore-buffers 'org-mobile-push)))
-(run-at-time "00:29" 7200 'org-mobile-pullpush)
+  ;; My main desktop systems are Macs for now
+  (if (eq system-type 'darwin)
+      (progn
+       ;; sync at start, finish and in between 2x p hr
+       (add-hook 'after-init-hook
+                 (lambda ()
+                   (restore-buffers 'org-mobile-pull)))
+       (add-hook 'kill-emacs-hook
+                 (lambda ()
+                   (restore-buffers 'org-mobile-push)))
+       (run-at-time "00:29" 7200 'org-mobile-pullpush)))
 #+END_SRC
 
 #+RESULTS:
-: [nil 21518 11692 0 7200 org-mobile-pullpush nil nil 0]
 
 **** jira integration
 #+BEGIN_SRC emacs-lisp
