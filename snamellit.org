@@ -11,6 +11,11 @@
 Emacs comes with org-mode installed standard, which allows us to
 create the emacs configuration in a well documented manner.
 
+** Sources
+
+-
+- [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua emacs config]]
+
 * The basics
 
 ** Package and Extension Management
@@ -30,12 +35,10 @@ Let's add the melpa repo to get the cutting-edge goodness.
 (add-to-list
 'package-archives
 '("melpa" . "http://melpa.milkbox.net/packages/") t)
-;; (add-to-list
-;;  'package-archives
-;;  '("marmalade" . "http://marmalade-repo.org/packages/") t)
-
 #+END_SRC
 
+I used to have the marmalade repo configured too, but it's maintenance
+has been patchy over the last years, so I removed it.
 #+RESULTS:
 
 *** Initialize Package Management
@@ -136,15 +139,20 @@ the content on a light background. I fixed it once, but it is broken
 again so I switched back to solarized.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'zenburn-theme 'solarized-theme)
-  (load-theme 'solarized-dark t)
+  ;(require-packages 'zenburn-theme 'solarized-theme)
+  ;(load-theme 'solarized-dark t)
   ;(load-theme 'solarized-light t)
   ;(load-theme 'zenburn t)
+  (require-packages
+   'color-theme
+   'color-theme-solarized
+   'color-theme-sanityinc-solarized)
+
+  (color-theme-sanityinc-solarized-dark)
 
 #+END_SRC
 
 #+RESULTS:
-: t
 
 I never use the toolbar, and seldom use the menu.
 
@@ -175,22 +183,34 @@ control tools and their users can get confused by this.
 
 Let's move these to a separate folder.
 
+Also never delete backup versions, keep backup files for files under
+version control, add version numbers to the backup files.
+
+Disk space is cheap but don't forget to clean out the backup
+directory regularly.
+
 #+BEGIN_SRC emacs-lisp
-;; set the temporary files in a separate folder to avoid junk
-;; in the work directories. Autobuilds and git will be happier.
-;;
-;; stolen from
-;; http://github.com/febuiles/dotemacs/tree/master/temp_files.el
-(defvar user-temporary-file-directory "~/.emacs-autosaves/")
-(make-directory user-temporary-file-directory t)
-(setq backup-by-copying t)
-(setq backup-directory-alist
-    `(("." . ,user-temporary-file-directory)
-      (,tramp-file-name-regexp nil)))
-(setq auto-save-list-file-prefix
-    (concat user-temporary-file-directory ".auto-saves-"))
-(setq auto-save-file-name-transforms
-    `((".*" ,user-temporary-file-directory t)))
+  ;; set the temporary files in a separate folder to avoid junk
+  ;; in the work directories. Autobuilds and git will be happier.
+  ;;
+  ;; stolen from
+  ;; http://github.com/febuiles/dotemacs/tree/master/temp_files.el
+
+  (defvar user-temporary-file-directory "~/.emacs-autosaves/")
+
+  (make-directory user-temporary-file-directory t)
+  (setq backup-by-copying t)
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq backup-directory-alist
+        `(("." . ,user-temporary-file-directory)
+          (,tramp-file-name-regexp nil)))
+  (setq auto-save-list-file-prefix
+        (concat user-temporary-file-directory ".auto-saves-"))
+  (setq auto-save-file-name-transforms
+        `((".*" ,user-temporary-file-directory t)))
+
 #+END_SRC
 
 ** File Encodings
@@ -216,6 +236,20 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 
 
 * Editing Environment
+
+** Replace yes/no by y/n
+
+From [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-14][Sacha Chua's emacs config]].
+
+Lazy people like me don't want to type *yes* or *no* when *y* or *n*
+is ok.
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+#+RESULTS:
+: y-or-n-p
 
 ** Smart Mode line
 
@@ -483,7 +517,7 @@ you to search for marks with a helm interface.
 #+RESULTS:
 : helm-register
 
-*** helm interface for expression with eldoc
+** helm interface for expression with eldoc
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c h M-:") 'helm-eval-expression-with-eldoc)
@@ -648,7 +682,8 @@ Global mapping to comment and uncommenting
 ** Quickly jump in document with ace-jump-mode
 
 #+BEGIN_SRC emacs-lisp
-(define-key global-map (kbd "C-`") 'ace-jump-mode)
+  (require-packages 'ace-jump-mode)
+  (define-key global-map (kbd "C-`") 'ace-jump-mode)
 #+END_SRC
 
 #+RESULTS:
@@ -741,6 +776,21 @@ See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on 
                (groovy-electric-mode)
                (add-untabify-before-save)))
 #+END_SRC
+
+** Go
+
+Go mode used to be shipped with the Go language, however this has
+stopped with Go 1.4 and later. The canonical place for go-mode is
+github and an up-to-date version is available from melpa.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'go-mode
+                    'go-eldoc
+                    'go-projectile
+                    'go-snippets)
+#+END_SRC
+
+#+RESULTS:
 
 ** Javascript
 
@@ -1251,11 +1301,26 @@ Map mustache files to template mode
 ** Org Mode
 
 #+BEGIN_SRC emacs-lisp
-(setq xxorg-directory "~/org")
+(setq org-directory "~/org"
 #+END_SRC
 
 #+RESULTS:
-: ~/or*g
+: ~/org
+
+*** Add contrib directory if available
+
+The contrib directory is not shipped with emacs or with the org
+packages.
+
+So I added the git repository to the vendor extensions and then add
+the contrib directory included in there to the load path.
+
+#+BEGIN_SRC emacs-lisp
+  (if (file-exists-p "~/.emacs.d/vendor/org-mode")
+      (add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
+    (message "org-mode not present in vendor extensions"))
+
+#+END_SRC
 
 *** Global keybindings
 
@@ -1396,23 +1461,41 @@ consult the manual for more.
 - %T          timestamp with date and time
 - %u, %U      like the above, but inactive timestamps
 
+*** Narrowing to a node or block
+
+When the org files get bigger, it can get confusing when suddenly the
+window scroll away. It takes time to find the node back, especially if
+you jumped in from a ling and you have not navigated to it.
+
+By narrowing the buffer to the subtree or block you can avoid
+inadvertent moving away or doing changes to other parts of the file.
+
+- C-x n s : (org-narrow-to-subtree) Narrow buffer to current subtree.
+- C-x n b : (org-narrow-to-block) Narrow buffer to current block.
+- C-x n w : (widen) Widen buffer to remove narrowing.
 
 *** Refile targets
 #+BEGIN_SRC emacs-lisp
-; Targets include this file and any file contributing to the agenda
-; up to 2 levels deep
-(setq org-refile-targets (quote ((nil :maxlevel . 2)
-                               (org-agenda-files :maxlevel . 2))))
+  ; Targets include this file and any file contributing to the agenda
+  ; up to 2 levels deep
+  (setq org-refile-targets (quote ((nil :maxlevel . 2)
+                                 (org-agenda-files :maxlevel . 2))))
 
-; Targets start with the file name - allows creating level 1 tasks
-(setq org-refile-use-outline-path (quote file))
+  ; Targets start with the file name - allows creating level 1 tasks
+  (setq org-refile-use-outline-path (quote file))
 
-; Targets complete directly with IDO
-;  (setq org-outline-path-complete-in-steps nil)
+  ; Targets complete directly with IDO
+  ;  (setq org-outline-path-complete-in-steps nil)
 
-; Allow refile to create parent tasks with confirmation
-(setq org-refile-allow-creating-parent-nodes (quote confirm))
+  ; Allow refile to create parent tasks with confirmation
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+  ; helm does not show headers as refile target if this is not nil
+  (setq org-outline-path-complete-in-steps nil)
+
 #+END_SRC
+
+#+RESULTS:
 
 # *** Use IDO for for org
 # #+BEGIN_SRC emacs-lisp
@@ -1921,6 +2004,18 @@ EmacsClient.app does not know the difference.
 
 This was successfully tested on Firefox.
 
+**** taskjuggler project management
+
+The taskjuggler is an export target in the contrib folder.
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-taskjuggler)
+(add-to-list 'org-export-backends 'taskjuggler)
+#+END_SRC
+
+#+RESULTS:
+| taskjuggler | ascii | html | icalendar | latex |
+
 ** Markdown
 
 *** Support markdown files
@@ -2102,6 +2197,16 @@ VCS folder.
 (projectile-global-mode)
 #+END_SRC
 
+Projectile has a special module to integrate with helm and replaces
+several commands with helm enabled ones. Enable this alternative
+keymap.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-projectile)
+  (setq projectile-completion-system 'helm)
+  (helm-projectile-on)
+#+END_SRC
+
 
 ** Makefiles
 
@@ -2136,35 +2241,37 @@ this code
 ** Rcirc IRC client
 
 #+BEGIN_SRC emacs-lisp
-; settings for rcirc IRC client
+  ; settings for rcirc IRC client
 
-;; Don't print /away messages.
-;; This does not require rcirc to be loaded already,
-;; since rcirc doesn't define a 301 handler (yet).
-(defun rcirc-handler-301 (process cmd sender args)
-"/away message handler.")
+  ;; Don't print /away messages.
+  ;; This does not require rcirc to be loaded already,
+  ;; since rcirc doesn't define a 301 handler (yet).
+  (defun rcirc-handler-301 (process cmd sender args)
+  "/away message handler.")
 
-;; Turn on spell checking.
-(add-hook 'rcirc-mode-hook (lambda ()
-                         (flyspell-mode 1)))
+  ;; Turn on spell checking.
+  (add-hook 'rcirc-mode-hook (lambda ()
+                           (flyspell-mode 1)))
 
-;; Keep input line at bottom.
-(add-hook 'rcirc-mode-hook
-        (lambda ()
-          (set (make-local-variable 'scroll-conservatively)
-               8192)))
+  ;; Keep input line at bottom.
+  (add-hook 'rcirc-mode-hook
+          (lambda ()
+            (set (make-local-variable 'scroll-conservatively)
+                 8192)))
 
-;; Join these channels at startup.
-(setq rcirc-server-alist
-    '(("irc.freenode.net"
-       :channels ("#emacs"
-                  "#rcirc"
-                  "#clojure"
-                  "#cucumber"
-                  "#leiningen"
-                  "#ubuntu-bugs"))
-      ("irc.geekshed.net"
-       :channels ("#jupiterbroadcasting"))))
+  ;; Join these channels at startup.
+  (setq rcirc-server-alist
+      '(("irc.freenode.net"
+         :channels ("#emacs"
+                    "#rcirc"
+                    "#clojure"
+                    "#cucumber"
+                    "#leiningen"
+                    "#ubuntu-bugs"))
+        ("irc.geekshed.net"
+         :channels ("#jupiterbroadcasting"))
+        ("irc.codehaus.org"
+         :channel ("#activemq"))))
 
 
 #+END_SRC
@@ -2212,6 +2319,45 @@ Elnode is an implementation of an event driven server a la node.
 #+END_SRC
 
 * Integration with other systems
+
+** with Google Calendar
+
+Org-mode is awesome for task management however to do effective task
+scheduling we would need to have the calendar included too.
+
+The process for importing your google calendar is [[http://orgmode.org/worg/org-tutorials/org-google-sync.html][documented on Worg]].
+
+It uses the *ical2org.awk* script by Eric S. Fraga. I added a
+postamble with some file local variables to make the file read-only,
+to avoid complications, and to autorevert the file on updates.
+
+#+BEGIN_SRC awk
+
+  END {
+      # postamble
+
+      # print a local variable section to auto revert this file
+      print ""
+      print ""
+      print "# Local Variables:"
+      print "# buffer-read-only: 1"
+      print "# eval: (auto-revert-mode)"
+      print "# End:"
+  }
+
+#+END_SRC
+
+This makes it a lot easier when running in a cron job.
+
+I configured a recurring job which synchs every hour.
+
+Now make sure the calendar is in the calendar list. Go to the file and
+type *C-c [*.
+
+Then you can see your calendar with tasks etc, by typing *C-c a a*
+
+Note: make sure this section is not to close to the end of the file as
+emacs will mistake the awk snippet as a real varialble section.
 
 ** Integration with host system
 
