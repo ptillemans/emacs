@@ -1301,7 +1301,7 @@ Map mustache files to template mode
 ** Org Mode
 
 #+BEGIN_SRC emacs-lisp
-(setq org-directory "~/org"
+(setq org-directory "~/org")
 #+END_SRC
 
 #+RESULTS:
@@ -1316,11 +1316,21 @@ So I added the git repository to the vendor extensions and then add
 the contrib directory included in there to the load path.
 
 #+BEGIN_SRC emacs-lisp
-  (if (file-exists-p "~/.emacs.d/vendor/org-mode")
-      (add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
-    (message "org-mode not present in vendor extensions"))
+  ;;  (if (file-exists-p "~/.emacs.d/vendor/org-mode")
+  ;;      (add-to-list 'load-path "~/.emacs.d/vendor/org-mode/contrib/lisp")
+  ;;    (message "org-mode not present in vendor extensions"))
 
 #+END_SRC
+
+**** TODO Fix conflict with org-jira
+
+Currently I commented this out to fix a conflict with elpa's
+org-jira. The contrib folder also contains a stub implementation of
+org-jira which masks the elpa one.
+
+I also change the taskjuggler integration to directly load the code
+from the contrib folder rather than putting the contrib folder on the
+search path.
 
 *** Global keybindings
 
@@ -1920,8 +1930,9 @@ It exchanges the files in both directions using Dropbox.
 
 **** jira integration
 #+BEGIN_SRC emacs-lisp
-(setq jiralib-url "https://jira.melexis.com/jira")
-(setq org-jira-working-dir "~/org/melexis/jira")
+  (require-packages 'org-jira)
+  (setq jiralib-url "https://jira.melexis.com/jira")
+  (setq org-jira-working-dir "~/org/melexis/jira")
 
 #+END_SRC
 
@@ -2011,8 +2022,10 @@ This was successfully tested on Firefox.
 The taskjuggler is an export target in the contrib folder.
 
 #+BEGIN_SRC emacs-lisp
-(require 'ox-taskjuggler)
-(add-to-list 'org-export-backends 'taskjuggler)
+  (let ((tj3-file "~/.emacs.d/vendor/org-mode/contrib/lisp/ox-taskjuggler.el"))
+    (when (file-exists-p tj3-file)
+      (load-file tj3-file)
+      (add-to-list 'org-export-backends 'taskjuggler)))
 #+END_SRC
 
 #+RESULTS:
