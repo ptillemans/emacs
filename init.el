@@ -1,5 +1,16 @@
-
+(load-library "url-handlers")
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+			 ;("org" . "http://orgmode.org/elpa/")
+			 ))
 (package-initialize)
+(if (not (file-exists-p (concat user-emacs-directory "/elpa/archives/melpa/archive-content")))
+    (package-refresh-contents))
+
+(require 'org)
 (require 'ob-tangle)
+
 (org-babel-load-file "~/.emacs.d/snamellit.org")
 (put 'narrow-to-region 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
+(put 'upcase-region 'disabled nil)

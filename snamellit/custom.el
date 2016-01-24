@@ -13,7 +13,7 @@
  '(custom-enabled-themes (quote (sanityinc-solarized-dark)))
  '(custom-safe-themes
    (quote
-    ("4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
  '(fci-rule-color "#073642")
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
@@ -35,9 +35,16 @@
  '(magit-diff-use-overlays nil)
  '(magit-use-overlays nil)
  '(multi-term-scroll-show-maximum-output t)
+ '(org-agenda-custom-commands
+   (quote
+    (("n" "Agenda and all TODO's"
+      ((agenda "" nil)
+       (alltodo "" nil))
+      nil)
+     ("b" "All tasks in current buffer" todo-tree "" nil))))
  '(org-agenda-files
    (quote
-    ("~/org/melexis/ea/setup-ea.org" "~/org/melexis/projects/pos/point-of-sales.org" "/Users/pti/org/flagged.org" "/Users/pti/org/personal.org" "~/org/melexis/edi-program.org" "~/org/snamellit/snm_general.org" "~/org/notes.org" "~/org/melexis/management/brecht.org" "~/org/melexis/melexis.org" "/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/index.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
+    ("~/org/snamellit/snm_general.org" "~/org/melexis/ea/setup-ea.org" "~/org/melexis/projects/pos/point-of-sales.org" "/Users/pti/org/flagged.org" "~/org/melexis/edi-program.org" "~/org/notes.org" "~/org/melexis/management/brecht.org" "~/org/melexis/melexis.org" "/Users/pti/org/google_calendar.org" "/Users/pti/org/diary.org" "/Users/pti/org/index.org" "/Users/pti/org/refile.org" "/Users/pti/org/todo.org")))
  '(org-jira-serv-alist
    (quote
     ((melexis password wqsXSbjSthVqr78Y username pti url\  https://jira\.melexis\.com/jira))))
@@ -97,6 +104,9 @@
      ("A" "#+ASCII: " "")
      ("i" "#+INDEX: ?" "#+INDEX: ?")
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
+ '(package-selected-packages
+   (quote
+    (editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
  '(rcirc-server-alist
    (quote
     (("irc.freenode.net" :channels
@@ -104,7 +114,17 @@
      ("irc.geekshed.net" \#jupiterbroadcasting nil))) t)
  '(safe-local-variable-values
    (quote
-    ((buffer-read-only . 1)
+    ((python-shell-virtualenv-path . "/Users/pti/playpen/python/gmailpurge")
+     (python-shell-completion-string-code . "';'.join(get_ipython().Completer.all_completions('''%s'''))
+")
+     (python-shell-completion-module-string-code . "';'.join(module_completion('''%s'''))
+")
+     (python-shell-completion-setup-code . "from IPython.core.completerlib import module_completion")
+     (python-shell-prompt-output-regexp . "Out[[0-9]+]: ")
+     (python-shell-prompt-regexp . "In [[0-9]+]: ")
+     (python-shell-interpreter-args . "/Users/pti/playpen/python/gmailpurge/manage.py")
+     (python-shell-interpreter . "python")
+     (buffer-read-only . 1)
      (ruby-compilation-executable . "ruby")
      (ruby-compilation-executable . "ruby1.8")
      (ruby-compilation-executable . "ruby1.9")
@@ -113,6 +133,8 @@
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
  '(term-default-bg-color "#002b36")
  '(term-default-fg-color "#839496")
+ '(tidy-shell-command "/usr/local/bin/tidy")
+ '(tidy-temp-directory "~/tmp")
  '(vc-annotate-background "#2b2b2b")
  '(vc-annotate-color-map
    (quote

@@ -31,11 +31,13 @@ conservative.
 Let's add the melpa repo to get the cutting-edge goodness.
 
 #+BEGIN_SRC emacs-lisp
-;; enable package repositories
-(add-to-list
-'package-archives
-'("melpa" . "http://melpa.milkbox.net/packages/") t)
+  ;; enable package repositories
+  (add-to-list
+  'package-archives
+  '("melpa" . "http://melpa.milkbox.net/packages/") t)
 #+END_SRC
+
+#+RESULTS:
 
 I used to have the marmalade repo configured too, but it's maintenance
 has been patchy over the last years, so I removed it.
@@ -272,12 +274,12 @@ However this clashes with org-mode, notably the tab handling, so
 reset the keybindings with *evil-org* package.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'evil-leader 'evil 'evil-org)
-  (evil-mode 1)
+  ;; got bored of vi emulation
+  ;(require-packages 'evil-leader 'evil 'evil-org)
+  ;(evil-mode 1)
 #+END_SRC
 
 #+RESULTS:
-: t
 
 the evil-org package provides following evil keybinding in Org
 
@@ -529,6 +531,21 @@ you to search for marks with a helm interface.
 
 * General
 
+** EditorConfig support
+
+There is a new movement to provide cross platform/editor support for
+editor settings in IDE/Editors to make the life with linters more easy
+for multi person teams (and that include single person teams working
+back after an hiatus).
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'editorconfig)
+  (editorconfig-mode 1)
+#+END_SRC
+
+#+RESULTS:
+: t
+
 ** Whitespace handling
 
 *** Trailing white space
@@ -649,6 +666,14 @@ each time having the overhead of starting all the packages.
 #+RESULTS:
 | global-company-mode |
 
+** Syntax checking
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'flycheck)
+#+END_SRC
+
+#+RESULTS:
+
 ** Rainbow Delimiters
 
 #+BEGIN_SRC emacs-lisp
@@ -718,6 +743,21 @@ unwind-protects.
 (setq max-specpdl-size 30000)
 #+END_SRC
 
+** GNU Global tags
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'ggtags)
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                (ggtags-mode 1))))
+#+END_SRC
+
+#+RESULTS:
+| lambda | nil | (when (derived-mode-p (quote c-mode) (quote c++-mode) (quote java-mode)) (ggtags-mode 1)) |
+
+
+
 
 
 * Programming Languages
@@ -764,6 +804,8 @@ I also enabled the eldoc mode with cider.
 See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on the groovy website]].
 
 #+BEGIN_SRC emacs-lisp
+  (require-packages 'groovy-mode )
+
   ;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
   (autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
   (add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
@@ -797,16 +839,27 @@ github and an up-to-date version is available from melpa.
 For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'js2-mode 'js2-refactor)
+  (require-packages 'js2-mode 'js2-refactor)
 
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
 
-(js2r-add-keybindings-with-prefix "C-c C-m")
+  (setq js-indent-level 2)
+  (setq js-indent-first-init "dynamic")
 
-(add-hook 'js2-mode-hook 'add-untabify-before-save)
+  (js2r-add-keybindings-with-prefix "C-c C-m")
+
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (set (make-local-variable 'indent-tabs-mode) 'nil)
+              (set (make-local-variable 'js-indent-level) 2)
+              (set (make-local-variable 'tab-width) 2)
+              (add-untabify-before-save)))
 
 #+END_SRC
+
+#+RESULTS:
+| (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | skewer-mode | add-untabify-before-save | er/add-js2-mode-expansions | er/add-js-mode-expansions |
 
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
@@ -895,7 +948,6 @@ There is a snippet collection in *elixir-yasnippets*
 #+RESULTS:
 | elixir-mode-compile-on-save | alchemist-mode-hook |
 
-
 ** TODO Python
 
 This is very 'light' for python development. Especially with plone
@@ -912,6 +964,7 @@ On the other hand the include python mode works quite well out of the box.
 - C-c C-p:   Run python repl
 - C-c C-c:   Execute current buffer in python
 - C-c C-v:   Syntax check with pyflakes
+- C-c C-z:   Switch to python shell
 
 - C-c <:     Indent left
 - C-c >:     Indent right
@@ -924,6 +977,42 @@ Skeletons :
 - C-c C-t m: import
 - C-c C-t t: try catch
 - C-c C-t w: while loop
+
+*** Virtualenv support
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'virtualenvwrapper)
+  (venv-initialize-interactive-shells) ;; if you want interactive shell support
+  (venv-initialize-eshell) ;; if you want eshell support
+
+  ;; where are the virtual environments?
+
+  ;; when a single path is given then the packages assumes
+  ;; all virtualenvs are in this folder.
+  (setq venv-location (concat
+                       (getenv "HOME")
+                       "/playpen/python"))
+
+  ;; when a list of paths is given, then each path should
+  ;; point to a virtualenv. All of them must have a unique
+  ;; folder name (the last part of the path) as that is used
+  ;; to find the right virtualenv to activate
+  ;;(setq venv-location  '("/Users/pti/Nitrous/snamellit-6031/python-100545/itbiusers"
+  ;;                      "/Users/pti/projects/vcs-adapter"))
+#+END_SRC
+
+#+RESULTS:
+: /Users/pti/playpen/python
+
+*** TODO Auto completion and docs with Jedi
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'jedi)
+  (add-hook 'python-hook-mode 'jedi:setup)
+  (setq jedi:complete-on-dot t)
+
+#+END_SRC
+
 
 *** TODO Kind of Electric newlines
 
@@ -938,13 +1027,32 @@ Indent after a new line.
 
 However, this seems so _cuddly_ that there must be a better way
 
-The standard C-j electric newline does not seem to do what I want. It behaves weird.
+The standard C-j electric newline does not seem to do what I want. It
+behaves weird.
+
+*** Django Support
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'python-django)
+#+END_SRC
+
+#+RESULTS:
+
 
 *** Python unit testing with nose
 
 #+BEGIN_SRC emacs-lisp
 (require-packages 'nose)
 #+END_SRC
+
+*** IPython Notebook Support
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'ein)
+
+#+END_SRC
+
+#+RESULTS:
 
 ** TODO Ruby
 
@@ -1070,6 +1178,25 @@ OTOH I do very little scala atm, so I'll look at it later.
   (add-hook 'scala-mode-hook 'add-untabify-before-save)
 #+END_SRC
 
+** TODO Rust
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'flycheck-rust 'racer 'company-racer 'rust-mode)
+
+  (setq racer-cmd "/Users/pti/.cargo/bin/racer")
+  (setq racer-rust-src-path "/Users/pti/playpen/rust/rust/src")
+
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode)
+  (add-hook 'racer-mode-hook #'company-mode)
+
+  (global-set-key (kbd "TAB") #'company-indent-or-complete-common) ;
+  (setq company-tooltip-align-annotations t)
+#+END_SRC
+
+#+RESULTS:
+: t
+
 ** Shell
 
 #+BEGIN_SRC emacs-lisp
@@ -1146,17 +1273,26 @@ more isolated from the rest of emacs.
 ** Web Templates
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (require-packages 'web-mode)
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 
-(add-hook 'web-mode-hook 'add-untabify-before-save)
+  (add-hook 'web-mode-hook 'add-untabify-before-save)
+
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+
+  (setq web-mode-style-padding 1)
+  (setq web-mode-script-padding 1)
+
 #+END_SRC
 
 #+RESULTS:
+: 1
 
 *** Shortcuts for web-mode
 
@@ -1475,7 +1611,7 @@ consult the manual for more.
 
 When the org files get bigger, it can get confusing when suddenly the
 window scroll away. It takes time to find the node back, especially if
-you jumped in from a ling and you have not navigated to it.
+you jumped in from a link and you have not navigated to it.
 
 By narrowing the buffer to the subtree or block you can avoid
 inadvertent moving away or doing changes to other parts of the file.
@@ -1678,7 +1814,7 @@ However it is best to let this be managed with custom.el.
 #+END_SRC
 
 
-*** Latex Support S
+*** Latex Support
 
 Org mode has great support to create nice looking documents and
 presentations using the LaTeX typesetting system.
@@ -1800,16 +1936,6 @@ classes.
              ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
 (add-to-list 'org-latex-classes
-           '("mlx-report" "\\documentclass{mlx-report}
-[NO-DEFAULT-PACKAGES]
-[NO-PACKAGES]"
-             ("\\part{%s}" . "\\part*{%s}")
-             ("\\chapter{%s}" . "\\chapter*{%s}")
-             ("\\section{%s}" . "\\section*{%s}")
-             ("\\subsection{%s}" . "\\subsection*{%s}")
-             ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-(add-to-list 'org-latex-classes
            '("mlx-book" "\\documentclass{mlx-book}
 [NO-DEFAULT-PACKAGES]
 [NO-PACKAGES]"
@@ -1862,6 +1988,7 @@ standard search path.
  ;; run command 3x to update indexes and such
  (list cmd cmd cmd)))
 #+END_SRC
+
 *** Integration with other systems
 **** Org Mobile
 
@@ -2031,17 +2158,30 @@ The taskjuggler is an export target in the contrib folder.
 #+RESULTS:
 | taskjuggler | ascii | html | icalendar | latex |
 
+**** groovy babel support
+
+The taskjuggler is an export target in the contrib folder.
+
+#+BEGIN_SRC emacs-lisp
+  (let ((ob-groovy "~/.emacs.d/vendor/org-mode/contrib/lisp/ob-groovy.el"))
+    (when (file-exists-p ob-groovy)
+      (load-file ob-groovy)
+      (add-to-list 'org-export-backends 'taskjuggler)))
+#+END_SRC
+
+#+RESULTS:
+
 ** Markdown
 
 *** Support markdown files
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'markdown-mode)
+  (require-packages 'markdown-mode)
 
-(setq auto-mode-alist (cons '("\\.markdown" . markdown-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.markdown" . markdown-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
 
-
+  (add-hook 'markdown-mode-hook '(lambda() (auto-fill-mode)))
 #+END_SRC
 
 *** Modify TAB behavior for markdown
@@ -2189,11 +2329,14 @@ Map magit-status so it is only 1 global keystroke away.
 - C-x g:  magit-status
 
 #+BEGIN_SRC emacs-lisp
-(global-set-key "\C-xg" 'magit-status)
+  (require-packages 'magit)
+  (global-set-key "\C-xg" 'magit-status)
+  (setq magit-last-seen-setup-instructions "1.4.0")
+  (setq magit-emacsclient-executable "/usr/local/bin/emacsclient")
 #+END_SRC
 
 #+RESULTS:
-: magit-status
+: 1.4.0
 
 ** Project Support
 
@@ -2217,7 +2360,7 @@ several commands with helm enabled ones. Enable this alternative
 keymap.
 
 #+BEGIN_SRC emacs-lisp
-  (require 'helm-projectile)
+  (require-packages 'helm-projectile)
   (setq projectile-completion-system 'helm)
   (helm-projectile-on)
 #+END_SRC
@@ -2325,13 +2468,6 @@ Note that in private.el are the mail accounts like:
     smtpmail-local-domain "XXXXXXX.XXX")
 
 #+END_SRC
-** Web Server with Elnode
-
-Elnode is an implementation of an event driven server a la node.
-
-#+BEGIN_SRC emacs-lisp
-(require-packages 'elnode)
-#+END_SRC
 
 * Integration with other systems
 
@@ -2437,6 +2573,8 @@ This use a server running in emacs to interact with.
 (require-packages 'edit-server)
 (edit-server-start)
 #+END_SRC
+
+#+RESULTS:
 
 ** with GitHub
 
