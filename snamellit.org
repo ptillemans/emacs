@@ -291,6 +291,10 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 #+RESULTS:
 : ssh
 
+
+#+BEGIN_SRC emacs-lisp
+(message "The basics done")
+#+END_SRC
 * Editing Environment
 
 ** Replace yes/no by y/n
@@ -626,6 +630,10 @@ which uses the menu structure
 #+RESULTS:
 : lacarte-execute-menu-command
 
+
+#+BEGIN_SRC emacs-lisp
+(message "editing environment done")
+#+END_SRC
 * General
 
 ** EditorConfig support
@@ -738,9 +746,12 @@ selected region from word --> sentence --> paragraph --> ... and back
 again. Similar for blocks in programming languages.
 
 #+BEGIN_SRC emacs-lisp
-(vendor 'expand-region)
-(global-set-key (kbd "C-@") 'er/expand-region)
+  (require 'expand-region)
+  (global-set-key (kbd "C-@") 'er/expand-region)
 #+END_SRC
+
+#+RESULTS:
+: er/expand-region
 
 ** Emacs Server
 In order to use emacs for quick and dirty edits it is useful to start
@@ -855,6 +866,10 @@ unwind-protects.
 
 
 
+
+#+BEGIN_SRC emacs-lisp
+(message "general done.")
+#+END_SRC
 
 * Programming Languages
 
@@ -1127,7 +1142,8 @@ Skeletons :
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'virtualenvwrapper)
-  (venv-initialize-interactive-shells) ;; if you want interactive shell support
+  (venv-initialize-interactive-shells) ;; if you want interactive shell
+                                       ;; support
   (venv-initialize-eshell) ;; if you want eshell support
 
   ;; where are the virtual environments?
@@ -1138,12 +1154,14 @@ Skeletons :
                        (getenv "HOME")
                        "/playpen/python"))
 
-  ;; when a list of paths is given, then each path should
-  ;; point to a virtualenv. All of them must have a unique
-  ;; folder name (the last part of the path) as that is used
-  ;; to find the right virtualenv to activate
-  ;;(setq venv-location  '("/Users/pti/Nitrous/snamellit-6031/python-100545/itbiusers"
-  ;;                      "/Users/pti/projects/vcs-adapter"))
+  ;; when a list of paths is given, then each path should point to a
+  ;; virtualenv. All of them must have a unique folder name (the last
+  ;; part of the path) as that is used to find the right virtualenv to
+  ;; activate
+  ;; (setq venv-location
+  ;;   '("/Users/pti/Nitrous/snamellit-6031/python-100545/itbiusers"
+  ;;     "/Users/pti/projects/vcs-adapter"))
+
 #+END_SRC
 
 #+RESULTS:
@@ -1283,12 +1301,16 @@ same ruby environment as the project I am working on.
 (require-packages 'rspec-mode)
 #+END_SRC
 
+#+RESULTS:
+
 **** Additional snippets for RSpec
 
 #+BEGIN_SRC emacs-lisp
   (eval-after-load 'rspec-mode
     '(rspec-install-snippets))
 #+END_SRC
+
+#+RESULTS:
 
 **** RSpec mode and ZSH and RVM
 
@@ -1311,6 +1333,9 @@ specs. This piece of code does the job:
 
   (ad-activate 'rspec-compile)
 #+END_SRC
+
+#+RESULTS:
+: rspec-compile
 
 ** TODO Scala
 
@@ -1412,6 +1437,11 @@ more isolated from the rest of emacs.
    (define-key shell-mode-map [down] 'comint-next-input)
    (define-key shell-mode-map "\C-p" 'comint-previous-input)
    (define-key shell-mode-map "\C-n" 'comint-next-input)))
+#+END_SRC
+
+** Languages done
+#+BEGIN_SRC emacs-lisp
+(message "languages done")
 #+END_SRC
 
 * Web Development
@@ -1576,6 +1606,11 @@ Map mustache files to template mode
 #+END_SRC
 
 #+RESULTS:
+
+** Web Development done
+#+BEGIN_SRC emacs-lisp
+  (message "web development section done")
+#+END_SRC
 
 * Content Creation
 
@@ -2484,6 +2519,12 @@ the 3D printing world. I downloaded an extension for it in the
 (add-hook 'scad-mode 'add-untabify-before-save)
 #+END_SRC
 
+** Content Creation Done
+
+#+BEGIN_SRC emacs-lisp
+  (message "Content Creation section done.")
+#+END_SRC
+
 * Programming Tools
 
 ** Version Control
@@ -2545,6 +2586,13 @@ This is stupid and ugly, but so be it. So we have to relax our
 ;; leave tabs in the file do not add the untabify hook here
 
 #+END_SRC
+
+** Programming Tools done
+
+#+BEGIN_SRC emacs-lisp
+  (message "Programming Tools section done")
+#+END_SRC
+
 
 * Applications
 ** Dired File Manager
@@ -2634,6 +2682,12 @@ Note that in private.el are the mail accounts like:
     smtpmail-smtp-service 587
     smtpmail-local-domain "XXXXXXX.XXX")
 
+#+END_SRC
+
+** Applications done
+
+#+BEGIN_SRC emacs-lisp
+  (message "Applications section done")
 #+END_SRC
 
 * Integration with other systems
@@ -2801,6 +2855,7 @@ postgresql.colo.elex.be:5432:*:jira:moresecret
 
 This avoids the passwords to be in plain sight in the files which
 would be a pain if parts of them are ever exported and published.
+
 ** with docker
 
 This allows to open files in docker containers with tramp using the
@@ -2828,7 +2883,21 @@ _/docker:container_name:/file/name_ syntax
                              (split-string dockernames-raw "\n"))))
           (setq ad-return-value dockernames))
       ad-do-it))
+
+  (message "docker tramp integration added.")
 #+END_SRC
 
 #+RESULTS:
 : tramp-completion-handle-file-name-all-completions
+
+** Integrations done
+
+#+BEGIN_SRC emacs-lisp
+  (message "Integration section done")
+#+END_SRC
+
+* Final thoughts
+
+#+BEGIN_SRC emacs-lisp
+  (message "Snamellit configuration completed.")
+#+END_SRC
