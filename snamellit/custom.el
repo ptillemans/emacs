@@ -3,8 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   [solarized-bg red green yellow blue magenta cyan solarized-fg])
  '(compilation-message-face (quote default))
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#839496")
@@ -14,7 +12,6 @@
  '(custom-safe-themes
    (quote
     ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
- '(fci-rule-color "#073642")
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -32,9 +29,18 @@
      ("#8B2C02" . 70)
      ("#93115C" . 85)
      ("#073642" . 100))))
+ '(hl-bg-colors
+   (quote
+    ("#7B6000" "#8B2C02" "#990A1B" "#93115C" "#3F4D91" "#00629D" "#00736F" "#546E00")))
+ '(hl-fg-colors
+   (quote
+    ("#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36")))
  '(magit-diff-use-overlays nil)
  '(magit-use-overlays nil)
  '(multi-term-scroll-show-maximum-output t)
+ '(nrepl-message-colors
+   (quote
+    ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(org-agenda-custom-commands
    (quote
     (("n" "Agenda and all TODO's"
@@ -106,7 +112,9 @@
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
  '(package-selected-packages
    (quote
-    (editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
+    (lacarte solarized-theme zenburn-theme slime editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
+ '(pos-tip-background-color "#073642")
+ '(pos-tip-foreground-color "#93a1a1")
  '(rcirc-server-alist
    (quote
     (("irc.freenode.net" :channels
@@ -135,31 +143,13 @@
  '(term-default-fg-color "#839496")
  '(tidy-shell-command "/usr/local/bin/tidy")
  '(tidy-temp-directory "~/tmp")
- '(vc-annotate-background "#2b2b2b")
- '(vc-annotate-color-map
-   (quote
-    ((20 . "#bc8383")
-     (40 . "#cc9393")
-     (60 . "#dfaf8f")
-     (80 . "#d0bf8f")
-     (100 . "#e0cf9f")
-     (120 . "#f0dfaf")
-     (140 . "#5f7f5f")
-     (160 . "#7f9f7f")
-     (180 . "#8fb28f")
-     (200 . "#9fc59f")
-     (220 . "#afd8af")
-     (240 . "#bfebbf")
-     (260 . "#93e0e3")
-     (280 . "#6ca0a3")
-     (300 . "#7cb8bb")
-     (320 . "#8cd0d3")
-     (340 . "#94bff3")
-     (360 . "#dc8cc3"))))
- '(vc-annotate-very-old-color "#dc8cc3")
  '(weechat-color-list
    (quote
-    (unspecified "#002b36" "#073642" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#839496" "#657b83"))))
+    (unspecified "#002b36" "#073642" "#990A1B" "#dc322f" "#546E00" "#859900" "#7B6000" "#b58900" "#00629D" "#268bd2" "#93115C" "#d33682" "#00736F" "#2aa198" "#839496" "#657b83")))
+ '(xterm-color-names
+   ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#eee8d5"])
+ '(xterm-color-names-bright
+   ["#002b36" "#cb4b16" "#586e75" "#657b83" "#839496" "#6c71c4" "#93a1a1" "#fdf6e3"]))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

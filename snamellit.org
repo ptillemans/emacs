@@ -17,8 +17,16 @@ create the emacs configuration in a well documented manner.
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua emacs config]]
 
 * The basics
-
 ** Force path to be consistent with terminal path
+
+The mac behaves increasingly weird with relation to how paths are
+being set in the terminal and in programs launched by  launchd (or by
+extension Alfred).
+
+In order to combat this I stole a trick from the Emacs wiki where the
+path is obtained from a login shell, so it is guaranteed to be
+consistent with the terminal. This will minimize surprises since I
+like my editing environment to be identical to the shell environment.
 
 #+BEGIN_SRC emacs-lisp
   (defun set-exec-path-from-shell-PATH ()
@@ -37,6 +45,10 @@ create the emacs configuration in a well documented manner.
 
 #+RESULTS:
 | /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /usr/local/MacGPG2/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.sdkman/candidates/lazybones/current/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
+
+
+Tip: run the code above with C-C C-C to see the actual path being set
+in the *RESULTS*.
 
 ** Package and Extension Management
 
@@ -137,6 +149,30 @@ preferences.
 (when (file-exists-p custom-file) (load custom-file))
 #+END_SRC
 
+** Setup registers for easy file access
+
+Registers allow to quickly access stuff, in this case files.
+
+Access the files using
+
+ - C-x r j <register>
+
+e.g.
+
+ - C-x r j s  : access ~/.emacs.d/snamellit.org
+ - C-x r j z  : open ~/.zshrc
+ - C-x r j m  : open ~/org/melexis/melexis.org
+
+
+#+BEGIN_SRC emacs-lisp
+  (set-register ?s (cons 'file "~/.emacs.d/snamellit.org"))
+  (set-register ?z (cons 'file "~/.zshrc"))
+  (set-register ?m (cons 'file "~/org/melexis/melexis.org"))
+#+END_SRC
+
+#+RESULTS:
+: (file . ~/org/melexis/melexis.org)
+
 ** Private information in separate file
 
 Some things cannot be shared to the repo's so we also load a private
@@ -149,7 +185,6 @@ Here oauth keys and other private details can be stored.
 (when (file-exists-p private-file) (load private-file))
 #+END_SRC
 
-
 ** Theming
 
 I like the low contrast zenburn theme. Although I am also partial to
@@ -161,10 +196,10 @@ the content on a light background. I fixed it once, but it is broken
 again so I switched back to solarized.
 
 #+BEGIN_SRC emacs-lisp
-  ;(require-packages 'zenburn-theme 'solarized-theme)
-  ;(load-theme 'solarized-dark t)
-  ;(load-theme 'solarized-light t)
-  ;(load-theme 'zenburn t)
+  (require-packages 'zenburn-theme 'solarized-theme)
+  (load-theme 'solarized-dark t)
+  (load-theme 'solarized-light t)
+  (load-theme 'zenburn t)
   (require-packages
    'color-theme
    'color-theme-solarized
@@ -255,7 +290,6 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 
 #+RESULTS:
 : ssh
-
 
 * Editing Environment
 
@@ -548,6 +582,49 @@ you to search for marks with a helm interface.
 #+RESULTS:
 : helm-eval-expression-with-eldoc
 
+** resize windows with C-S-arrowkey
+
+The normal keybindings for resizing windows are :
+
+ - C-x ^ : increase vertical size
+ - C-x } : increase horizotal size
+
+With ESC-number this is doable, but not very friendly : this is a
+control sequence to the bottom of the keyboard followed by a shift +
+top row key.
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+  (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+  (global-set-key (kbd "S-C-<down>") 'shrink-window)
+  (global-set-key (kbd "S-C-<up>") 'enlarge-window)
+#+END_SRC
+
+#+RESULTS:
+: enlarge-window
+
+Note that these keybindings are overriddden in org-mode buffers. In
+practice this is seldom a problem : go to another, non-org window and
+resize that.
+
+** control menus with lacarte
+
+Lacarte allows fast access to menu and other commands.
+
+There are 2 variants, one which uses the function names and the other
+which uses the menu structure
+
+ - ESC M-x : execute menu commands by function name
+ - M-` : execute menu commands by menu structure
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'lacarte)
+  (global-set-key [?\e ?\M-x] 'lacarte-execute-command)
+  (global-set-key [?\M-`] 'lacarte-execute-menu-command)
+#+END_SRC
+
+#+RESULTS:
+: lacarte-execute-menu-command
 
 * General
 
@@ -779,7 +856,6 @@ unwind-protects.
 
 
 
-
 * Programming Languages
 
 ** Clojure
@@ -854,7 +930,23 @@ github and an up-to-date version is available from melpa.
 
 #+RESULTS:
 
+** Lisp
+
+*** Slime mode
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'slime)
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+  (setq slime-contribs '(slime-fancy slime-js)) ; almost everything
+  (slime-setup '(slime-fancy slime-asdf slime-js))
+
+#+END_SRC
+
+#+RESULTS:
+
 ** Javascript
+
+*** js2-mode
 
 For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
 
@@ -884,6 +976,39 @@ For javascript, Steve Yegge's js2-mode is recommended over the version shipped w
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
 I also enabled the js2-refactor package.
+
+*** swank-js
+
+see [[https://github.com/swank-js/swank-js][SwankJS github repo]] for more details.
+
+Install Node.JS and npm using your favorite package manager.
+
+Install swank-js from npm:
+
+#+BEGIN_SRC sh
+  npm install -g swank-js
+#+END_SRC
+
+Now enable swank-js in emacs
+
+#+BEGIN_SRC emacs-lisp
+
+  (global-set-key [f5] 'slime-js-reload)
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (slime-js-minor-mode 1)))
+
+  ;; for css mode support
+  (add-hook 'css-mode-hook
+            (lambda ()
+              (define-key css-mode-map "\M-\C-x" 'slime-js-refresh-css)
+              (define-key css-mode-map "\C-c\C-r" 'slime-js-embed-css)))
+
+#+END_SRC
+
+#+RESULTS:
+| (lambda nil (define-key css-mode-map \230 (quote slime-js-refresh-css)) (define-key css-mode-map  (quote slime-js-embed-css))) | skewer-css-mode | add-untabify-before-save |
+
 
 *** Live Browser Interaction with skewer-mode
 
@@ -2286,6 +2411,25 @@ the browser.
 # #+END_SRC
 
 ** HTML and SGML
+*** escape html/xml code for inclusion
+
+#+BEGIN_SRC emacs-lisp
+  (defun unhtml (start end)
+    (interactive "r")
+    (save-excursion
+      (save-restriction
+        (narrow-to-region start end)
+        (goto-char (point-min))
+        (replace-string "&" "&amp;")
+        (goto-char (point-min))
+        (replace-string "<" "&lt;")
+        (goto-char (point-min))
+        (replace-string ">" "&gt;")
+        )))
+#+END_SRC
+
+#+RESULTS:
+: unhtml
 
 *** Live browser integration
 
@@ -2356,7 +2500,7 @@ Map magit-status so it is only 1 global keystroke away.
 #+END_SRC
 
 #+RESULTS:
-: 1.4.0
+: /usr/local/bin/emacsclient
 
 ** Project Support
 
