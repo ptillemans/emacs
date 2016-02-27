@@ -2801,3 +2801,34 @@ postgresql.colo.elex.be:5432:*:jira:moresecret
 
 This avoids the passwords to be in plain sight in the files which
 would be a pain if parts of them are ever exported and published.
+** with docker
+
+This allows to open files in docker containers with tramp using the
+_/docker:container_name:/file/name_ syntax
+
+#+BEGIN_SRC emacs-lisp
+  ;; Open files in Docker containers like so: /docker:drunk_bardeen:/etc/passwd
+  (push
+   (cons
+    "docker"
+    '((tramp-login-program "docker")
+      (tramp-login-args (("exec" "-it") ("%h") ("/bin/bash")))
+      (tramp-remote-shell "/bin/sh")
+      (tramp-remote-shell-args ("-i") ("-c"))))
+   tramp-methods)
+
+  (defadvice tramp-completion-handle-file-name-all-completions
+    (around dotemacs-completion-docker activate)
+    "(tramp-completion-handle-file-name-all-completions \"\" \"/docker:\" returns
+      a list of active Docker container names, followed by colons."
+    (if (equal (ad-get-arg 1) "/docker:")
+        (let* ((dockernames-raw (shell-command-to-string "docker ps | awk '$NF != \"NAMES\" { print $NF \":\" }'"))
+               (dockernames (cl-remove-if-not
+                             #'(lambda (dockerline) (string-match ":$" dockerline))
+                             (split-string dockernames-raw "\n"))))
+          (setq ad-return-value dockernames))
+      ad-do-it))
+#+END_SRC
+
+#+RESULTS:
+: tramp-completion-handle-file-name-all-completions
