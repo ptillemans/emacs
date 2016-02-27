@@ -2519,6 +2519,9 @@ VCS folder.
 (projectile-global-mode)
 #+END_SRC
 
+#+RESULTS:
+: t
+
 Projectile has a special module to integrate with helm and replaces
 several commands with helm enabled ones. Enable this alternative
 keymap.
