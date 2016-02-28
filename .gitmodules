@@ -1,9 +1,0 @@
-[submodule "vendor/expand-region.el"]
-	path = vendor/expand-region.el
-	url = https://github.com/magnars/expand-region.el.git
-[submodule "vendor/habitrpg"]
-	path = vendor/habitrpg
-	url = http://github.com/ryjm/habitrpg.el.git
-[submodule "org-mode"]
-	path = vendor/org-mode
-	url = git://orgmode.org/org-mode.git
