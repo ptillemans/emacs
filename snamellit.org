@@ -790,9 +790,14 @@ IntelliJ has a cool feature that a single keystroke switches the
 selected region from word --> sentence --> paragraph --> ... and back
 again. Similar for blocks in programming languages.
 
+ - C-= : expand region
+
 #+BEGIN_SRC emacs-lisp
   (require-packages 'expand-region)
+n<<<<<<< variant A
   (global-set-key (kbd "C-@") 'er/expand-region)
+>>>>>>> variant B
+======= end
 #+END_SRC
 
 #+RESULTS:
@@ -2190,31 +2195,36 @@ One of the best ways is to use the minted option which uses the python
 standard search path.
 
 #+BEGIN_SRC emacs-lisp
-;; Setup minted fancy listings
-(setq org-latex-listings 'minted)
-(setq org-latex-custom-lang-environments
-    '(
-      (emacs-lisp "common-lispcode")
-      ))
-(setq org-latex-minted-options
-    '(("frame" "lines")
-      ("fontsize" "\\scriptsize")
-      ("linenos" "")))
+  ;; Setup minted fancy listings
+  (setq org-latex-listings 'minted)
+  (setq org-latex-custom-lang-environments
+      '(
+  ;;      (emacs-lisp "common-lispcode")
+        ))
+  (setq org-latex-minted-options
+      '(("frame" "lines")
+        ("fontsize" "\\scriptsize")
+        ("linenos" "")
+        ("breaklines" "true")
+        ("breakanywhere" "true")))
 
-;; Add -shell-escape to enable pygmentize to be called
-(let ((cmd (mapconcat
-          'identity
-          '("pdflatex"
-            "-shell-escape"
-            "-interaction nonstopmode"
-            "-output-directory %o"
-            "%f")
-          " ")))
-(setq
- org-latex-pdf-process
- ;; run command 3x to update indexes and such
- (list cmd cmd cmd)))
+  ;; Add -shell-escape to enable pygmentize to be called
+  (let ((cmd (mapconcat
+            'identity
+            '("lualatex"
+              "-shell-escape"
+              "-interaction nonstopmode"
+              "-output-directory %o"
+              "%f")
+            " ")))
+  (setq
+   org-latex-pdf-process
+   ;; run command 3x to update indexes and such
+   (list cmd cmd cmd)))
 #+END_SRC
+
+#+RESULTS:
+| lualatex -shell-escape -interaction nonstopmode -output-directory %o %f | lualatex -shell-escape -interaction nonstopmode -output-directory %o %f | lualatex -shell-escape -interaction nonstopmode -output-directory %o %f |
 
 *** Integration with other systems
 **** Org Mobile

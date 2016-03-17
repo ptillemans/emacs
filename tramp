@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <16/02/27 19:53:22 /home/pti/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <16/02/27 23:51:34 /home/pti/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -25,5 +25,22 @@
   ("git" "\\git"))
  (["docker" nil "test" nil nil]
   nil)
- (["ssh" nil "docker" nil nil]
-  nil))
+ (["docker" nil "ubuntu" nil nil]
+  ("locale" "LC_ALL=C")
+  ("uname" "Linux 4.4.1-2-ARCH")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("~" "/root")
+  ("file-exists" "test -e")
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("gid-string" "root")
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")
+  ("readlink" "\\readlink")
+  ("ls" "/bin/ls --color=never")
+  ("git" nil)))
