@@ -2813,7 +2813,53 @@ postgresql.colo.elex.be:5432:*:jira:moresecret
 This avoids the passwords to be in plain sight in the files which
 would be a pain if parts of them are ever exported and published.
 
-** with docker
+** with  docker
+
+*** Get the connection to the docker environment
+
+#+BEGIN_SRC emacs-lisp
+  (defun snam/clean-docker-env-value (s)
+    "the values are escaped with quotes which have to
+     be removed for our use"
+    (replace-regexp-in-string "\\\"" "" s))
+
+  (defun snam/docker-environment (script)
+    "remove the export statements from the lines which
+     were actually intended to be interpreted by bash"
+    (mapcar
+     (lambda (l)
+       (message l)
+       (let* ((kv (split-string l "="))
+              (key (car kv))
+              (val (snam/clean-docker-env-value (cadr kv))))
+         (cons key val)))
+     (mapcar
+      (lambda (s)
+        (cadr (split-string s "[ ]+")))                 ; remove export part
+      (remove-if-not                                    ; only keep env vars
+       (lambda (s) (string-prefix-p "export" s))        ; from output of cmd
+       (split-string script "[\r\n]+")))))
+
+  (defun docker-init ()
+    "check if docker-machine is on the path and get the
+    expected environment from there to allow docker to find
+    the docker daemon."
+    (message "initializing docker...")
+    (let* ((eval-script (shell-command-to-string "docker-machine env dev"))
+           (docker-env (snam/docker-environment eval-script)))
+
+      (loop for (key . val) in docker-env
+            collect (setenv key val))))
+
+  (docker-init)
+
+
+#+END_SRC
+
+#+RESULTS:
+| 1 | tcp://192.168.99.100:2376 | /Users/pti/.docker/machine/machines/dev | dev |
+
+*** Tramp support for files in containers
 
 This allows to open files in docker containers with tramp using the
 _/docker:container_name:/file/name_ syntax
