@@ -790,14 +790,10 @@ IntelliJ has a cool feature that a single keystroke switches the
 selected region from word --> sentence --> paragraph --> ... and back
 again. Similar for blocks in programming languages.
 
- - C-= : expand region
+q - C-= : expand region
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'expand-region)
-n<<<<<<< variant A
-  (global-set-key (kbd "C-@") 'er/expand-region)
->>>>>>> variant B
-======= end
 #+END_SRC
 
 #+RESULTS:
@@ -2197,10 +2193,6 @@ standard search path.
 #+BEGIN_SRC emacs-lisp
   ;; Setup minted fancy listings
   (setq org-latex-listings 'minted)
-  (setq org-latex-custom-lang-environments
-      '(
-  ;;      (emacs-lisp "common-lispcode")
-        ))
   (setq org-latex-minted-options
       '(("frame" "lines")
         ("fontsize" "\\scriptsize")
