@@ -634,6 +634,51 @@ which uses the menu structure
 #+BEGIN_SRC emacs-lisp
 (message "editing environment done")
 #+END_SRC
+
+** eshell better handling of terminal codes
+
+#+BEGIN_SRC emacs-lisp
+  (require 'eshell)
+  (defconst control-sequence-drop-regexp
+    "\\[[0-?]*[ -/]*[a-ln-z]"
+    "Regexp that matches control sequences to silently drop.")
+
+  ;; First, eliminate unrecognized ANSI control sequences.
+  (defun remove-control-sequences ()
+    "remove all control sequences, except the m command for color"
+    (let ((start-marker (copy-marker eshell-last-output-start))
+          (end-marker (copy-marker eshell-last-output-end)))
+      (save-excursion
+        (goto-char start-marker)
+        (while (re-search-forward control-sequence-drop-regexp
+                                  end-marker t)
+          (replace-match "")))))
+
+  (add-hook 'eshell-output-filter-functions
+            'remove-control-sequences)
+
+#+END_SRC
+
+#+RESULTS:
+| remove-control-sequences |
+
+** sane re-builder
+
+Emacs has a built in tool to interactively create regexes. By default
+it uses the lisp syntax which requires the awful escaping of
+characters. Switch it to 'normal' regex mode.
+
+#+BEGIN_SRC emacs-lisp
+  (require 're-builder)
+  (setq reb-re-syntax 'string)
+#+END_SRC
+
+#+RESULTS:
+: string
+
+Some useful keybindings:
+
+ -
 * General
 
 ** EditorConfig support
@@ -746,7 +791,7 @@ selected region from word --> sentence --> paragraph --> ... and back
 again. Similar for blocks in programming languages.
 
 #+BEGIN_SRC emacs-lisp
-  (require 'expand-region)
+  (require-packages 'expand-region)
   (global-set-key (kbd "C-@") 'er/expand-region)
 #+END_SRC
 
@@ -802,15 +847,6 @@ Global mapping to comment and uncommenting
 
 #+RESULTS:
 : uncomment-region
-
-** Expand Region
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd  "C-=") 'er/expand-region)
-#+END_SRC
-
-#+RESULTS:
-: er/expand-region
 
 ** Quickly jump in document with ace-jump-mode
 
@@ -1984,6 +2020,8 @@ However it is best to let this be managed with custom.el.
 
 #+END_SRC
 
+#+RESULTS:
+
 **** Org Babel setup for fancy graphics etc
 
 #+BEGIN_SRC emacs-lisp
@@ -2135,6 +2173,15 @@ classes.
 
 #+END_SRC
 
+#+RESULTS:
+| mlx-beamer  | \documentclass{mlx-beamer}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]  | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |                                      |                                            |
+| mlx-book    | \documentclass{mlx-book}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]    | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-report  | \documentclass{mlx-report}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]  | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-article | \documentclass{mlx-article}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES] | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| article     | \documentclass[11pt]{article}                                     | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| report      | \documentclass[11pt]{report}                                      | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| book        | \documentclass[11pt]{book}                                        | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+
 **** Source Code Highlighting
 
 Since I deal with a lot of source-code I like to have it nicely formatted.
@@ -2245,46 +2292,6 @@ It exchanges the files in both directions using Dropbox.
 
 #+RESULTS:
 : ~/org/melexis/jira
-
-**** org-mode to habitrpg integration
-
-This module ties org mode to habitrpg.
-
-Whenever a tast changes status it is added to habitrpg. This is easy
-and automatic.
-
-Tag (in org-mode) your habits and dailys with *hrpghabit*, *hrpgdaily*,
-and *hrpgreward* to get them in the corresponding categories.
-
-- f9 a  : display habitrpg status
-- C-c C-x h : copy a task to habitrpg manually
-
-Clocking in and out is also supported.
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/habitrpg/habitrpg")
-(vendor 'habitrpg)
-
-(add-hook 'org-after-todo-state-change-hook 'habitrpg-add 'append)
-
-;; For adding tasks from org mode
-(global-set-key (kbd "C-c C-x h") 'habitrpg-add)
-
-;; Status buffer - use C-h m to see the keybindings
-;; C-c C-c - upvote task or buy reward
-;; C-c C-d - downvote task
-;; t - bring up manage menu, which adds or deletes tasks
-(global-set-key (kbd "<f9> a") 'habitrpg-status)
-
-;; Continuously update a habit attache to a clocking task
-(add-hook 'org-clock-in-hook 'habitrpg-clock-in)
-(add-hook 'org-clock-out-hook 'habitrpg-clock-out)
-
-;; List of habits to check for when clocking a task
-(add-to-list 'hrpg-tags-list "PROGRAMMING")
-(add-to-list 'hrpg-tags-list "WORK")
-
-#+END_SRC
 
 **** org-protocol handlers with browsers
 
