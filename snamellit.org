@@ -64,15 +64,17 @@ Let's add the melpa repo to get the cutting-edge goodness.
 
 #+BEGIN_SRC emacs-lisp
   ;; enable package repositories
-  (add-to-list
-  'package-archives
-  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (if (not (assoc "melpa" package-archives))
+      (add-to-list
+       'package-archives
+       '("melpa" . "http://melpa.milkbox.net/packages/") t))
 #+END_SRC
 
 #+RESULTS:
 
 I used to have the marmalade repo configured too, but it's maintenance
 has been patchy over the last years, so I removed it.
+
 #+RESULTS:
 
 *** Initialize Package Management
@@ -295,6 +297,10 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 #+BEGIN_SRC emacs-lisp
 (message "The basics done")
 #+END_SRC
+
+** Close old untouched buffers
+
+
 * Editing Environment
 
 ** Replace yes/no by y/n
@@ -643,7 +649,6 @@ which uses the menu structure
     "\\[[0-?]*[ -/]*[a-ln-z]"
     "Regexp that matches control sequences to silently drop.")
 
-  ;; First, eliminate unrecognized ANSI control sequences.
   (defun remove-control-sequences ()
     "remove all control sequences, except the m command for color"
     (let ((start-marker (copy-marker eshell-last-output-start))
@@ -676,9 +681,37 @@ characters. Switch it to 'normal' regex mode.
 #+RESULTS:
 : string
 
+
 Some useful keybindings:
 
- -
+ - C-c C-w : copy the regex
+ - C-c C-u : force update, which also gives more error info
+
+** Guide to shortcuts
+
+which-key is a minor mode for Emacs that displays the key bindings
+following your currently entered incomplete command (a prefix) in a
+popup. For example, after enabling the minor mode if you enter C-x and
+wait for the default of 1 second the minibuffer will expand with all
+of the available key bindings that follow C-x (or as many as space
+allows given your settings). This includes prefixes like C-x 8 which
+are shown in a different face.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'which-key)
+#+END_SRC
+
+** Command Log Mode
+
+Command log mode is a minor mode to log the keystroke and associated
+command together with a timestamp. Very useful to demo emacs usage,
+but also to analyse keycodes afterwards.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'command-log-mode)
+#+END_SRC
+
+
 * General
 
 ** EditorConfig support
@@ -907,6 +940,23 @@ unwind-protects.
 #+BEGIN_SRC emacs-lisp
 (message "general done.")
 #+END_SRC
+
+** Aggressive Indent Mode
+
+Electric-indent-mode is enough to keep your code nicely aligned when
+all you do is type. However, once you start shifting blocks around,
+transposing lines, or slurping and barfing sexps, indentation is bound
+to go wrong.
+
+Aggressive-indent-mode is a minor mode that keeps your code always
+indented. It reindents after every change, making it more reliable
+than electric-indent-mode.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'aggressive-indent)
+  (global-aggressive-indent-mode 1)
+#+END_SRC
+
 
 * Programming Languages
 
@@ -2623,37 +2673,35 @@ this code
 ** Rcirc IRC client
 
 #+BEGIN_SRC emacs-lisp
-  ; settings for rcirc IRC client
+      ; settings for rcirc IRC client
 
-  ;; Don't print /away messages.
-  ;; This does not require rcirc to be loaded already,
-  ;; since rcirc doesn't define a 301 handler (yet).
-  (defun rcirc-handler-301 (process cmd sender args)
-  "/away message handler.")
+      ;; Don't print /away messages.
+      ;; This does not require rcirc to be loaded already,
+      ;; since rcirc doesn't define a 301 handler (yet).
+      (defun rcirc-handler-301 (process cmd sender args)
+      "/away message handler.")
 
-  ;; Turn on spell checking.
-  (add-hook 'rcirc-mode-hook (lambda ()
-                           (flyspell-mode 1)))
+      ;; Turn on spell checking.
+      (add-hook 'rcirc-mode-hook (lambda ()
+                               (flyspell-mode 1)))
 
-  ;; Keep input line at bottom.
-  (add-hook 'rcirc-mode-hook
-          (lambda ()
-            (set (make-local-variable 'scroll-conservatively)
-                 8192)))
+      ;; Keep input line at bottom.
+      (add-hook 'rcirc-mode-hook
+              (lambda ()
+                (set (make-local-variable 'scroll-conservatively)
+                     8192)))
 
-  ;; Join these channels at startup.
-  (setq rcirc-server-alist
-      '(("irc.freenode.net"
-         :channels ("#emacs"
-                    "#rcirc"
-                    "#clojure"
-                    "#cucumber"
-                    "#leiningen"
-                    "#ubuntu-bugs"))
-        ("irc.geekshed.net"
-         :channels ("#jupiterbroadcasting"))
-        ("irc.codehaus.org"
-         :channel ("#activemq"))))
+      ;; Join these channels at startup.
+      (setq rcirc-server-alist
+          '(("irc.freenode.net"
+             :channels ("#emacs"
+                        "#rcirc"
+                        "#clojure"
+                        "#leiningen"
+                        ))
+            ("irc.geekshed.net"
+             :channels ("#jupiterbroadcasting"))
+            ))
 
 
 #+END_SRC
@@ -2662,6 +2710,31 @@ When starting *rcirc* it will open connections to the servers listed
 in the *rcirc-server-alist* and open a buffer for each of the channels
 listed.
 
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'rcirc
+    '(defun-rcirc-command reconnect (arg)
+       "Reconnect the server process."
+       (interactive "i")
+       (unless process
+         (error "There's no process for this target"))
+       (let* ((server (car (process-contact process)))
+              (port (process-contact process :service))
+              (nick (rcirc-nick process))
+              channels query-buffers)
+         (dolist (buf (buffer-list))
+           (with-current-buffer buf
+             (when (eq process (rcirc-buffer-process))
+               (remove-hook 'change-major-mode-hook
+                            'rcirc-change-major-mode-hook)
+               (if (rcirc-channel-p rcirc-target)
+                   (setq channels (cons rcirc-target channels))
+                 (setq query-buffers (cons buf query-buffers))))))
+         (delete-process process)
+         (rcirc-connect server port nick
+                        rcirc-default-user-name
+                        rcirc-default-full-name
+                        channels))))
+#+END_SRC
 
 ** Gnus News and Mail reading
 
