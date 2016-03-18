@@ -67,7 +67,9 @@ Let's add the melpa repo to get the cutting-edge goodness.
   (if (not (assoc "melpa" package-archives))
       (add-to-list
        'package-archives
-       '("melpa" . "http://melpa.milkbox.net/packages/") t))
+       '("melpa" . "http://melpa.milkbox.net/packages/")
+       '("elpy" . "https://jorgenschaefer.github.io/packages/")
+       t))
 #+END_SRC
 
 #+RESULTS:
@@ -1079,6 +1081,29 @@ To customize how it works: *M-x customize-group RET js2-mode RET*.
 
 I also enabled the js2-refactor package.
 
+*** js-doc mode
+
+Support for adding jsdoc style comments to javascript files.
+
+I am more tempted by docco style documentation, but a lot of others
+seem to prefer the js-doc style of structured comments.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'js-doc)
+  (setq js-doc-mail-address "pti@melexis.com"
+        js-doc-author (format "Peter Tillemans <%s>" js-doc-mail-address)
+        js-doc-url "https://www.melexis.com/"
+        js-doc-license "Apache 2")
+
+  (add-hook 'js2-mode-hook
+            #'(lambda ()
+                (define-key js2-mode-map "\C-ci" 'js-doc-insert-function-doc)
+                (define-key js2-mode-map "@" 'js-doc-insert-tag)))
+#+END_SRC
+
+#+RESULTS:
+| (lambda nil (define-key js2-mode-map i (quote js-doc-insert-function-doc)) (define-key js2-mode-map @ (quote js-doc-insert-tag))) | skewer-mode | (lambda nil (slime-js-minor-mode 1)) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | er/add-js2-mode-expansions | er/add-js-mode-expansions |
+
 *** swank-js
 
 see [[https://github.com/swank-js/swank-js][SwankJS github repo]] for more details.
@@ -1224,6 +1249,16 @@ Skeletons :
 - C-c C-t m: import
 - C-c C-t t: try catch
 - C-c C-t w: while loop
+
+*** Install and enable elpy
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'elpy)
+  (elpy-enable)
+#+END_SRC
+
+#+RESULTS:
+| elpy-rpc--disconnect |
 
 *** Virtualenv support
 
