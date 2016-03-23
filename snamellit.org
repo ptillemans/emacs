@@ -2465,6 +2465,16 @@ line.
 ))
 #+END_SRC
 
+** LaTeX
+#+BEGIN_SRC emacs-lisp
+  (package-install 'auctex)
+  (load "auctex.el" nil t t)
+  (load "preview.el" nil t t)
+#+END_SRC
+
+#+RESULTS:
+
+
 ** 3D Modelling with SCAD
 
 There is a programming language like 3D modeller which is popular in
