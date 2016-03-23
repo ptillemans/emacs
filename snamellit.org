@@ -64,15 +64,19 @@ Let's add the melpa repo to get the cutting-edge goodness.
 
 #+BEGIN_SRC emacs-lisp
   ;; enable package repositories
-  (add-to-list
-  'package-archives
-  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (if (not (assoc "melpa" package-archives))
+      (add-to-list
+       'package-archives
+       '("melpa" . "http://melpa.milkbox.net/packages/")
+       '("elpy" . "https://jorgenschaefer.github.io/packages/")
+       t))
 #+END_SRC
 
 #+RESULTS:
 
 I used to have the marmalade repo configured too, but it's maintenance
 has been patchy over the last years, so I removed it.
+
 #+RESULTS:
 
 *** Initialize Package Management
@@ -295,6 +299,10 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 #+BEGIN_SRC emacs-lisp
 (message "The basics done")
 #+END_SRC
+
+** Close old untouched buffers
+
+
 * Editing Environment
 
 ** Replace yes/no by y/n
@@ -634,6 +642,78 @@ which uses the menu structure
 #+BEGIN_SRC emacs-lisp
 (message "editing environment done")
 #+END_SRC
+
+** eshell better handling of terminal codes
+
+#+BEGIN_SRC emacs-lisp
+  (require 'eshell)
+  (defconst control-sequence-drop-regexp
+    "\\[[0-?]*[ -/]*[a-ln-z]"
+    "Regexp that matches control sequences to silently drop.")
+
+  (defun remove-control-sequences ()
+    "remove all control sequences, except the m command for color"
+    (let ((start-marker (copy-marker eshell-last-output-start))
+          (end-marker (copy-marker eshell-last-output-end)))
+      (save-excursion
+        (goto-char start-marker)
+        (while (re-search-forward control-sequence-drop-regexp
+                                  end-marker t)
+          (replace-match "")))))
+
+  (add-hook 'eshell-output-filter-functions
+            'remove-control-sequences)
+
+#+END_SRC
+
+#+RESULTS:
+| remove-control-sequences |
+
+** sane re-builder
+
+Emacs has a built in tool to interactively create regexes. By default
+it uses the lisp syntax which requires the awful escaping of
+characters. Switch it to 'normal' regex mode.
+
+#+BEGIN_SRC emacs-lisp
+  (require 're-builder)
+  (setq reb-re-syntax 'string)
+#+END_SRC
+
+#+RESULTS:
+: string
+
+
+Some useful keybindings:
+
+ - C-c C-w : copy the regex
+ - C-c C-u : force update, which also gives more error info
+
+** Guide to shortcuts
+
+which-key is a minor mode for Emacs that displays the key bindings
+following your currently entered incomplete command (a prefix) in a
+popup. For example, after enabling the minor mode if you enter C-x and
+wait for the default of 1 second the minibuffer will expand with all
+of the available key bindings that follow C-x (or as many as space
+allows given your settings). This includes prefixes like C-x 8 which
+are shown in a different face.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'which-key)
+#+END_SRC
+
+** Command Log Mode
+
+Command log mode is a minor mode to log the keystroke and associated
+command together with a timestamp. Very useful to demo emacs usage,
+but also to analyse keycodes afterwards.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'command-log-mode)
+#+END_SRC
+
+
 * General
 
 ** EditorConfig support
@@ -745,7 +825,7 @@ IntelliJ has a cool feature that a single keystroke switches the
 selected region from word --> sentence --> paragraph --> ... and back
 again. Similar for blocks in programming languages.
 
- - C-= : expand region
+q - C-= : expand region
 
 #+BEGIN_SRC emacs-lisp
   (require-packages 'expand-region)
@@ -862,6 +942,23 @@ unwind-protects.
 #+BEGIN_SRC emacs-lisp
 (message "general done.")
 #+END_SRC
+
+** Aggressive Indent Mode
+
+Electric-indent-mode is enough to keep your code nicely aligned when
+all you do is type. However, once you start shifting blocks around,
+transposing lines, or slurping and barfing sexps, indentation is bound
+to go wrong.
+
+Aggressive-indent-mode is a minor mode that keeps your code always
+indented. It reindents after every change, making it more reliable
+than electric-indent-mode.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'aggressive-indent)
+  (global-aggressive-indent-mode 1)
+#+END_SRC
+
 
 * Programming Languages
 
@@ -983,6 +1080,29 @@ For javascript, Steve Yegge's js2-mode is recommended over the version shipped w
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
 I also enabled the js2-refactor package.
+
+*** js-doc mode
+
+Support for adding jsdoc style comments to javascript files.
+
+I am more tempted by docco style documentation, but a lot of others
+seem to prefer the js-doc style of structured comments.
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'js-doc)
+  (setq js-doc-mail-address "pti@melexis.com"
+        js-doc-author (format "Peter Tillemans <%s>" js-doc-mail-address)
+        js-doc-url "https://www.melexis.com/"
+        js-doc-license "Apache 2")
+
+  (add-hook 'js2-mode-hook
+            #'(lambda ()
+                (define-key js2-mode-map "\C-ci" 'js-doc-insert-function-doc)
+                (define-key js2-mode-map "@" 'js-doc-insert-tag)))
+#+END_SRC
+
+#+RESULTS:
+| (lambda nil (define-key js2-mode-map i (quote js-doc-insert-function-doc)) (define-key js2-mode-map @ (quote js-doc-insert-tag))) | skewer-mode | (lambda nil (slime-js-minor-mode 1)) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | er/add-js2-mode-expansions | er/add-js-mode-expansions |
 
 *** swank-js
 
@@ -1129,6 +1249,16 @@ Skeletons :
 - C-c C-t m: import
 - C-c C-t t: try catch
 - C-c C-t w: while loop
+
+*** Install and enable elpy
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'elpy)
+  (elpy-enable)
+#+END_SRC
+
+#+RESULTS:
+| elpy-rpc--disconnect |
 
 *** Virtualenv support
 
@@ -1976,6 +2106,8 @@ However it is best to let this be managed with custom.el.
 
 #+END_SRC
 
+#+RESULTS:
+
 **** Org Babel setup for fancy graphics etc
 
 #+BEGIN_SRC emacs-lisp
@@ -2127,6 +2259,15 @@ classes.
 
 #+END_SRC
 
+#+RESULTS:
+| mlx-beamer  | \documentclass{mlx-beamer}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]  | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |                                      |                                            |
+| mlx-book    | \documentclass{mlx-book}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]    | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-report  | \documentclass{mlx-report}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES]  | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| mlx-article | \documentclass{mlx-article}\n[NO-DEFAULT-PACKAGES]\n[NO-PACKAGES] | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| article     | \documentclass[11pt]{article}                                     | (\section{%s} . \section*{%s}) | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) | (\paragraph{%s} . \paragraph*{%s})   | (\subparagraph{%s} . \subparagraph*{%s})   |
+| report      | \documentclass[11pt]{report}                                      | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+| book        | \documentclass[11pt]{book}                                        | (\part{%s} . \part*{%s})       | (\chapter{%s} . \chapter*{%s})       | (\section{%s} . \section*{%s})             | (\subsection{%s} . \subsection*{%s}) | (\subsubsection{%s} . \subsubsection*{%s}) |
+
 **** Source Code Highlighting
 
 Since I deal with a lot of source-code I like to have it nicely formatted.
@@ -2137,10 +2278,6 @@ standard search path.
 #+BEGIN_SRC emacs-lisp
   ;; Setup minted fancy listings
   (setq org-latex-listings 'minted)
-  (setq org-latex-custom-lang-environments
-      '(
-  ;;      (emacs-lisp "common-lispcode")
-        ))
   (setq org-latex-minted-options
       '(("frame" "lines")
         ("fontsize" "\\scriptsize")
@@ -2581,37 +2718,35 @@ this code
 ** Rcirc IRC client
 
 #+BEGIN_SRC emacs-lisp
-  ; settings for rcirc IRC client
+      ; settings for rcirc IRC client
 
-  ;; Don't print /away messages.
-  ;; This does not require rcirc to be loaded already,
-  ;; since rcirc doesn't define a 301 handler (yet).
-  (defun rcirc-handler-301 (process cmd sender args)
-  "/away message handler.")
+      ;; Don't print /away messages.
+      ;; This does not require rcirc to be loaded already,
+      ;; since rcirc doesn't define a 301 handler (yet).
+      (defun rcirc-handler-301 (process cmd sender args)
+      "/away message handler.")
 
-  ;; Turn on spell checking.
-  (add-hook 'rcirc-mode-hook (lambda ()
-                           (flyspell-mode 1)))
+      ;; Turn on spell checking.
+      (add-hook 'rcirc-mode-hook (lambda ()
+                               (flyspell-mode 1)))
 
-  ;; Keep input line at bottom.
-  (add-hook 'rcirc-mode-hook
-          (lambda ()
-            (set (make-local-variable 'scroll-conservatively)
-                 8192)))
+      ;; Keep input line at bottom.
+      (add-hook 'rcirc-mode-hook
+              (lambda ()
+                (set (make-local-variable 'scroll-conservatively)
+                     8192)))
 
-  ;; Join these channels at startup.
-  (setq rcirc-server-alist
-      '(("irc.freenode.net"
-         :channels ("#emacs"
-                    "#rcirc"
-                    "#clojure"
-                    "#cucumber"
-                    "#leiningen"
-                    "#ubuntu-bugs"))
-        ("irc.geekshed.net"
-         :channels ("#jupiterbroadcasting"))
-        ("irc.codehaus.org"
-         :channel ("#activemq"))))
+      ;; Join these channels at startup.
+      (setq rcirc-server-alist
+          '(("irc.freenode.net"
+             :channels ("#emacs"
+                        "#rcirc"
+                        "#clojure"
+                        "#leiningen"
+                        ))
+            ("irc.geekshed.net"
+             :channels ("#jupiterbroadcasting"))
+            ))
 
 
 #+END_SRC
@@ -2620,6 +2755,31 @@ When starting *rcirc* it will open connections to the servers listed
 in the *rcirc-server-alist* and open a buffer for each of the channels
 listed.
 
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'rcirc
+    '(defun-rcirc-command reconnect (arg)
+       "Reconnect the server process."
+       (interactive "i")
+       (unless process
+         (error "There's no process for this target"))
+       (let* ((server (car (process-contact process)))
+              (port (process-contact process :service))
+              (nick (rcirc-nick process))
+              channels query-buffers)
+         (dolist (buf (buffer-list))
+           (with-current-buffer buf
+             (when (eq process (rcirc-buffer-process))
+               (remove-hook 'change-major-mode-hook
+                            'rcirc-change-major-mode-hook)
+               (if (rcirc-channel-p rcirc-target)
+                   (setq channels (cons rcirc-target channels))
+                 (setq query-buffers (cons buf query-buffers))))))
+         (delete-process process)
+         (rcirc-connect server port nick
+                        rcirc-default-user-name
+                        rcirc-default-full-name
+                        channels))))
+#+END_SRC
 
 ** Gnus News and Mail reading
 
