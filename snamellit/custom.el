@@ -113,14 +113,14 @@
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
  '(package-selected-packages
    (quote
-    (elpy js-doc command-log-mode aggressive-indent aggressive-indent-mode which-key lacarte solarized-theme zenburn-theme slime editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
+    (htmlize elpy js-doc command-log-mode aggressive-indent aggressive-indent-mode which-key lacarte solarized-theme zenburn-theme slime editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(rcirc-server-alist
    (quote
     (("irc.freenode.net" :channels
       ("#emacs" "#rcirc" "#clojure" "#cucumber" "#leiningen" "#ubuntu-bugs"))
-     ("irc.geekshed.net" \#jupiterbroadcasting nil))))
+     ("irc.geekshed.net" \#jupiterbroadcasting nil))) t)
  '(safe-local-variable-values
    (quote
     ((python-shell-virtualenv-path . "/Users/pti/playpen/python/gmailpurge")
