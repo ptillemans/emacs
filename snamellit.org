@@ -1935,9 +1935,6 @@ inadvertent moving away or doing changes to other parts of the file.
   ; Targets start with the file name - allows creating level 1 tasks
   (setq org-refile-use-outline-path (quote file))
 
-  ; Targets complete directly with IDO
-  ;  (setq org-outline-path-complete-in-steps nil)
-
   ; Allow refile to create parent tasks with confirmation
   (setq org-refile-allow-creating-parent-nodes (quote confirm))
 
@@ -1948,11 +1945,13 @@ inadvertent moving away or doing changes to other parts of the file.
 
 #+RESULTS:
 
-# *** Use IDO for for org
-# #+BEGIN_SRC emacs-lisp
+*** Disable IDO for for org
 
-# (setq org-completion-use-ido t)
-# #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq org-completion-use-ido nil)
+#+END_SRC
+
+#+RESULTS:
 
 *** Do not dim blocked tasks
 
@@ -2628,9 +2627,11 @@ line.
 
 ** LaTeX
 #+BEGIN_SRC emacs-lisp
-  (package-install 'auctex)
-  (load "auctex.el" nil t t)
-  (load "preview.el" nil t t)
+  (unless (package-installed-p 'auctex)
+    (package-install 'auctex))
+  (require 'tex)
+  (require-packages 'auctex-lua)
+
 #+END_SRC
 
 #+RESULTS:

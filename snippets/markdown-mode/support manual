@@ -1,0 +1,58 @@
+# -*- mode: snippet -*-
+# name: support manual
+# key:
+# --
+# Installation Instructions
+
+<!--  instructions about the installation concept, packaging -->
+<!--  and deployment -->
+
+
+# Configuration
+
+<!--  instructions on how to configure the configuration item -->
+
+# Starting/Stopping
+
+<!--  instructions on how to start and stop the system -->
+
+# Backup Instructions
+
+<!--  instructions what to backup, frequency, how. Do not forget  -->
+<!--  to indicate which data not to backup because it is  -->
+<!--  calculated, a cache, a duplicate of another backed up repository -->
+
+# Restore instructions
+
+<!--  instruction to restore prod after a disaster has happened -->
+
+# Clone Instructions
+
+<!--  instruction how to create a copy of a production system  -->
+<!--  to a test system to validate new releases or investigate  -->
+<!--  problems. Preferably these instructions are based on  -->
+<!--  restoring the instance from a production backup. That  -->
+<!--  way we test the backup/restore instructions during each  -->
+<!--  clone/refresh -->
+
+# Refresh instructions
+
+<!--  instruction how to refresh an instance from the production. -->
+<!--  Preferably these instructions are based on restoring the  -->
+<!--  instance from a production backup. That way we test the  -->
+<!--  backup/restore instructions during each clone/refresh -->
+
+# Decommission instructions
+
+<!--  instruction how to decommission the production instance  -->
+<!--  when there is no further use of this product. This has to  -->
+<!--  include archiving a last backup or ... The goal is that  -->
+<!--  in any point in the future we can put the system back in -->
+<!--  operations including all data. -->
+
+# Monitoring instructions
+
+<!--  instruction how to monitor test instance -->
+<!--  this has to include which "product specific" nagios check  -->
+<!--  there are AND for every one of these the instructions  -->
+<!--  what to do if nagios reports an issue on this -->
