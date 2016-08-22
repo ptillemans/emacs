@@ -45,12 +45,14 @@
  '(hl-fg-colors
    (quote
     ("#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36")))
+ '(mac-option-modifier (quote (:ordinary nil :function alt :mouse alt)))
  '(magit-diff-use-overlays nil)
  '(magit-use-overlays nil)
+ '(mocha-options "--recursive -r babel-register")
  '(multi-term-scroll-show-maximum-output t)
  '(nrepl-message-colors
    (quote
-    ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
+    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(org-agenda-custom-commands
    (quote
     (("n" "Agenda and all TODO's"
@@ -67,6 +69,7 @@
      ("\\.mm\\'" . default)
      ("\\.x?html?\\'" . default)
      ("\\.pdf\\'" . "setsid xdg-open %s"))))
+ '(org-jira-default-assignee (quote pti))
  '(org-jira-serv-alist
    (quote
     ((melexis password wqsXSbjSthVqr78Y username pti url\  https://jira\.melexis\.com/jira))))
@@ -128,7 +131,7 @@
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
  '(package-selected-packages
    (quote
-    (auctex-lua auctex htmlize elpy js-doc command-log-mode aggressive-indent aggressive-indent-mode which-key lacarte solarized-theme zenburn-theme slime editorconfig company-racer racer flycheck-rust flycheck magit tidy groovy-mode js2-mode go-eldoc go-mode clojure-mode company multiple-cursors yasnippet edit-server skewer-mode helm-projectile web-mode virtualenvwrapper smart-mode-line scss-mode scala-mode rvm ruby-test-mode ruby-refactor ruby-electric ruby-compilation ruby-additional rspec-mode rainbow-delimiters python-django paredit org-jira nose markdown-mode js2-refactor jedi helm go-snippets go-projectile ggtags fill-column-indicator elixir-yasnippets ein color-theme-solarized color-theme-sanityinc-solarized cider alchemist ace-jump-mode)))
+    (mocha realgud expand-region company-tern tern auctex-lua auctex htmlize js-doc aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(rcirc-server-alist

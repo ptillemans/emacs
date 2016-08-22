@@ -200,20 +200,13 @@ the content on a light background. I fixed it once, but it is broken
 again so I switched back to solarized.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'zenburn-theme 'solarized-theme)
-  (load-theme 'solarized-dark t)
-  (load-theme 'solarized-light t)
+  (require-packages 'zenburn-theme)
   (load-theme 'zenburn t)
-  (require-packages
-   'color-theme
-   'color-theme-solarized
-   'color-theme-sanityinc-solarized)
-
-  (color-theme-sanityinc-solarized-dark)
 
 #+END_SRC
 
 #+RESULTS:
+: t
 
 I never use the toolbar, and seldom use the menu.
 
@@ -1057,7 +1050,7 @@ For javascript, Steve Yegge's js2-mode is recommended over the version shipped w
 #+BEGIN_SRC emacs-lisp
   (require-packages 'js2-mode 'js2-refactor)
 
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.js" . js2-mode))
   (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
 
   (setq js-indent-level 2)
@@ -1080,6 +1073,94 @@ For javascript, Steve Yegge's js2-mode is recommended over the version shipped w
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
 I also enabled the js2-refactor package.
+
+*** JSX support
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.jsx" . js2-jsx-mode))
+
+  (add-hook 'js2-jsx-mode-hook
+            (lambda ()
+              (set (make-local-variable 'indent-tabs-mode) 'nil)
+              (set (make-local-variable 'js-indent-level) 2)
+              (set (make-local-variable 'tab-width) 2)
+              (add-untabify-before-save)))
+#+END_SRC
+
+#+RESULTS:
+| lambda | nil | (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) | (set (make-local-variable (quote js-indent-level)) 2) | (set (make-local-variable (quote tab-width)) 2) | (add-untabify-before-save) |
+
+*** tern syntax support
+
+*ternjs* is a javascript server which analyzes a codebase and builds
+ an AST of the files and allows the editor to query the trees.
+
+The first step to using tern is installing the binary. I personally
+used npm to do so:
+
+#+BEGIN_SRC sh
+  $ sudo npm install -g tern
+#+END_SRC
+
+Then install in Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  ;;; tern
+  (require-packages 'tern)
+  (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+#+END_SRC
+
+#+RESULTS:
+| (lambda nil (tern-mode t)) | skewer-mode | (lambda nil (slime-js-minor-mode 1)) | (lambda nil (define-key js2-mode-map i (quote js-doc-insert-function-doc)) (define-key js2-mode-map @ (quote js-doc-insert-tag))) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | er/add-js2-mode-expansions | er/add-js-mode-expansions |
+
+The final step is to set up a .tern-project file in the root directory
+of your project. For Node.js projects, I use this as a starting point:
+
+#+BEGIN_SRC javascript
+  {
+      "loadEagerly": [
+          "src/**.js"
+      ],
+      "plugins": {
+          "node": {
+          }
+      }
+  }
+#+END_SRC
+
+If you use company-mode, then installing company-tern is also highly
+recommended:
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'company-tern)
+  (eval-after-load 'company
+      '(add-to-list 'company-backends 'company-tern))
+#+END_SRC
+
+#+RESULTS:
+| company-tern | alchemist-company | company-bbdb | company-nxml | company-css | company-eclim | company-semantic | company-clang | company-xcode | company-cmake | company-capf | company-files | (company-dabbrev-code company-gtags company-etags company-keywords) | company-oddmuse | company-dabbrev |
+
+As a note, some trouble was noted with the tern server occasionally
+dying this past summer (2014). Running the following fixed it
+consistently:
+
+M-: (delete-process "Tern") RET I wasn't able to figure out exactly
+what was causing it, but it happened infrequently enough to be little
+more than a nuisance.
+
+*** js2-refactor
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'js2-refactor)
+  (add-hook 'js2-mode-hook #'js2-refactor-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (js2r-add-keybindings-with-prefix "C-c C-m")
+  ;; eg. extract function with `C-c C-m ef`.
+#+END_SRC
+#+RESULTS:
+: js2r-move-line-up
 
 *** js-doc mode
 
@@ -1155,6 +1236,54 @@ into the current buffer.
 
 The result of the expression is echoed in the minibuffer.
 
+*** Mocha test support
+
+There is a plugin to manage mocha tests. Available on melpa and the
+source repo is at [[https://github.com/scottaj/mocha.el][github.]]
+
+**** Running Tests
+
+In order to run tests there are three functions exposed:
+
+ - *mocha-test-project* will run all the tests in your project.
+ - *mocha-test-file* will test just the current file you are visiting.
+ - *mocha-test-at-point* will try and semantically find the nearest
+   enclosing it or describe from your cursor, and just run that.
+
+You can run any of these functions via M-x, or assign them to hotkeys.
+
+Stack traces for failing tests have clickable links to the file and
+line that failed.
+
+**** Running Test at Point
+
+mocha-test-at-point uses js2-mode to find the nearest describe or it
+and extract the description string from it. As such, it only works in
+JavaScript files that have js2-mode set as the major mode.
+
+**** Debugging Tests
+
+Each of the test functions has a debug analog: mocha-debug-project,
+mocha-debug-file, and mocha-debug-at-point. Using these functions
+depends on having realgud installed and loaded.
+
+The provided debugging buffer takes the same commands as the standard
+node CLI debugger. Some useful ones are:
+
+ - s to step in
+ - o to step out
+ - n to step over
+ - c to continue execution
+
+repl use interactive REPL at point
+
+Additionally C-c C-c will send a BREAK signal, and M-p will cycle
+through previous inputs.
+
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'mocha)
+#+END_SRC
 ** Lisp
 
 *** Paredit Mode
@@ -1225,7 +1354,8 @@ There is a snippet collection in *elixir-yasnippets*
 This is very 'light' for python development. Especially with plone
 there is ample room for more support here.
 
-On the other hand the include python mode works quite well out of the box.
+On the other hand the include python mode works quite well out of the
+box.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'python-mode-hook 'add-untabify-before-save)
@@ -1763,16 +1893,6 @@ the contrib directory included in there to the load path.
 
 #+END_SRC
 
-**** TODO Fix conflict with org-jira
-
-Currently I commented this out to fix a conflict with elpa's
-org-jira. The contrib folder also contains a stub implementation of
-org-jira which masks the elpa one.
-
-I also change the taskjuggler integration to directly load the code
-from the contrib folder rather than putting the contrib folder on the
-search path.
-
 *** Global keybindings
 
 In order to use org mode effectively we need easy access from anywhere
@@ -1782,11 +1902,10 @@ in emacs.
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
 
 #+RESULTS:
-: org-iswitchb
+: org-agenda
 
 *** Org mode TODO Keywords
 
@@ -2394,7 +2513,8 @@ It exchanges the files in both directions using Dropbox.
 
 **** jira integration
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'org-jira)
+  ;;(require-packages 'org-jira)
+  (vendor 'org-jira) ;; switched to experimental REST version
   (setq jiralib-url "https://jira.melexis.com/jira")
   (setq org-jira-working-dir "~/org/melexis/jira")
 
@@ -2702,6 +2822,11 @@ keymap.
   (helm-projectile-on)
 #+END_SRC
 
+** Debugger Support
+
+#+BEGIN_SRC emacs-lisp
+  (require-packages 'realgud)
+#+END_SRC
 
 ** Makefiles
 
