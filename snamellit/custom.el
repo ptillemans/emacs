@@ -20,8 +20,8 @@
  '(custom-enabled-themes (quote (sanityinc-solarized-dark)))
  '(custom-safe-themes
    (quote
-    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
- '(fci-rule-color "#073642")
+    ("4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "3a727bdc09a7a141e58925258b6e873c65ccf393b2240c51553098ca93957723" "6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "3b819bba57a676edf6e4881bd38c777f96d1aa3b3b5bc21d8266fa5b0d0f1ebf" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "d2622a2a2966905a5237b54f35996ca6fda2f79a9253d44793cfe31079e3c92b" "501caa208affa1145ccbb4b74b6cd66c3091e41c5bb66c677feda9def5eab19c" default)))
+ '(fci-rule-color "#383838")
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -45,7 +45,6 @@
  '(hl-fg-colors
    (quote
     ("#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36")))
- '(mac-option-modifier (quote (:ordinary nil :function alt :mouse alt)))
  '(magit-diff-use-overlays nil)
  '(magit-use-overlays nil)
  '(mocha-options "--recursive -r babel-register")
@@ -53,6 +52,7 @@
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
+ '(ns-alternate-modifier (quote (:ordinary nil :function alt :mouse alt)))
  '(org-agenda-custom-commands
    (quote
     (("n" "Agenda and all TODO's"
@@ -131,7 +131,7 @@
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
  '(package-selected-packages
    (quote
-    (mocha realgud expand-region company-tern tern auctex-lua auctex htmlize js-doc aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
+    (color-theme-sanityinc-solarized ruby-test-mode ruby-additional ein elpy jedi js2-refactor js2-mode slime go-projectile go-mode groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck company multiple-cursors yasnippet editorconfig command-log-mode which-key helm smart-mode-line mocha realgud expand-region company-tern tern auctex-lua auctex htmlize js-doc aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(rcirc-server-alist

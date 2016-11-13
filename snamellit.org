@@ -17,6 +17,17 @@ create the emacs configuration in a well documented manner.
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua emacs config]]
 
 * The basics
+** Use option key as meta
+
+Mac OSX maps Alt-key combinations to symbols before emacs can intercept them.
+
+#+BEGIN_SRC emacs-lisp
+ (setq mac-option-modifier 'meta)
+#+END_SRC
+
+#+RESULTS:
+: meta
+
 ** Force path to be consistent with terminal path
 
 The mac behaves increasingly weird with relation to how paths are
@@ -68,6 +79,10 @@ Let's add the melpa repo to get the cutting-edge goodness.
       (add-to-list
        'package-archives
        '("melpa" . "http://melpa.milkbox.net/packages/")
+       t))
+  (if (not (assoc "elpy" package-archives))
+      (add-to-list
+       'package-archives
        '("elpy" . "https://jorgenschaefer.github.io/packages/")
        t))
 #+END_SRC
@@ -1360,6 +1375,35 @@ box.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'python-mode-hook 'add-untabify-before-save)
 #+END_SRC
+*** Anaconda Support
+
+Anaconda is now gathering a lot of traction as a ready to run
+distribution for especially Windows and Mac, delivering those
+complicated scientific modules precompiled.
+
+It works by creating separate environments like pyvenv and can
+actually use the same tools to switch to the environments.
+
+#+BEGIN_SRC emacs-lisp :eval no
+(pyvenv-activate (expand-file-name "~/anaconda3/envs/pelican"))
+#+END_SRC
+
+this would activate the pelican environment. For the root environment
+use :
+
+#+BEGIN_SRC emacs-lisp
+(pyvenv-activate (expand-file-name "~/anaconda3"))
+#+END_SRC
+
+#+RESULTS:
+
+When creating a new environment in anaconda, don't forget to install
+the python modules above.
+
+**** Notable shortcuts
+
+
+
 *** Shortcuts
 
 **** Interactive python
@@ -1476,33 +1520,6 @@ or for python3
 #+BEGIN_SRC sh
 $ pip install rope_py3k jedi importmagic autopep8 flake8 ipython
 #+END_SRC
-
-**** Anaconda Support
-
-Anaconda is now gathering a lot of traction as a ready to run
-distribution for especially Windows and Mac, delivering those
-complicated scientific modules precompiled.
-
-It works by creating separate environments like pyvenv and can
-actually use the same tools to switch to the environments.
-
-#+BEGIN_SRC emacs-lisp :eval no
-(pyvenv-activate (expand-file-name "~/anaconda/envs/pelican"))
-#+END_SRC
-
-this would activate the pelican environment. For the root environment
-use :
-
-#+BEGIN_SRC emacs-lisp :eval no
-(pyvenv-activate (expand-file-name "~/anaconda"))
-#+END_SRC
-
-When creating a new environment in anaconda, don't forget to install
-the python modules above.
-
-**** Notable shortcuts
-
-
 
 *** IPython Notebook Support
 
