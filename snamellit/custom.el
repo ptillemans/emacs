@@ -131,7 +131,7 @@
      ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
  '(package-selected-packages
    (quote
-    (color-theme-sanityinc-solarized ruby-test-mode ruby-additional ein elpy jedi js2-refactor js2-mode slime go-projectile go-mode groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck company multiple-cursors yasnippet editorconfig command-log-mode which-key helm smart-mode-line mocha realgud expand-region company-tern tern auctex-lua auctex htmlize js-doc aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
+    (magit color-theme-sanityinc-solarized ruby-test-mode ruby-additional ein elpy jedi js2-refactor js2-mode slime go-projectile go-mode groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck company multiple-cursors yasnippet editorconfig command-log-mode which-key helm smart-mode-line mocha realgud expand-region company-tern tern auctex-lua auctex htmlize js-doc aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
  '(rcirc-server-alist
