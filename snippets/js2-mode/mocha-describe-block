@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: mocha describe block
+# key: describe
+# group: js-mode
+# --
+describe("$1", () => {
+$0
+});

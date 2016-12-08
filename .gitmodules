@@ -1,3 +1,6 @@
 [submodule "vendor/org-jira"]
 	path = vendor/org-jira
 	url = https://github.com/ptillemans/org-jira.git
+[submodule "vendor/espuds"]
+	path = vendor/espuds
+	url = https://github.com/ecukes/espuds.git

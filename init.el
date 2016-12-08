@@ -1,11 +1,10 @@
-(load-library "url-handlers")
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-			 ;("org" . "http://orgmode.org/elpa/")
-			 ))
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
 (package-initialize)
-(if (not (file-exists-p (concat user-emacs-directory "/elpa/archives/melpa/archive-content")))
-    (package-refresh-contents))
+
+(load-library "url-handlers")
 
 (require 'org)
 (require 'ob-tangle)

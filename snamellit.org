@@ -13,7 +13,7 @@ create the emacs configuration in a well documented manner.
 
 ** Sources
 
--
+- Phil Hagelberg's starter package
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua emacs config]]
 
 * The basics
@@ -44,40 +44,31 @@ like my editing environment to be identical to the shell environment.
 #+END_SRC
 
 #+RESULTS:
-| /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /usr/local/MacGPG2/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.sdkman/candidates/lazybones/current/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
+| /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
 
 
 Tip: run the code above with C-C C-C to see the actual path being set
 in the *RESULTS*.
+** Support gpg-agent
+
+GPG supports ssh connections with a hardware token as a
+Yubikey. However on the Mac the system launches an ssh-agent on login
+which hijacks the *SSH_AUTH_SOCK*.
+
+#+BEGIN_SRC emacs-lisp
+  (if (eq system-type 'darwin)
+      (setenv "SSH_AUTH_SOCK"
+              (concat (getenv "HOME") "/.gnupg/S.gpg-agent.ssh")))
+
+#+END_SRC
+
+This is not needed for linux.
+
 
 ** Package and Extension Management
 
 Emacs has a package management system we'll be using to load the
 extensions.
-
-*** Setup repositories
-
-By default emacs only comes with the elpa repository which is a bit
-conservative.
-
-Let's add the melpa repo to get the cutting-edge goodness.
-
-#+BEGIN_SRC emacs-lisp
-  ;; enable package repositories
-  (if (not (assoc "melpa" package-archives))
-      (add-to-list
-       'package-archives
-       '("melpa" . "http://melpa.milkbox.net/packages/")
-       '("elpy" . "https://jorgenschaefer.github.io/packages/")
-       t))
-#+END_SRC
-
-#+RESULTS:
-
-I used to have the marmalade repo configured too, but it's maintenance
-has been patchy over the last years, so I removed it.
-
-#+RESULTS:
 
 *** Initialize Package Management
 
@@ -90,6 +81,66 @@ However this also means we cannot call into the libraries.
 #+BEGIN_SRC emacs-lisp
 (package-initialize)
 #+END_SRC
+
+#+RESULTS:
+
+*** Setup repositories
+
+By default emacs only comes with the elpa repository which is a bit
+conservative.
+
+Let's add the melpa repo to get the cutting-edge goodness.
+
+#+BEGIN_SRC emacs-lisp
+  ;; enable package repositories
+  (add-to-list 'package-archives
+               '("elpy" . "https://jorgenschaefer.github.io/packages/"))
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.milkbox.net/packages/"))
+
+#+END_SRC
+
+#+RESULTS:
+
+I used to have the marmalade repo configured too, but it's maintenance
+has been patchy over the last years, so I removed it.
+
+#+RESULTS:
+
+*** Add personal lisp playing area to load path
+
+When playing with elisp, creating a folder is often too much of a
+hurdle to jump. So just create a play area to store temporary stuff.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/playpen/elisp")
+#+END_SRC
+
+*** Use jwiegley's use-package to load modules
+
+I used a homebrew solution for package management which worked fine
+but is a tad slow. I heard great things about *use-package*.
+
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (setq use-package-verbose t)
+  (setq use-package-always-ensure t)
+
+  (eval-when-compile
+    (require 'use-package))
+
+  (use-package auto-compile
+    :config (auto-compile-on-load-mode))
+
+  (setq load-prefer-newer t)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+So let's try if it lives up to the expectations.
 
 *** Add a helper to get libraries
 
@@ -200,9 +251,9 @@ the content on a light background. I fixed it once, but it is broken
 again so I switched back to solarized.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'zenburn-theme)
-  (load-theme 'zenburn t)
-
+  (use-package solarized-theme
+               :config
+               (load-theme 'solarized-light t))
 #+END_SRC
 
 #+RESULTS:
@@ -317,8 +368,8 @@ is ok.
 The vi emulation can really benefit from the powerline port.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'smart-mode-line)
-  (sml/setup)
+  (use-package smart-mode-line
+    :config (sml/setup))
 #+END_SRC
 
 #+RESULTS:
@@ -365,227 +416,39 @@ with leader :
 ** Helm autocompletion mode
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'helm)
-  (require 'helm-config)
+  (use-package helm
+    :init
+    (progn
+      (require 'helm-config)
 
-  ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-  ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-  ;; can't change `helm-command-prefix-key' once `helm-config' is loaded.
-  (global-set-key (kbd "C-c h") 'helm-command-prefix)
-  (global-unset-key (kbd "C-x c"))
+      (when (executable-find "curl")
+        (setq helm-google-suggest-use-curl-p t))
 
-  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-  (when (executable-find "curl")
-    (setq helm-google-suggest-use-curl-p t))
-
-  (setq helm-split-window-in-side-p       t ; open helm buffer inside current window, not occupy whole other window
-    helm-buffers-fuzzy-matching           t ; fuzzy matching buffer names when non--nil
-    helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-    helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-    helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-    helm-ff-file-name-history-use-recentf t)
-
-  ;; swap tab with C-z as tab is easier for frequent actions
-  ; rebind tab to do persistent action
-  (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
-  ; make TAB works in terminal
-  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
-  ; list actions using C-z
-  (define-key helm-map (kbd "C-z")  'helm-select-action)
-
-  (helm-mode 1)
-#+END_SRC
+      (setq helm-split-window-in-side-p       t ; open helm buffer inside current window, not occupy whole other window
+            helm-buffers-fuzzy-matching           t ; fuzzy matching buffer names when non--nil
+            helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+            helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+            helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+            helm-ff-file-name-history-use-recentf t)
+      (helm-mode 1))
+    :bind (("C-c h" . helm-mini)
+           ("C-h a" . helm-apropos)
+           ("C-x C-b" . helm-buffers-list)
+           ("C-x b" . helm-buffers-list)
+           ("M-y" . helm-show-kill-ring)
+           ("M-x" . helm-M-x)
+           ("C-x c o" . helm-occur)
+           ("C-x c s" . helm-swoop)
+           ("C-x c y" . helm-yas-complete)
+           ("C-x c Y" . helm-yas-create-snippet-on-region)
+           ("C-x c b" . my/helm-do-grep-book-notes)
+           ("C-x c SPC" . helm-all-mark-rings)))
 
 
-- C-c h i    : browse tags
-- C-c h r    : regexp builder
-- C-c h p    : browse emacs processes
-- C-c h t    : browse top system processes
-- C-c h C-,  : helm interface for calc
-
-*** Helm M-x support
-
-Helm has a feature to help completion in the command line. The normal
-helm expansions now work over the interactive command set.
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-x") 'helm-M-x)
 #+END_SRC
 
 #+RESULTS:
-: helm-M-x
 
-- Tab:    shows documentation of currently selected command
-
-*** Helm kill ring support
-
-Helm allows us to see the content of the kill ring and select using
-its normal matchers the one we're interested in.
-
-- M-y     show kill ring and allow helm selection.
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-#+END_SRC
-
-#+RESULTS:
-: helm-show-kill-ring
-
-*** Helm switch buffer/file support
-
-Helm allows fancy selecting in the current buffers and the recent file
-list.
-
-helm-mini comprises of multiple sources:
-
-- Current opening buffers, under the header Buffers.
-- Recently opened files, under the header Recentf.
-- Allow you to create a new buffer by pressing RET, under the header
-Create Buffer.
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x b") 'helm-mini)
-#+END_SRC
-
-#+RESULTS:
-: helm-mini
-
-- <left> <right>   : move between groups
-- C-v M-v          : scroll up and down
-
-You can filter out buffers by major mode using the pattern
-*<major-mode>. For example, *dired narrows to only Dired buffers. You
-can also filter out buffers that belong to a major mode by adding ! to
-the pattern. For example, *!dired select all buffers that are not in
-Dired mode.
-
-You can also select buffers in a specific directory by using the
-pattern /directory. For example, /.emacs.d/ narrows to buffers that
-are only inside .emacs.d. Add ! before the pattern for reverse
-version. For example, !/.emacs.d/ narrows to buffers not in .emacs.d.
-
-You can even use helm-mini to narrow to buffers that contains a regexp
-in their contents, by appending @ before the search pattern. For
-example, you can select buffers that only contain the string "test":
-@test. If you want to see the locations of the string in the buffers,
-mark all the buffer with M-a and C-s while in helm-mini session, to
-switch to helm-moccur. You can mark buffers to search by C-SPC. When
-you switch to helm-moccur, matches that are in selected buffers are
-displayed. You can also perform occur only on the current buffer with
-prefix argument: C-u C-s; this is useful when you already marked
-buffers but don't want to unmark just to view only in a
-buffer. However, in general, you won't need C-u C-s.
-
-Meaning of colors and prefixes for buffers:
-
-- Remote buffers are prefixed with '@'.
-- Red => Buffer have its file modified on disk by an external process.
-- Indianred2 => Buffer exists but its file have been deleted.
-- Orange => Buffer is modified and its file not saved to disk.
-- Italic => A non-file buffer.
-
-*** Helm find files support
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-#+END_SRC
-
-helm-find-files is file navigation on steroids:
-
-- helm-find-files can fuzzy match candidates in current directory. e.g
-"fob" or "fbr" will complete "foobar".
-- You can also execute persistent action, which is bound to C-z (by
-default) or TAB if you use my configuration, to narrow the current
-highlighting candidate; C-z or TAB again to view content of the
-buffer. You can scroll the other buffer up/down by M-<next> and
-M-<prior>.
-- Alternatively, you can C-j to narrow to the highlighting candidate
-and C-j again to view the content of other buffer. C-l to go back.
-- You can also go up one directory level with C-l. NOTE: if you use
-C-l, Helm goes up one level and the cursor is on the directory
-you've just got out. If you want to go up and have the cursors on
-the parent directory, in Helm prompt, enter ../.
-- To create a directory, enter a new name that does not exist in the
-current directory and append / at the end. After you created a
-directory, Helm continues in that directory.
-- To create a new file, enter a name and select the top row that has
-the symbol [?] next to it. By default, Helm always selects the first
-match in the directory.
-- You can invoke grep on the current highlighting entry by C-s. C-u
-C-s to perform recursive grep.
-- Enter ~/ at end of pattern to quickly reach home directory.
-- Enter / at end of pattern to quickly reach root of your file system.
-- Enter ./ at end of pattern to quickly reach `default-directory'
-(initial start of session). If you are in `default-directory' move
-cursor on top.
-- You can perform more actions on the highlighted entry by running
-helm-select-action, which is bound to TAB by default and C-z in my
-configuration. The guide for each action in the action menu is
-written in the guide Exploring large projects with Projectile and
-Helm Projectile. It is written there because you will end up using
-Projectile (a project manage for Emacs, introduced in later section)
-to navigate to files much more efficient, anywhere and anytime you
-need.
-
-**** Grep in find files
-
-Within the find-files you can activate a grep with C-s.
-
-- C-s : grep in files
-- C-u C-s : grep in directory tree like rgrep
-
-The following snippet uses ack instead of grep for improved
-responsiveness.
-
-#+BEGIN_SRC emacs-lisp
-(when (executable-find "ack-grep")
-(setq helm-grep-default-command "ack-grep -Hn --no-group --no-color %e %p %f"
-    helm-grep-default-recurse-command
-    "ack-grep -H --no-group --no-color %e %p %f"))
-(when (executable-find "ack")
-(setq helm-grep-default-command "ack -Hn --no-group --no-color %e %p %f"
-    helm-grep-default-recurse-command
-    "ack -H --no-group --no-color %e %p %f"))
-#+END_SRC
-
-#+RESULTS:
-: ack -H --no-group --no-color %e %p %f
-
-*** Helm access to mark ring
-
-Marks allow fast navigation between points in the codebase, however
-this gets confusing after some marks are active. This extension allows
-you to search for marks with a helm interface.
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
-#+END_SRC
-
-#+RESULTS:
-: helm-all-mark-rings
-
-- C-h SPC   : browse the mark ring
-
-*** helm support for emacs registers
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c h x") 'helm-register)
-#+END_SRC
-
-#+RESULTS:
-: helm-register
-
-** helm interface for expression with eldoc
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-c h M-:") 'helm-eval-expression-with-eldoc)
-#+END_SRC
-
-#+RESULTS:
-: helm-eval-expression-with-eldoc
 
 ** resize windows with C-S-arrowkey
 
@@ -669,8 +532,8 @@ it uses the lisp syntax which requires the awful escaping of
 characters. Switch it to 'normal' regex mode.
 
 #+BEGIN_SRC emacs-lisp
-  (require 're-builder)
-  (setq reb-re-syntax 'string)
+  (use-package re-builder
+    :init (setq reb-re-syntax 'string))
 #+END_SRC
 
 #+RESULTS:
@@ -693,7 +556,7 @@ allows given your settings). This includes prefixes like C-x 8 which
 are shown in a different face.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'which-key)
+  (use-package which-key)
 #+END_SRC
 
 ** Command Log Mode
@@ -703,7 +566,7 @@ command together with a timestamp. Very useful to demo emacs usage,
 but also to analyse keycodes afterwards.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'command-log-mode)
+  (use-package command-log-mode)
 #+END_SRC
 
 
@@ -717,8 +580,8 @@ for multi person teams (and that include single person teams working
 back after an hiatus).
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'editorconfig)
-  (editorconfig-mode 1)
+  (use-package editorconfig
+    :config (editorconfig-mode 1))
 #+END_SRC
 
 #+RESULTS:
@@ -735,7 +598,7 @@ the end of lines. Let's get rid of it before saving.
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+END_SRC
 
-*** TODO Tabs in source code
+*** Tabs in source code
 
 TODO: figure out an overridable way to untabify buffers.
 
@@ -785,9 +648,9 @@ again. Only *Makefiles* and tab separated files come to mind.
 Enable *yasnippet* globally
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'yasnippet)
-(eval-after-load "yasnippet"
-'(yas-global-mode 1))
+  (use-package yasnippet
+    :config (yas-global-mode 1))
+
 #+END_SRC
 
 However snippets wreak havoc in terminals, especially with tab
@@ -805,12 +668,16 @@ A cool feature introduced by Sublime are multiple cursors.
 It did not take long before this was ported to emacs
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+  (use-package multiple-cursors
+    :bind (("C-S-c C-S-c" . mc/edit-lines)
+           ("C->" . mc/mark-next-like-this)
+           ("C-<" . mc/mark-previous-like-this)
+           ("C-c C-<" . mc/mark-all-like-this)))
 #+END_SRC
+
+#+RESULTS:
+
+
 
 ** Expand Region
 
@@ -821,7 +688,7 @@ again. Similar for blocks in programming languages.
 q - C-= : expand region
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'expand-region)
+  (use-package expand-region)
 #+END_SRC
 
 #+RESULTS:
@@ -841,8 +708,9 @@ each time having the overhead of starting all the packages.
 ** Auto Completion
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'company)
-  (add-hook 'after-init-hook 'global-company-mode)
+  (use-package company
+    :config (global-company-mode))
+
 #+END_SRC
 
 #+RESULTS:
@@ -851,7 +719,7 @@ each time having the overhead of starting all the packages.
 ** Syntax checking
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'flycheck)
+  (use-package flycheck)
 #+END_SRC
 
 #+RESULTS:
@@ -859,9 +727,7 @@ each time having the overhead of starting all the packages.
 ** Rainbow Delimiters
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'rainbow-delimiters)
-
-
+(use-package rainbow-delimiters)
 #+END_SRC
 
 ** Comment Regions
@@ -880,12 +746,11 @@ Global mapping to comment and uncommenting
 ** Quickly jump in document with ace-jump-mode
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'ace-jump-mode)
-  (define-key global-map (kbd "C-`") 'ace-jump-mode)
+  (use-package ace-jump-mode
+    :bind ("C-`" . ace-jump-mode))
 #+END_SRC
 
 #+RESULTS:
-: ace-jump-mode
 
 ** Move kill-region away from s-x
 
@@ -919,15 +784,16 @@ unwind-protects.
 ** GNU Global tags
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'ggtags)
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (ggtags-mode 1))))
+  (use-package ggtags
+    :config
+    (add-hook 'c-mode-common-hook
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                  (ggtags-mode 1)))))
 #+END_SRC
 
 #+RESULTS:
-| lambda | nil | (when (derived-mode-p (quote c-mode) (quote c++-mode) (quote java-mode)) (ggtags-mode 1)) |
+: t
 
 
 
@@ -947,10 +813,21 @@ Aggressive-indent-mode is a minor mode that keeps your code always
 indented. It reindents after every change, making it more reliable
 than electric-indent-mode.
 
+That being said, there are some modes which cycle through different
+indent levels as part of indentation. This makes the indent jerk
+through the cycle on each keystroke, which is very disturbing. For
+modes which are not yet part of the standard list, you can add them to
+the variable *aggressive-indent-excluded-modes* .
+
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'aggressive-indent)
-  (global-aggressive-indent-mode 1)
+  (use-package aggressive-indent
+    :config (progn
+              (global-aggressive-indent-mode 1)
+              (push 'feature-mode aggressive-indent-excluded-modes)))
 #+END_SRC
+
+#+RESULTS:
+: t
 
 
 * Programming Languages
@@ -965,11 +842,15 @@ Enable clojure-mode and add support for clojurescript.
 
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'paredit 'clojure-mode)
-(add-to-list 'auto-mode-alist '("\.cljs$" . clojure-mode))
-(add-hook 'clojure-mode-hook 'paredit-mode)
-(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'clojure-mode-hook 'add-untabify-before-save)
+  (use-package paredit)
+  (use-package clojure-mode
+    :mode ("\.cljs$" . clojure-mode)
+    :init (progn
+            (add-hook 'clojure-mode-hook 'paredit-mode)
+            (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+            (add-hook 'clojure-mode-hook 'add-untabify-before-save)))
+
+
 #+END_SRC
 
 *** Cider REPL integration
@@ -980,37 +861,65 @@ Enable paredit and rainbow delimiters in the repl. We also let the
 clojure syntax highlighter work in the repl.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'cider)
-  (add-hook 'cider-repl-mode-hook 'paredit-mode)
-  (add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
-  (setq cider-repl-use-clojure-font-lock t)
-  (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+  (use-package cider
+    :init (progn
+            (add-hook 'cider-repl-mode-hook 'paredit-mode)
+            (add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
+            (setq cider-repl-use-clojure-font-lock t)
+            (add-hook 'cider-mode-hook 'eldoc-mode)))
+
 #+END_SRC
+
+#+RESULTS:
 
 I also enabled the eldoc mode with cider.
 
 #+RESULTS:
 : t
 
+** Cucumber
+
+#+BEGIN_SRC emacs-lisp
+  (use-package feature-mode
+    :mode "\.feature$")
+
+#+END_SRC
+
+#+RESULTS:
+
+Key Bindings
+
+In order to get goto-step-definition to work, you must install the
+ruby_parser gem (version 2.0.x).For example:
+
+gem install ruby_parser --version "~> 2.0.5"
+
+| Keybinding | Description                                      |
+|------------+--------------------------------------------------|
+| C-c ,v     | Verify all scenarios in the current buffer file. |
+| C-c ,s     | Verify the scenario under the point              |
+| C-c ,f     | Verify all features in project.                  |
+| C-c ,r     | Repeat the last verification process.            |
+| C-c ,g     | Go to step-definition under point                |
+
 ** Groovy
 
 See [[http://groovy.codehaus.org/Emacs%2BGroovy%2BMode][the emacs guidelines on the groovy website]].
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'groovy-mode )
-
-  ;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
-  (autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
-  (add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
-  (add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
+  (use-package groovy-mode
+    :mode "\.groovy$"
+    :interpreter "groovy"
 
   ;;; make Groovy mode electric by default.
-  (add-hook 'groovy-mode-hook
-            '(lambda ()
-               (require 'groovy-electric)
-               (groovy-electric-mode)
-               (add-untabify-before-save)))
+    :config (add-hook 'groovy-mode-hook
+                    '(lambda ()
+                       (require 'groovy-electric)
+                       (groovy-electric-mode)
+                       (add-untabify-before-save))))
 #+END_SRC
+
+#+RESULTS:
 
 ** Go
 
@@ -1019,10 +928,11 @@ stopped with Go 1.4 and later. The canonical place for go-mode is
 github and an up-to-date version is available from melpa.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'go-mode
-                    'go-eldoc
-                    'go-projectile
-                    'go-snippets)
+  (use-package go-mode
+    :mode ("\.go$" . go-mode))
+  (use-package go-eldoc)
+  (use-package go-projectile)
+  (use-package go-snippets)
 #+END_SRC
 
 #+RESULTS:
@@ -1032,10 +942,11 @@ github and an up-to-date version is available from melpa.
 *** Slime mode
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'slime)
-  (setq inferior-lisp-program "/usr/local/bin/sbcl")
-  (setq slime-contribs '(slime-fancy slime-js)) ; almost everything
-  (slime-setup '(slime-fancy slime-asdf slime-js))
+  (use-package slime
+    :init (progn
+            (setq inferior-lisp-program "/usr/local/bin/sbcl")
+            (setq slime-contribs '(slime-fancy slime-js)) ; almost everything
+            (slime-setup '(slime-fancy slime-asdf slime-js))))
 
 #+END_SRC
 
@@ -1048,27 +959,34 @@ github and an up-to-date version is available from melpa.
 For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'js2-mode 'js2-refactor)
+  (use-package js2-mode
 
-  (add-to-list 'auto-mode-alist '("\\.js" . js2-mode))
-  (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+    :mode (("\\.js$" . js2-mode)
+           ("\\.jsx$" . js2-jsx-mode))
+    :interpreter ("node" . js2-mode)
+    :init (progn
+            (setq js-indent-level 2)
+            (setq js-indent-first-init "dynamic"))
+    :config (progn
+              (add-hook 'js2-mode-hook
+                        (lambda ()
+                          (set (make-local-variable 'indent-tabs-mode) 'nil)
+                          (set (make-local-variable 'js-indent-level) 2)
+                          (set (make-local-variable 'tab-width) 2)
+                          (add-untabify-before-save)))
+              (add-hook 'js2-jsx-mode-hook
+                        (lambda ()
+                          (set ((make-local-variable 'indent-tabs-mode) 'nil)
+                          (set (make-local-variable 'js-indent-level) 2)
+                          (set (make-local-(vector )ariable 'tab-width) 2)
+                          (add-untabify-before-save))))
 
-  (setq js-indent-level 2)
-  (setq js-indent-first-init "dynamic")
-
-  (js2r-add-keybindings-with-prefix "C-c C-m")
-
-  (add-hook 'js2-mode-hook
-            (lambda ()
-              (set (make-local-variable 'indent-tabs-mode) 'nil)
-              (set (make-local-variable 'js-indent-level) 2)
-              (set (make-local-variable 'tab-width) 2)
-              (add-untabify-before-save)))
+    ))
 
 #+END_SRC
 
 #+RESULTS:
-| (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | skewer-mode | add-untabify-before-save | er/add-js2-mode-expansions | er/add-js-mode-expansions |
+: t
 
 To customize how it works: *M-x customize-group RET js2-mode RET*.
 
@@ -1076,19 +994,56 @@ I also enabled the js2-refactor package.
 
 *** JSX support
 
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.jsx" . js2-jsx-mode))
+Included in main js2 mode.
 
-  (add-hook 'js2-jsx-mode-hook
-            (lambda ()
-              (set (make-local-variable 'indent-tabs-mode) 'nil)
-              (set (make-local-variable 'js-indent-level) 2)
-              (set (make-local-variable 'tab-width) 2)
-              (add-untabify-before-save)))
+*** Typescript
+
+install support for TypeScript :
+
+#+BEGIN_SRC emacs-lisp
+  (use-package tide)
+
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    ;; company is an optional dependency. You have to
+    ;; install it separately via package-install
+    ;; `M-x package-install [ret] company`
+    (company-mode +1))
+
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
+
+  ;; formats the buffer before saving
+  (add-hook 'before-save-hook 'tide-format-before-save)
+
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+  ;; format options
+  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+
 #+END_SRC
 
 #+RESULTS:
-| lambda | nil | (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) | (set (make-local-variable (quote js-indent-level)) 2) | (set (make-local-variable (quote tab-width)) 2) | (add-untabify-before-save) |
+| :insertSpaceAfterFunctionKeywordForAnonymousFunctions | t | :placeOpenBraceOnNewLineForFunctions | nil |
+
+and support for react :
+
+#+BEGIN_SRC emacs-lisp
+  (require 'web-mode)
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
+#+END_SRC
+
+#+RESULTS:
+| (lambda nil (when (string-equal tsx (file-name-extension buffer-file-name)) (setup-tide-mode))) | add-untabify-before-save | er/add-web-mode-expansions | er/add-html-mode-expansions |
 
 *** tern syntax support
 
@@ -1106,12 +1061,12 @@ Then install in Emacs.
 
 #+BEGIN_SRC emacs-lisp
   ;;; tern
-  (require-packages 'tern)
-  (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+  (use-package tern
+    :config (add-hook 'js2-mode-hook (lambda () (tern-mode t))))
 #+END_SRC
 
 #+RESULTS:
-| (lambda nil (tern-mode t)) | skewer-mode | (lambda nil (slime-js-minor-mode 1)) | (lambda nil (define-key js2-mode-map i (quote js-doc-insert-function-doc)) (define-key js2-mode-map @ (quote js-doc-insert-tag))) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | er/add-js2-mode-expansions | er/add-js-mode-expansions |
+: t
 
 The final step is to set up a .tern-project file in the root directory
 of your project. For Node.js projects, I use this as a starting point:
@@ -1132,13 +1087,12 @@ If you use company-mode, then installing company-tern is also highly
 recommended:
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'company-tern)
-  (eval-after-load 'company
-      '(add-to-list 'company-backends 'company-tern))
+  (use-package company-tern
+    :config (add-to-list 'company-backends 'company-tern))
 #+END_SRC
 
 #+RESULTS:
-| company-tern | alchemist-company | company-bbdb | company-nxml | company-css | company-eclim | company-semantic | company-clang | company-xcode | company-cmake | company-capf | company-files | (company-dabbrev-code company-gtags company-etags company-keywords) | company-oddmuse | company-dabbrev |
+: t
 
 As a note, some trouble was noted with the tern server occasionally
 dying this past summer (2014). Running the following fixed it
@@ -1151,43 +1105,93 @@ more than a nuisance.
 *** js2-refactor
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'js2-refactor)
-  (add-hook 'js2-mode-hook #'js2-refactor-mode)
-#+END_SRC
+  (use-package js2-refactor
+    :config (progn
+              (add-hook 'js2-mode-hook #'js2-refactor-mode)
+              (js2r-add-keybindings-with-prefix "C-c r")))
 
-#+BEGIN_SRC emacs-lisp
-  (js2r-add-keybindings-with-prefix "C-c C-m")
   ;; eg. extract function with `C-c C-m ef`.
 #+END_SRC
 #+RESULTS:
-: js2r-move-line-up
+: t
 
-*** js-doc mode
+The refactorings are triggered with 'C-c r'
 
-Support for adding jsdoc style comments to javascript files.
+e.g.: C-c r ev : extract variable
 
-I am more tempted by docco style documentation, but a lot of others
-seem to prefer the js-doc style of structured comments.
+List of refactorings:
 
-#+BEGIN_SRC emacs-lisp
-  (require-packages 'js-doc)
-  (setq js-doc-mail-address "pti@melexis.com"
-        js-doc-author (format "Peter Tillemans <%s>" js-doc-mail-address)
-        js-doc-url "https://www.melexis.com/"
-        js-doc-license "Apache 2")
+| shortcut | description                                  |
+|----------+----------------------------------------------|
+| ev       | extract variable                             |
+| em       | extract method                               |
+| ef       | extract function                             |
+| ip       | introduce parameter                          |
+| lp       | localize parameter to local variable         |
+| eo       | expand object to multiline                   |
+| co       | contrat object to single line                |
+| eu       | expand function to multiline                 |
+| cu       | contract function to single line             |
+| ea       | expand array to multiline                    |
+| ca       | contract array to single line                |
+| wi       | wrap buffer in iife                          |
+| ig       | inject global in iife                        |
+| ag       | adds  glodal annotation                      |
+| iv       | inline variable                              |
+| rv       | rename variable                              |
+| vt       | var to this                                  |
+| ao       | arguments to object argument                 |
+| 3i       | ternary op to if statement                   |
+| sv       | split multiple variable definitions          |
+| ss       | split string                                 |
+| uw       | unwrap, replace parent statement with region |
+| lt       | add log statement for thing at point         |
+| dt       | debug this                                   |
+| sl       | forward slurp: move next statement in block  |
+| ba       | backward barf: kick last statement out block |
+| k        | kill to end of line within js semantics      |
 
-  (add-hook 'js2-mode-hook
-            #'(lambda ()
-                (define-key js2-mode-map "\C-ci" 'js-doc-insert-function-doc)
-                (define-key js2-mode-map "@" 'js-doc-insert-tag)))
-#+END_SRC
 
-#+RESULTS:
-| (lambda nil (define-key js2-mode-map i (quote js-doc-insert-function-doc)) (define-key js2-mode-map @ (quote js-doc-insert-tag))) | skewer-mode | (lambda nil (slime-js-minor-mode 1)) | (lambda nil (set (make-local-variable (quote indent-tabs-mode)) (quote nil)) (set (make-local-variable (quote js-indent-level)) 2) (set (make-local-variable (quote tab-width)) 2) (add-untabify-before-save)) | er/add-js2-mode-expansions | er/add-js-mode-expansions |
+**** Some useful keybindings :
 
+| shortcut     | function                                         |
+|--------------+--------------------------------------------------|
+| - C-c C-m eo | js2r-expand-object                               |
+| - C-c C-m co | js2r-contract-object                             |
+| - C-c C-m eu | js2r-expand-function                             |
+| - C-c C-m cu | js2r-contract-function                           |
+| - C-c C-m ec | js2r-expand-call-args                            |
+| - C-c C-m cc | js2r-contract-call-args                          |
+| - C-c C-m ea | js2r-expand-array                                |
+| - C-c C-m ca | js2r-contract-array                              |
+| - C-c C-m wi | js2r-wrap-buffer-in-iife                         |
+| - C-c C-m ig | js2r-inject-global-in-iife                       |
+| - C-c C-m ev | js2r-extract-var                                 |
+| - C-c C-m iv | js2r-inline-var                                  |
+| - C-c C-m rv | js2r-rename-var                                  |
+| - C-c C-m vt | js2r-var-to-this                                 |
+| - C-c C-m ag | js2r-add-to-globals-annotation                   |
+| - C-c C-m sv | js2r-split-var-declaration                       |
+| - C-c C-m ss | js2r-split-string                                |
+| - C-c C-m ef | js2r-extract-function                            |
+| - C-c C-m em | js2r-extract-method                              |
+| - C-c C-m ip | js2r-introduce-parameter                         |
+| - C-c C-m lp | js2r-localize-parameter                          |
+| - C-c C-m tf | js2r-toggle-function-expression-and-declaration  |
+| - C-c C-m ao | js2r-arguments-to-object                         |
+| - C-c C-m uw | js2r-unwrap                                      |
+| - C-c C-m wl | js2r-wrap-in-for-loop                            |
+| - C-c C-m 3i | js2r-ternary-to-if                               |
+| - C-c C-m lt | js2r-log-this                                    |
+| - C-c C-m dt | js2r-debug-this                                  |
+| - C-c C-m sl | js2r-forward-slurp                               |
+| - C-c C-m ba | js2r-forward-barf                                |
+| - C-c C-m k  | js2r-kill                                        |
+| - C-S-down   | js2r-move-line-down)                             |
+| - C-S-up     | js2r-move-line-up))                              |
+|--------------+--------------------------------------------------|
 *** swank-js
-
-see [[https://github.com/swank-js/swank-js][SwankJS github repo]] for more details.
+|see [[https://github.com/swank-js/swank-js][SwankJS github repo]] for more details.
 
 Install Node.JS and npm using your favorite package manager.
 
@@ -1241,6 +1245,10 @@ The result of the expression is echoed in the minibuffer.
 There is a plugin to manage mocha tests. Available on melpa and the
 source repo is at [[https://github.com/scottaj/mocha.el][github.]]
 
+#+BEGIN_SRC emacs-lisp
+  (use-package mocha)
+#+END_SRC
+
 **** Running Tests
 
 In order to run tests there are three functions exposed:
@@ -1280,10 +1288,6 @@ repl use interactive REPL at point
 Additionally C-c C-c will send a BREAK signal, and M-p will cycle
 through previous inputs.
 
-
-#+BEGIN_SRC emacs-lisp
-  (require-packages 'mocha)
-#+END_SRC
 ** Lisp
 
 *** Paredit Mode
@@ -1309,6 +1313,18 @@ Enable it when editing emacs lisp and also enable highlighting parens.
 #+RESULTS:
 | lambda | nil | (paredit-mode 1) | (show-paren-mode 1) |
 
+*** Cucumber for emacs
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ecukes
+    :load-path "vendor/espuds"
+    :config (require 'espuds))
+
+#+END_SRC
+
+#+RESULTS:
+: t
+
 ** Elixir
 
 Elixir has good tooling in emacs.
@@ -1326,30 +1342,31 @@ now considered obsolete : it is no longer maintained.
 There is a snippet collection in *elixir-yasnippets*
 
 #+BEGIN_SRC emacs-lisp
-;; elixir-mode : basic elixir editing support
-;; elixir-yasnippets : predefined elixir snippets
-;; alchemist : mix and other elixir tool integration
-;; Note : elixir-mix is included in alchemist and obsolete now
-(require-packages 'alchemist 'elixir-mode 'elixir-yasnippets)
-
-;; add a hook to compile on save
-(defun elixir-mode-compile-on-save ()
-"Elixir mode compile files on save."
-  (and (file-exists (buffer-file-name))
-       (file-exists (elixir-mode-compiled-file-name))
-           (elixir-cos-mode t)))
-(add-hook 'elixir-mode-hook 'elixir-mode-compile-on-save)
-
-
-;; enable to let mix run the test suite on save
-(setq alchemist-hooks-test-on-save t)
+  ;; elixir-mode : basic elixir editing support
+  ;; elixir-yasnippets : predefined elixir snippets
+  ;; alchemist : mix and other elixir tool integration
+  ;; Note : elixir-mix is included in alchemist and obsolete now
+  (use-package alchemist)
+  (use-package elixir-yasnippets)
+  (use-package elixir-mode
+    :config (progn
+              ;; add a hook to compile on save
+              (defun elixir-mode-compile-on-save ()
+                "Elixir mode compile files on save."
+                (and (file-exists (buffer-file-name))
+                     (file-exists (elixir-mode-compiled-file-name))
+                     (elixir-cos-mode t)))
+              (add-hook 'elixir-mode-hook 'elixir-mode-compile-on-save))
+    ;; enable to let mix run the test suite on save
+    :init (setq alchemist-hooks-test-on-save t))
 
 #+END_SRC
 
 #+RESULTS:
-| elixir-mode-compile-on-save | alchemist-mode-hook |
+: t
 
-** TODO Python
+** DONE Python
+   - State "DONE"       from "NEXT"       [2016-11-17 Thu 20:32]
 
 This is very 'light' for python development. Especially with plone
 there is ample room for more support here.
@@ -1413,14 +1430,16 @@ Elpy now collects a ton of other modules and interoperates with some
 python modules
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'elpy)
-  (elpy-enable)
-  (elpy-use-ipython)
-  (setq elpy-rpc-python-command "python3") ;; use the default python3
-  (elpy-rpc-restart)
+  (use-package elpy
+    :init (setq elpy-rpc-python-command "python3") ;; use the default python3
+    :config (progn
+              (elpy-enable)
+              (elpy-use-ipython)
+              (elpy-rpc-restart)))
 #+END_SRC
 
 #+RESULTS:
+: t
 
 
 **** Python Setup
@@ -1436,7 +1455,7 @@ or for python3
 $ pip install rope_py3k jedi importmagic autopep8 flake8 ipython
 #+END_SRC
 
-**** Anaconda Support
+*** Anaconda Support
 
 Anaconda is now gathering a lot of traction as a ready to run
 distribution for especially Windows and Mac, delivering those
@@ -1459,14 +1478,11 @@ use :
 When creating a new environment in anaconda, don't forget to install
 the python modules above.
 
-**** Notable shortcuts
-
-
-
+*** Notable shortcuts
 *** IPython Notebook Support
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'ein)
+  (use-package ein)
 
 #+END_SRC
 
@@ -1484,10 +1500,20 @@ Enable electric mode and reindent after a newline.
 Also force tab settings just in case.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'ruby-electric 'ruby-additional 'ruby-compilation
-                    'ruby-refactor 'ruby-test-mode)
+  (use-package ruby-electric
+    :config (add-hook 'ruby-mode-hook
+                      (lambda ()
+                        (set (make-local-variable 'indent-tabs-mode) 'nil)
+                        (set (make-local-variable 'tab-width) 2)
+                        (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
+                        (ruby-electric-mode t)
+                        (add-untabify-before-save))))
+  (use-package ruby-additional)
+  (use-package ruby-compilation)
+  (use-package ruby-refactor)
+  (use-package ruby-test-mode)
 
-  ; where'd this go?
+                                          ; where'd this go?
   (defun ruby-reindent-then-newline-and-indent ()
     "Reindents the current line then creates an indented newline."
     (interactive "*")
@@ -1497,7 +1523,7 @@ Also force tab settings just in case.
       (indent-according-to-mode)
       (delete-region (point) (progn (skip-chars-backward " \t") (point))))
     (when (ruby-previous-line-is-comment)
-        (insert "# "))
+      (insert "# "))
     (indent-according-to-mode))
 
   (defun ruby-previous-line-is-comment ()
@@ -1512,13 +1538,7 @@ Also force tab settings just in case.
       (beginning-of-line)
       (search-forward "#" (point-at-eol) t)))
 
-  (add-hook 'ruby-mode-hook
-            (lambda ()
-              (set (make-local-variable 'indent-tabs-mode) 'nil)
-              (set (make-local-variable 'tab-width) 2)
-              (define-key ruby-mode-map "\C-m" 'ruby-reindent-then-newline-and-indent)
-              (ruby-electric-mode t)
-              (add-untabify-before-save)))
+
 #+END_SRC
 
 *** Add ruby support to popular file types
@@ -1533,27 +1553,20 @@ Also force tab settings just in case.
 (setq auto-mode-alist (cons '("\\.gemspec" . ruby-mode) auto-mode-alist))
 #+END_SRC
 
-*** DONE Integrate with RVM
+*** TODO integrate with chruby
 
-I use RVM to manage my ruby versions independently from the
-system. This eases cross machine development and cross project
-dependencies.
-
-#+BEGIN_SRC emacs-lisp
-
-(require-packages 'rvm)
-
-(add-hook 'ruby-mode-hook
-        (lambda () (rvm-activate-corresponding-ruby)))
-#+END_SRC
-
-By setting the corresponding ruby, the live interaction will see the
-same ruby environment as the project I am working on.
+I switched from rvm to chruby.
 
 *** Testing with RSpec
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'rspec-mode)
+  (use-package rspec-mode
+    :config (progn
+              (setq rspec-use-rake-flag nil)
+              (defadvice rspec-compile (around rspec-compile-around activate)
+                "Use BASH shell for running the specs because of ZSH issues."
+                (let ((shell-file-name "/bin/bash"))
+                  ad-do-it))))
 #+END_SRC
 
 #+RESULTS:
@@ -1694,6 +1707,17 @@ more isolated from the rest of emacs.
    (define-key shell-mode-map "\C-n" 'comint-next-input)))
 #+END_SRC
 
+** Haskell
+
+#+BEGIN_SRC emacs-lisp
+  (use-package haskell-mode
+    :mode "\.hs$"
+    :config (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+    )
+#+END_SRC
+
+#+RESULTS:
+
 ** Languages done
 #+BEGIN_SRC emacs-lisp
 (message "languages done")
@@ -1826,14 +1850,20 @@ Load SCSS mode for Sassy support
 Another cute acronym.
 
 #+BEGIN_SRC emacs-lisp
-; rinari
-(setq rinari-tags-file-name "TAGS")
-(add-hook 'rinari-minor-mode-hook
-        (lambda ()
-          (define-key
-            rinari-minor-mode-map
-            (kbd "A-r")
-            'rinari-test)))
+                                          ; rinari
+  (use-package rinari
+    :init (global-rinari-mode 1)
+    :config (progn
+              (setq ruby-insert-encoding-magic-comment nil)
+
+              (setq rinari-tags-file-name "TAGS")
+              (add-hook 'rinari-minor-mode-hook
+                        (lambda ()
+                          (define-key
+                            rinari-minor-mode-map
+                            (kbd "A-r")
+                            'rinari-test)))))
+
 #+END_SRC
 
 *** Enable ruby support in rails templates
@@ -2163,16 +2193,6 @@ inadvertent moving away or doing changes to other parts of the file.
 (setq org-agenda-tags-todo-honor-ignore-options t)
 #+END_SRC
 
-***
-***
-***
-***
-***
-***
-***
-***
-
-
 *** checklists
 
 #+BEGIN_SRC emacs-lisp
@@ -2452,35 +2472,75 @@ Org Mobile allows me to take my org files on my iPhone.
 
 It exchanges the files in both directions using Dropbox.
 
-#+BEGIN_SRC emacs-lisp
-  ;; Set to the name of the file where new notes will be stored
-  (setq org-mobile-inbox-for-pull "~/org/flagged.org")
-  ;; Set to <your Dropbox root directory>/Apps/MobileOrg.
-  (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-  (setq org-mobile-files
+I created an emacs script which I dropped in ~/bin to run the synch. I
+used to schedule it while running in emacs but this got on my nerves
+as it interrupts the flow at (semmingly) random times.
+
+#+BEGIN_SRC emacs-lisp :eval no :padline no :tangle ~/bin/org-sync-agenda
+#!/Applications/Emacs.app/Contents/MacOS/Emacs-x86_64-10_9 --script
+
+;; WARNING: DO NOT EDIT THIS FILE
+;;
+;; The source is in ~/.emacs.d/snamellit.org. Export it with
+;; org-babel-tangle (C-c C-v t)
+
+
+(load "~/.emacs.d/snamellit/custom.el")
+
+(package-initialize)
+
+(princ "packages inited")
+
+(require 'org)
+(setq org-directory "~/org")
+
+
+                                        ; Targets include this file
+                                        ; and any file contributing to
+                                        ; the agenda up to 2 levels
+                                        ; deep
+(setq org-refile-targets (quote ((nil :maxlevel . 2)
+                                 (org-agenda-files :maxlevel . 2))))
+
+                                        ; Targets start with the file
+                                        ; name - allows creating level
+                                        ; 1 tasks
+(setq org-refile-use-outline-path (quote file))
+
+                                        ; Allow refile to create
+                                        ; parent tasks with
+                                        ; confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+                                        ; helm does not show headers
+                                        ; as refile target if this is
+                                        ; not nil
+(setq org-outline-path-complete-in-steps nil)
+
+                                        ; Set to the name of the file
+                                        ; where new notes will be
+                                        ; stored
+(setq org-mobile-inbox-for-pull "~/org/flagged.org")
+;; Set to <your Dropbox root directory>/Apps/MobileOrg.
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
+(setq org-mobile-files
       (quote
        (org-agenda-files
         "~/org/todo.org"
         "~/org/emacs.org"
         "~/org/pfus.org")))
 
-  ;; org-mobile integration and automation.
-  ;;
-  ;; wait 60 min between auto updates to avoid losing time
-  ;; when "catching up"
-  (setq  org-mobile-last-sync 0)
-
-  (defun pti-set-difference (a b)
+(defun pti-set-difference (a b)
   (delq nil
-   (mapcar
-    (lambda (x)
-      (when (not (and (member x a) (member x b))) x))
-    (append a b))))
+        (mapcar
+         (lambda (x)
+           (when (not (and (member x a) (member x b))) x))
+         (append a b))))
 
-  (defun open-buffer-names ()
+(defun open-buffer-names ()
   (mapcar 'buffer-name (buffer-list)))
 
-  (defun restore-buffers (fn)
+(defun restore-buffers (fn)
   (let ((old-open-buffers (open-buffer-names)))
     (funcall fn)
     (dolist ( buffer-name
@@ -2488,28 +2548,58 @@ It exchanges the files in both directions using Dropbox.
                                   old-open-buffers))
       (kill-buffer buffer-name))))
 
-  (defun org-mobile-pullpush nil nil
-  ( if (> (- (float-time) org-mobile-last-sync) 3600)
-     (progn
-        (restore-buffers 'org-mobile-pull)
-        (restore-buffers 'org-mobile-push)
-        (setq org-mobile-last-sync (float-time))))
-  )
+(defun org-mobile-pullpush nil nil
+       ( if (> (- (float-time) org-mobile-last-sync) 3600)
+           (progn
+             (restore-buffers 'org-mobile-pull)
+             (restore-buffers 'org-mobile-push)
+             (setq org-mobile-last-sync (float-time))))
+       )
 
-  ;; My main desktop systems are Macs for now
-  (if (eq system-type 'darwin)
-      (progn
-       ;; sync at start, finish and in between 2x p hr
-       (add-hook 'after-init-hook
-                 (lambda ()
-                   (restore-buffers 'org-mobile-pull)))
-       (add-hook 'kill-emacs-hook
-                 (lambda ()
-                   (restore-buffers 'org-mobile-push)))
-       (run-at-time "00:29" 7200 'org-mobile-pullpush)))
+;; My main desktop systems are Macs for now
+(if (eq system-type 'darwin)
+    (progn
+      ;; sync at start, finish and in between 2x p hr
+      (add-hook 'after-init-hook
+                (lambda ()
+                  (restore-buffers 'org-mobile-pull)))
+      (add-hook 'kill-emacs-hook
+                (lambda ()
+                  (restore-buffers 'org-mobile-push)))
+      ))
 #+END_SRC
 
-#+RESULTS:
+This is then scheduled with the following plist file
+
+#+BEGIN_SRC xml :eval no :padline no :tangle ~/Library/LaunchAgents/com.snamellit.org-sync-agenda.plist
+  <?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+  <plist version="1.0">
+    <dict>
+      <key>Label</key>
+      <string>com.snamellit.org-sync-agenda</string>
+      <key>Program</key>
+      <string>/Users/pti/bin/org-sync-agenda</string>
+      <key>StandardErrorPath</key>
+      <string>/tmp/com.snamellit.emacs.backup.err</string>
+      <key>StandardOutPath</key>
+      <string>/tmp/com.snamellit.emacs.backup.out</string>
+      <key>StartInterval</key>
+      <integer>3600</integer>
+    </dict>
+  </plist>
+
+#+END_SRC
+
+When tangled this will run the sync script every hour after the next
+time you log in.
+
+If you are impatient you can load it immediately with
+
+#+BEGIN_SRC sh
+$ launchctl load -w ~/Library/LaunchAgents/com.snamellit.org-sync-agenda.plist
+#+END_SRC
 
 **** jira integration
 #+BEGIN_SRC emacs-lisp
@@ -2847,6 +2937,19 @@ This is stupid and ugly, but so be it. So we have to relax our
   (message "Programming Tools section done")
 #+END_SRC
 
+** Ediff diff/merge tool
+
+When running if fullscreen, the command window appears on another
+desktop, which is not very usefull and which probably confused me not
+to use this feature much sooner.
+
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-window-setup-function
+        (lambda
+          (if (and (ediff-window-display-p) (frame-parameter nil 'fullscreen))
+              'ediff-setup-windows-plain
+            'ediff-setup-windows-default)))
+#+END_SRC
 
 * Applications
 ** Dired File Manager
@@ -2868,38 +2971,48 @@ this code
 ** Rcirc IRC client
 
 #+BEGIN_SRC emacs-lisp
-      ; settings for rcirc IRC client
+                                          ; settings for rcirc IRC client
 
-      ;; Don't print /away messages.
-      ;; This does not require rcirc to be loaded already,
-      ;; since rcirc doesn't define a 301 handler (yet).
-      (defun rcirc-handler-301 (process cmd sender args)
-      "/away message handler.")
+  ;; Don't print /away messages.
+  ;; This does not require rcirc to be loaded already,
+  ;; since rcirc doesn't define a 301 handler (yet).
+  (defun rcirc-handler-301 (process cmd sender args)
+    "/away message handler.")
 
-      ;; Turn on spell checking.
-      (add-hook 'rcirc-mode-hook (lambda ()
+  ;; Turn on spell checking.
+  (add-hook 'rcirc-mode-hook (lambda ()
                                (flyspell-mode 1)))
 
-      ;; Keep input line at bottom.
-      (add-hook 'rcirc-mode-hook
-              (lambda ()
-                (set (make-local-variable 'scroll-conservatively)
-                     8192)))
+  ;; Keep input line at bottom.
+  (add-hook 'rcirc-mode-hook
+            (lambda ()
+              (set (make-local-variable 'scroll-conservatively)
+                   8192)))
 
-      ;; Join these channels at startup.
-      (setq rcirc-server-alist
-          '(("irc.freenode.net"
-             :channels ("#emacs"
-                        "#rcirc"
-                        "#clojure"
-                        "#leiningen"
-                        ))
-            ("irc.geekshed.net"
-             :channels ("#jupiterbroadcasting"))
-            ))
+  ;; Join these channels at startup.
+  (setq rcirc-server-alist
+        '(("irc.freenode.net"
+           :channels ("#emacs"
+                      "#rcirc"
+                      "#clojure"
+                      "#leiningen"
+                      ))
+          ("irc.geekshed.net"
+           :channels ("#jupiterbroadcasting"))
+          ("irc.flowdock.com"
+           :port 6697
+           :encryption tls
+           :nick "Peter"
+           :channels ("#melexis-cbs/main"
+                      "#melexis-cbs/spc4mlx"))))
 
 
 #+END_SRC
+
+#+RESULTS:
+| irc.freenode.net | :channels | (#emacs #rcirc #clojure #leiningen) |             |     |       |                 |           |                                          |
+| irc.geekshed.net | :channels | (#jupiterbroadcasting)              |             |     |       |                 |           |                                          |
+| irc.flowdock.com | :port     | 6697                                | :encryption | tls | :nick | pti@melexis.com | :channels | (#melexis-cbs/main #melexis-cbs/spc4mlx) |
 
 When starting *rcirc* it will open connections to the servers listed
 in the *rcirc-server-alist* and open a buffer for each of the channels
