@@ -1232,6 +1232,13 @@ Now enable swank-js in emacs
 #+RESULTS:
 | (lambda nil (define-key css-mode-map \230 (quote slime-js-refresh-css)) (define-key css-mode-map  (quote slime-js-embed-css))) | skewer-css-mode | add-untabify-before-save |
 
+*** flow support
+
+#+BEGIN_SRC emacs-lisp
+  (load-file "~/.emacs.d/vendor/flow/flow.el")
+#+END_SRC
+
+#+RESULTS:
 
 *** Live Browser Interaction with skewer-mode
 
