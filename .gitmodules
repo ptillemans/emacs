@@ -4,3 +4,6 @@
 [submodule "vendor/espuds"]
 	path = vendor/espuds
 	url = https://github.com/ecukes/espuds.git
+[submodule "vendor/flow"]
+	path = vendor/flow
+	url = https://github.com/flowtype/flow-for-emacs.git
