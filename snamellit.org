@@ -1358,12 +1358,7 @@ complicated scientific modules precompiled.
 It works by creating separate environments like pyvenv and can
 actually use the same tools to switch to the environments.
 
-#+BEGIN_SRC emacs-lisp :eval no
-(pyvenv-activate (expand-file-name "~/anaconda3/envs/pelican"))
-#+END_SRC
-
-this would activate the pelican environment. For the root environment
-use :
+For the root environment use :
 
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
@@ -1373,6 +1368,15 @@ use :
 
 #+RESULTS:
 : t
+
+And this :
+
+#+BEGIN_SRC emacs-lisp :eval no
+(pyvenv-activate (expand-file-name "~/anaconda3/envs/pelican"))
+#+END_SRC
+
+this would activate the pelican environment.
+
 
 When creating a new environment in anaconda, don't forget to install
 the python modules above.
@@ -1622,6 +1626,11 @@ OTOH I do very little scala atm, so I'll look at it later.
 ** TODO Rust
 
 #+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :mode ("\.rs$")
+    :init
+    (add-hook 'rust-mode-hook #'racer-mode))
+
   (use-package racer
     :config
     (setq racer-cmd "/Users/pti/.cargo/bin/racer")
@@ -1629,11 +1638,6 @@ OTOH I do very little scala atm, so I'll look at it later.
     :init
     (add-hook 'racer-mode-hook #'eldoc-mode)
     (add-hook 'racer-mode-hook #'company-mode))
-
-  (use-package rust
-    :mode ("\.rs$")
-    :init
-    (add-hook 'rust-mode-hook #'racer-mode))
 
   (use-package flycheck-rust)
   (use-package company-racer)
@@ -2851,7 +2855,6 @@ line.
 ** LaTeX
 #+BEGIN_SRC emacs-lisp
   (use-package tex :ensure auctex)
-  (use-package 'auctex-lua)
 #+END_SRC
 
 #+RESULTS:
