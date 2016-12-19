@@ -17,65 +17,6 @@ create the emacs configuration in a well documented manner.
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua emacs config]]
 
 * The basics
-** Use option key as meta
-
-Mac OSX maps Alt-key combinations to symbols before emacs can intercept them.
-
-#+BEGIN_SRC emacs-lisp
- (setq mac-option-modifier 'meta)
-#+END_SRC
-
-#+RESULTS:
-: meta
-
-** Force path to be consistent with terminal path
-
-The mac behaves increasingly weird with relation to how paths are
-being set in the terminal and in programs launched by  launchd (or by
-extension Alfred).
-
-In order to combat this I stole a trick from the Emacs wiki where the
-path is obtained from a login shell, so it is guaranteed to be
-consistent with the terminal. This will minimize surprises since I
-like my editing environment to be identical to the shell environment.
-
-#+BEGIN_SRC emacs-lisp
-  (defun set-exec-path-from-shell-PATH ()
-    "Sets the exec-path to the same value used by the user shell"
-    (let ((path-from-shell
-           (replace-regexp-in-string
-            "[[:space:]\n]*$" ""
-            (shell-command-to-string "$SHELL -l -c 'echo $PATH'"))))
-      (setenv "PATH" path-from-shell)
-      (setq exec-path (split-string path-from-shell path-separator))))
-
-  ;; call function now
-  (set-exec-path-from-shell-PATH)
-
-#+END_SRC
-
-#+RESULTS:
-| /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
-
-
-Tip: run the code above with C-C C-C to see the actual path being set
-in the *RESULTS*.
-** Support gpg-agent
-
-GPG supports ssh connections with a hardware token as a
-Yubikey. However on the Mac the system launches an ssh-agent on login
-which hijacks the *SSH_AUTH_SOCK*.
-
-#+BEGIN_SRC emacs-lisp
-  (if (eq system-type 'darwin)
-      (setenv "SSH_AUTH_SOCK"
-              (concat (getenv "HOME") "/.gnupg/S.gpg-agent.ssh")))
-
-#+END_SRC
-
-This is not needed for linux.
-
-
 ** Package and Extension Management
 
 Emacs has a package management system we'll be using to load the
@@ -139,6 +80,7 @@ but is a tad slow. I heard great things about *use-package*.
 
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
     (package-install 'use-package))
 
   (setq use-package-verbose t)
@@ -157,19 +99,6 @@ but is a tad slow. I heard great things about *use-package*.
 : t
 
 So let's try if it lives up to the expectations.
-
-*** Add a helper to get libraries
-
-This helper routine will install the package if it is not yet
-installed and then *require* it so it is available for emacs.
-
-#+BEGIN_SRC emacs-lisp
-  (defun require-packages (&rest packages)
-    (dolist (package packages)
-      (unless (package-installed-p package)
-        (package-install package))
-      (require package)))
-#+END_SRC
 
 *** 3rd party extension loader
 
@@ -219,6 +148,64 @@ preferences.
 (setq custom-file "~/.emacs.d/snamellit/custom.el")
 (when (file-exists-p custom-file) (load custom-file))
 #+END_SRC
+
+** Use option key as meta
+
+Mac OSX maps Alt-key combinations to symbols before emacs can intercept them.
+
+#+BEGIN_SRC emacs-lisp
+ (setq mac-option-modifier 'meta)
+#+END_SRC
+
+#+RESULTS:
+: meta
+
+** Force path to be consistent with terminal path
+
+The mac behaves increasingly weird with relation to how paths are
+being set in the terminal and in programs launched by  launchd (or by
+extension Alfred).
+
+In order to combat this I stole a trick from the Emacs wiki where the
+path is obtained from a login shell, so it is guaranteed to be
+consistent with the terminal. This will minimize surprises since I
+like my editing environment to be identical to the shell environment.
+
+#+BEGIN_SRC emacs-lisp
+  (defun set-exec-path-from-shell-PATH ()
+    "Sets the exec-path to the same value used by the user shell"
+    (let ((path-from-shell
+           (replace-regexp-in-string
+            "[[:space:]\n]*$" ""
+            (shell-command-to-string "$SHELL -l -c 'echo $PATH'"))))
+      (setenv "PATH" path-from-shell)
+      (setq exec-path (split-string path-from-shell path-separator))))
+
+  ;; call function now
+  (set-exec-path-from-shell-PATH)
+
+#+END_SRC
+
+#+RESULTS:
+| /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
+
+
+Tip: run the code above with C-C C-C to see the actual path being set
+in the *RESULTS*.
+** Support gpg-agent
+
+GPG supports ssh connections with a hardware token as a
+Yubikey. However on the Mac the system launches an ssh-agent on login
+which hijacks the *SSH_AUTH_SOCK*.
+
+#+BEGIN_SRC emacs-lisp
+  (if (eq system-type 'darwin)
+      (setenv "SSH_AUTH_SOCK"
+              (concat (getenv "HOME") "/.gnupg/S.gpg-agent.ssh")))
+
+#+END_SRC
+
+This is not needed for linux.
 
 ** Setup registers for easy file access
 
@@ -391,44 +378,6 @@ The vi emulation can really benefit from the powerline port.
 #+RESULTS:
 : t
 
-** Vi emulation
-
-Install evil mode as it is a very capable Vi emulation and allows
-emacs to be used on the ipad.
-
-However this clashes with org-mode, notably the tab handling, so
-reset the keybindings with *evil-org* package.
-
-#+BEGIN_SRC emacs-lisp
-  ;; got bored of vi emulation
-  ;(require-packages 'evil-leader 'evil 'evil-org)
-  ;(evil-mode 1)
-#+END_SRC
-
-#+RESULTS:
-
-the evil-org package provides following evil keybinding in Org
-
-- gh    : go up a heading
-- gj    : previous heading on same level
-- gk    : next heading on same level
-- gl    : go down the next visible level
-- t     : create a todo item
-- T     : convert heading to todo item
-- H or ^: begin of line
-- L or $: end of line
-- > / < : promote/demote item
-- -     : cycle list bullet
-- TAB   : cycle org collapse nodes
-
-with leader :
-
-- t     : show todo tree
-- a     : agenda
-- c     : archive subtree
-- l     : open links
-- o     : update clocks
-
 ** Helm autocompletion mode
 
 #+BEGIN_SRC emacs-lisp
@@ -502,13 +451,12 @@ which uses the menu structure
  - M-` : execute menu commands by menu structure
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'lacarte)
-  (global-set-key [?\e ?\M-x] 'lacarte-execute-command)
-  (global-set-key [?\M-`] 'lacarte-execute-menu-command)
+  (use-package lacarte
+  :bind (("\e\M-x" . lacarte-execute-command)
+         ("\M-`" . lacarte-execute-menu-command)))
 #+END_SRC
 
 #+RESULTS:
-: lacarte-execute-menu-command
 
 
 #+BEGIN_SRC emacs-lisp
@@ -1050,12 +998,13 @@ install support for TypeScript :
 and support for react :
 
 #+BEGIN_SRC emacs-lisp
-  (require 'web-mode)
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+ (use-package web-mode
+  :mode  "\.tsx$"
+  :config
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+                (setup-tide-mode)))))
 #+END_SRC
 
 #+RESULTS:
@@ -1409,18 +1358,25 @@ complicated scientific modules precompiled.
 It works by creating separate environments like pyvenv and can
 actually use the same tools to switch to the environments.
 
+For the root environment use :
+
+#+BEGIN_SRC emacs-lisp
+(use-package pyvenv
+  :config
+  (pyvenv-activate (expand-file-name "~/anaconda3")))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+And this :
+
 #+BEGIN_SRC emacs-lisp :eval no
 (pyvenv-activate (expand-file-name "~/anaconda3/envs/pelican"))
 #+END_SRC
 
-this would activate the pelican environment. For the root environment
-use :
+this would activate the pelican environment.
 
-#+BEGIN_SRC emacs-lisp
-(pyvenv-activate (expand-file-name "~/anaconda3"))
-#+END_SRC
-
-#+RESULTS:
 
 When creating a new environment in anaconda, don't forget to install
 the python modules above.
@@ -1445,40 +1401,18 @@ the python modules above.
 
 **** Completions
 
-*** Virtualenv support
-
-#+BEGIN_SRC emacs-lisp
-  (require-packages 'virtualenvwrapper)
-  (venv-initialize-interactive-shells) ;; if you want interactive shell support
-  (venv-initialize-eshell) ;; if you want eshell support
-
-  ;; where are the virtual environments?
-
-  ;; when a single path is given then the packages assumes
-  ;; all virtualenvs are in this folder.
-  (setq venv-location (concat
-                       (getenv "HOME")
-                       "/playpen/python"))
-
-  ;; when a list of paths is given, then each path should
-  ;; point to a virtualenv. All of them must have a unique
-  ;; folder name (the last part of the path) as that is used
-  ;; to find the right virtualenv to activate
-  ;;(setq venv-location  '("/Users/pti/Nitrous/snamellit-6031/python-100545/itbiusers"
-  ;;                      "/Users/pti/projects/vcs-adapter"))
-#+END_SRC
-
-#+RESULTS:
-: /Users/pti/playpen/python
-
 *** TODO Auto completion and docs with Jedi
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'jedi)
+(use-package jedi
+  :init
   (add-hook 'python-hook-mode 'jedi:setup)
-  (setq jedi:complete-on-dot t)
-
+  :config
+  (setq jedi:complete-on-dot t))
 #+END_SRC
+
+#+RESULTS:
+: t
 
 
 *** TODO Kind of Electric newlines
@@ -1529,7 +1463,7 @@ behaves weird.
 *** Django Support
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'python-django)
+  (use-package python-django)
 #+END_SRC
 
 #+RESULTS:
@@ -1681,21 +1615,34 @@ this is very sparse.
 OTOH I do very little scala atm, so I'll look at it later.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'scala-mode)
-  (add-hook 'scala-mode-hook 'add-untabify-before-save)
+  (use-package
+   scala-mode
+   :init
+   (add-hook 'scala-mode-hook 'add-untabify-before-save))
 #+END_SRC
+
+#+RESULTS:
 
 ** TODO Rust
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'flycheck-rust 'racer 'company-racer 'rust-mode)
+  (use-package rust-mode
+    :mode ("\.rs$")
+    :init
+    (add-hook 'rust-mode-hook #'racer-mode))
 
-  (setq racer-cmd "/Users/pti/.cargo/bin/racer")
-  (setq racer-rust-src-path "/Users/pti/playpen/rust/rust/src")
+  (use-package racer
+    :config
+    (setq racer-cmd "/Users/pti/.cargo/bin/racer")
+    (setq racer-rust-src-path "/Users/pti/playpen/rust/rust/src")
+    :init
+    (add-hook 'racer-mode-hook #'eldoc-mode)
+    (add-hook 'racer-mode-hook #'company-mode))
 
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode)
-  (add-hook 'racer-mode-hook #'company-mode)
+  (use-package flycheck-rust)
+  (use-package company-racer)
+
+
 
   (global-set-key (kbd "TAB") #'company-indent-or-complete-common) ;
   (setq company-tooltip-align-annotations t)
@@ -1796,26 +1743,24 @@ more isolated from the rest of emacs.
 ** Web Templates
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'web-mode)
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(use-package web-mode
+  :mode ("\\.phtml$" "\\.tpl\\.php$" "\\.[gj]sp\\'" "\\.as[cp]x$'" "\\.djhtml$" "\\.tsx$")
+  :config (progn
+            (add-hook 'web-mode-hook 'add-untabify-before-save)
+            (add-hook 'web-mode-hook
+                      (lambda ()
+                        (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                          (setup-tide-mode)))
+                      (setq web-mode-markup-indent-offset 2)
+                      (setq web-mode-css-indent-offset 2)
+                      (setq web-mode-code-indent-offset 2)
 
-  (add-hook 'web-mode-hook 'add-untabify-before-save)
-
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-
-  (setq web-mode-style-padding 1)
-  (setq web-mode-script-padding 1)
+                      (setq web-mode-style-padding 1)
+                      (setq web-mode-script-padding 1))))
 
 #+END_SRC
 
 #+RESULTS:
-: 1
 
 *** Shortcuts for web-mode
 
@@ -1892,7 +1837,7 @@ Set tabwidth to my preferred 2 spaces for CSS.
 #+END_SRC
 
 #+RESULTS:
-: 2
+| add-untabify-before-save | (lambda nil (define-key css-mode-map \230 (quote slime-js-refresh-css)) (define-key css-mode-map  (quote slime-js-embed-css))) |
 
 *** Live browser integration
 
@@ -1908,9 +1853,9 @@ Send CSS declarations directly to the browser using *skewer-mode*
 Load SCSS mode for Sassy support
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'scss-mode)
-
-(add-hook 'scss-mode-hook 'add-untabify-before-save)
+(use-package scss-mode
+  :config
+  (add-hook 'scss-mode-hook 'add-untabify-before-save))
 #+END_SRC
 
 ** Rails
@@ -2054,18 +1999,20 @@ org-todo-keywords
 
 Enable autofill in org-buffers to help with keeping the t
 #+BEGIN_SRC emacs-lisp
-(require-packages 'fill-column-indicator)
-(add-hook
-'org-mode-hook
-(lambda ()
- (auto-fill-mode)
- (fci-mode)))
-(setq fci-rule-width 1)
-(setq fci-rule-color "cornsilk4")
+  (use-package fill-column-indicator
+    :init
+    (add-hook
+     'org-mode-hook
+     (lambda ()
+       (auto-fill-mode)
+       (fci-mode)))
+    :config
+    (setq fci-rule-width 1)
+    (setq fci-rule-color "cornsilk4"))
 #+END_SRC
 
 #+RESULTS:
-: cornsilk4
+: t
 
 *** Capture templates
 
@@ -2519,7 +2466,7 @@ Org-mode needs htmlize which is mistakenly documented as being
 included with org-mode. It isn't, but it is in melpa.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'htmlize)
+  (use-package htmlize)
 
   ;; override an alias with broken parameters
   (defun org-font-lock-ensure ()
@@ -2589,6 +2536,7 @@ as it interrupts the flow at (semmingly) random times.
                                         ; Set to the name of the file
                                         ; where new notes will be
                                         ; stored
+
 (setq org-mobile-inbox-for-pull "~/org/flagged.org")
 ;; Set to <your Dropbox root directory>/Apps/MobileOrg.
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
@@ -2672,7 +2620,7 @@ $ launchctl load -w ~/Library/LaunchAgents/com.snamellit.org-sync-agenda.plist
 
 **** jira integration
 #+BEGIN_SRC emacs-lisp
-  ;;(require-packages 'org-jira)
+  ;;(use-package 'org-jira)
   (vendor 'org-jira) ;; switched to experimental REST version
   (setq jiralib-url "https://jira.melexis.com/jira")
   (setq org-jira-working-dir "~/org/melexis/jira")
@@ -2752,13 +2700,13 @@ The taskjuggler is an export target in the contrib folder.
 *** Support markdown files
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'markdown-mode)
-
-  (setq auto-mode-alist (cons '("\\.markdown" . markdown-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.md" . markdown-mode) auto-mode-alist))
-
-  (add-hook 'markdown-mode-hook '(lambda() (auto-fill-mode)))
+  (use-package markdown-mode
+    :mode ("\.markdown$" "\.md$")
+    :init
+    (add-hook 'markdown-mode-hook '(lambda() (auto-fill-mode))))
 #+END_SRC
+
+#+RESULTS:
 
 *** Modify TAB behavior for markdown
 
@@ -2906,11 +2854,7 @@ line.
 
 ** LaTeX
 #+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'auctex)
-    (package-install 'auctex))
-  (require 'tex)
-  (require-packages 'auctex-lua)
-
+  (use-package tex :ensure auctex)
 #+END_SRC
 
 #+RESULTS:
@@ -2942,14 +2886,15 @@ Map magit-status so it is only 1 global keystroke away.
 - C-x g:  magit-status
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'magit)
-  (global-set-key "\C-xg" 'magit-status)
-  (setq magit-last-seen-setup-instructions "1.4.0")
-  (setq magit-emacsclient-executable (executable-find "emacsclient"))
+  (use-package magit
+    :config
+    (global-set-key "\C-xg" 'magit-status)
+    (setq magit-last-seen-setup-instructions "1.4.0")
+    (setq magit-emacsclient-executable (executable-find "emacsclient")))
 #+END_SRC
 
 #+RESULTS:
-: 1.4.0
+: t
 
 ** Project Support
 
@@ -2964,28 +2909,35 @@ VCS folder.
 - C-c p p :   Switch project
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'projectile)
-(projectile-global-mode)
+  (use-package projectile
+    :init
+    (projectile-global-mode))
 #+END_SRC
 
 #+RESULTS:
-: t
 
 Projectile has a special module to integrate with helm and replaces
 several commands with helm enabled ones. Enable this alternative
 keymap.
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'helm-projectile)
-  (setq projectile-completion-system 'helm)
-  (helm-projectile-on)
+  (use-package helm-projectile
+    :config
+    (setq projectile-completion-system 'helm)
+    :init
+    (helm-projectile-on))
 #+END_SRC
+
+#+RESULTS:
+: t
 
 ** Debugger Support
 
 #+BEGIN_SRC emacs-lisp
-  (require-packages 'realgud)
+  (use-package realgud)
 #+END_SRC
+
+#+RESULTS:
 
 ** Makefiles
 
@@ -3239,8 +3191,9 @@ evaluated in the browser, just like Emacs does with an inferior Lisp
 process in Lisp modes.
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'skewer-mode)
-(skewer-setup)
+  (use-package skewer-mode
+    :init
+    (skewer-setup))
 #+END_SRC
 
 **** Enable emacs to edit textareas
@@ -3250,8 +3203,9 @@ There are browser plugins to allow emacs to be used to edit textareas.
 This use a server running in emacs to interact with.
 
 #+BEGIN_SRC emacs-lisp
-(require-packages 'edit-server)
-(edit-server-start)
+  (use-package edit-server
+    :init
+    (edit-server-start))
 #+END_SRC
 
 #+RESULTS:
