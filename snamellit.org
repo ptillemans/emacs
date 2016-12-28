@@ -533,6 +533,16 @@ but also to analyse keycodes afterwards.
   (use-package command-log-mode)
 #+END_SRC
 
+** Indent tools
+
+This installs a hydra to enable navigation and structure editing of
+indented code like yaml, python, ...
+
+#+BEGIN_SRC emacs-lisp
+  (use-package indent-tools
+    :init (progn
+            (global-set-key (kbd "C-c >") 'indent-tools-hydra/body)))
+#+END_SRC
 
 * General
 
@@ -1627,20 +1637,26 @@ OTOH I do very little scala atm, so I'll look at it later.
 
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
-    :mode ("\.rs$")
+    :mode "\\.rs$"
     :init
     (add-hook 'rust-mode-hook #'racer-mode))
 
   (use-package racer
     :config
     (setq racer-cmd "/Users/pti/.cargo/bin/racer")
-    (setq racer-rust-src-path "/Users/pti/playpen/rust/rust/src")
+    (setq racer-rust-src-path "/Users/pti/.multirust/toolchains/nightly-x86_64-apple-darwin/lib/rustlib/src/rust/src")
     :init
     (add-hook 'racer-mode-hook #'eldoc-mode)
     (add-hook 'racer-mode-hook #'company-mode))
 
-  (use-package flycheck-rust)
+  (use-package flycheck-rust
+    :init
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
   (use-package company-racer)
+  (use-package cargo
+    :init
+    (add-hook 'rust-mode-hook 'cargo-minor-mode)
+    (add-hook 'cargo-process-mode-hook (lambda () (visual-line-mode 1))))
 
 
 
@@ -2844,13 +2860,25 @@ Enable yaml mode for yaml files and remap return to indent on a new
 line.
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
-(add-hook 'yaml-mode-hook
-  '(lambda ()
-     (define-key yaml-mode-map "\C-m" 'newline-and-indent)
-     (add-untabify-before-save)
-))
+  (use-package yaml-mode
+    :mode  "\\.ya?ml$"
+    :init (add-hook 'yaml-mode-hook
+                    '(lambda ()
+                       (define-key yaml-mode-map "\C-m" 'newline-and-indent)
+                       (add-untabify-before-save)
+                       )))
 #+END_SRC
+
+#+RESULTS:
+
+** Toml Files
+
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode
+    :mode "\\.to?ml$")
+#+END_SRC
+
+#+RESULTS:
 
 ** LaTeX
 #+BEGIN_SRC emacs-lisp
