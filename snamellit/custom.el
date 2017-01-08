@@ -12,6 +12,8 @@
      (output-dvi "xdvi")
      (output-pdf "open")
      (output-html "open"))))
+ '(haskell-process-type (quote cabal-repl))
+ '(haskell-tags-on-save t)
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -225,7 +227,7 @@
   ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
 '(package-selected-packages
 (quote
- (toml-mode yaml-mode cargo cargo-mode rust-snippets indent-tools jedi coffee-mode haskell-mode tide solarized-theme rinari org-pomodoro feature-mode ecukes auto-compile use-package helm-projectile magit markdown-mode web-mode company-racer racer flycheck-rust scala-mode rspec-mode ruby-test-mode ruby-additional ein elpy js2-refactor slime go-projectile groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck multiple-cursors editorconfig command-log-mode which-key helm smart-mode-line mocha realgud expand-region company-tern tern auctex-lua auctex htmlize aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
+ (ghc haskell-cabal toml-mode yaml-mode cargo cargo-mode rust-snippets indent-tools jedi coffee-mode haskell-mode tide solarized-theme rinari org-pomodoro feature-mode ecukes auto-compile use-package helm-projectile magit markdown-mode web-mode company-racer racer flycheck-rust scala-mode rspec-mode ruby-test-mode ruby-additional ein elpy js2-refactor slime go-projectile groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck multiple-cursors editorconfig command-log-mode which-key helm smart-mode-line mocha expand-region company-tern tern auctex-lua auctex htmlize aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
 '(rcirc-bright-nicks

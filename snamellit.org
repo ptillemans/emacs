@@ -159,8 +159,17 @@ Mac OSX maps Alt-key combinations to symbols before emacs can intercept them.
 
 #+RESULTS:
 : meta
-
 ** Force path to be consistent with terminal path
+
+A particular pain point is that graphical apps do not have the same
+path setup as the command lines in the terminal, because the rc files
+have not yet run.
+
+We can get the path by executing the user configured shell and
+printing the path.
+
+I usually use *zsh* on my machines, but sometimes on remote machines I
+use the default *bash* shell. This way works both ways.
 
 The mac behaves increasingly weird with relation to how paths are
 being set in the terminal and in programs launched by  launchd (or by
@@ -171,27 +180,82 @@ path is obtained from a login shell, so it is guaranteed to be
 consistent with the terminal. This will minimize surprises since I
 like my editing environment to be identical to the shell environment.
 
-#+BEGIN_SRC emacs-lisp
-  (defun set-exec-path-from-shell-PATH ()
-    "Sets the exec-path to the same value used by the user shell"
-    (let ((path-from-shell
-           (replace-regexp-in-string
-            "[[:space:]\n]*$" ""
-            (shell-command-to-string "/bin/bash -l -c 'echo $PATH'"))))
-      (setenv "PATH" path-from-shell)
-      (setq exec-path (split-string path-from-shell path-separator))))
 
-  ;; call function now
-  (set-exec-path-from-shell-PATH)
+#+BEGIN_SRC emacs-lisp
+  (defun pti-chomp (str)
+    "Chomp leading and tailing whitespace from STR."
+    (while (string-match "\\`\n+\\|^\\s-+\\|\\s-+$\\|\n+\\'"
+                         str)
+      (setq str (replace-match "" t t str)))
+    str)
+
+  (defun pti-path-from-shell ()
+    (pti-chomp
+     (shell-command-to-string "$SHELL -l -c 'echo -n $PATH'")))
+
+  (defun pti-set-exec-path-from-shell-PATH ()
+    "Sets the exec-path to the same value used by the user shell"
+    (let* ((path-from-shell (pti-path-from-shell))
+           (path-list (mapcar 'pti-chomp
+                              (split-string path-from-shell path-separator))))
+      (message (concat "Path from shell: <" path-from-shell ">"))
+      (setenv "PATH" path-from-shell)
+      (setq exec-path path-list)))
+
+  ;; when running in a GUI reset path from an initialized shell
+  (when window-system (pti-set-exec-path-from-shell-PATH))
 
 #+END_SRC
 
 #+RESULTS:
-| /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /usr/local/bin | /usr/local/sbin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /Library/TeX/texbin | /usr/local/heroku/bin | /Users/pti/.rvm/gems/ruby-2.1.2/bin | /Users/pti/.rvm/gems/ruby-2.1.2@global/bin | /Users/pti/.rvm/rubies/ruby-2.1.2/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.rvm/bin | /Users/pti/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin |
+| /usr/local/heroku/bin | /usr/local/bin | /usr/local/sbin | /Users/pti/anaconda3/envs/pelican/bin | /usr/bin | /bin | /usr/sbin | /sbin | /opt/X11/bin | /Library/TeX/texbin | /Applications/Wireshark.app/Contents/MacOS | /Users/pti/bin | /Users/pti/playpen/go/bin | /usr/local/opt/go/libexec/bin | /Users/pti/.cargo/bin | /Users/pti/anaconda3/bin | /Users/pti/Library/Haskell/bin\n | /Users/pti/Library/Haskell/bin\n |
 
 
 Tip: run the code above with C-C C-C to see the actual path being set
 in the *RESULTS*.
+
+Similarly the apps when started in a graphical environment lack a
+current directory. Let's start in the home folder.
+
+#+BEGIN_SRC emacs-lisp
+(cd "~")
+#+END_SRC
+
+*** OSX quirks
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+*** Browser Integration
+
+**** Skewer mode
+
+Provides live interaction with JavaScript, CSS, and HTML in a web
+browser. Expressions are sent on-the-fly from an editing buffer to be
+evaluated in the browser, just like Emacs does with an inferior Lisp
+process in Lisp modes.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package skewer-mode
+    :init
+    (skewer-setup))
+#+END_SRC
+
+**** Enable emacs to edit textareas
+
+There are browser plugins to allow emacs to be used to edit textareas.
+
+This use a server running in emacs to interact with.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package edit-server
+    :init
+    (edit-server-start))
+#+END_SRC
+
+#+RESULTS:
+
 ** Support gpg-agent
 
 GPG supports ssh connections with a hardware token as a
@@ -1740,11 +1804,34 @@ more isolated from the rest of emacs.
 
 ** Haskell
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  :eval no
+  (autoload 'ghc-init "ghc" nil t)
+  (autoload 'ghc-debug "ghc" nil t)
+  (use-package ghc)
   (use-package haskell-mode
     :mode "\.hs$"
-    :config (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-    )
+    :init (progn
+            (custom-set-variables
+             '(haskell-tags-on-save t)
+             '(haskell-process-type 'cabal-repl)))
+    :config (progn
+              (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+              (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+              (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
+    :bind (:map haskell-mode-map
+                ("<f8>" . haskell-navigate-imports)
+                ("C-c C-l" . haskell-process-load-or-reload)
+                ("C-c C-z" . haskell-interactive-switch)
+                ("C-c C-n C-t" . haskell-process-do-type)
+                ("C-c C-n C-i" . haskell-process-do-info)
+                ("C-c C-n C-c" . haskell-process-cabal-build)
+                ("C-c C-n c" . haskell-process-cabal)
+                :map haskell-cabal-mode-map
+                ("C-c C-z" . haskell-interactive-switch)
+                ("C-c C-k" . haskell-interactive-mode-clear)
+                ("C-c C-c" . haskell-process-cabal-build)
+                ("C-c c" . haskell-process-cabal)))
+
 #+END_SRC
 
 #+RESULTS:
@@ -2505,7 +2592,7 @@ It exchanges the files in both directions using Dropbox.
 
 I created an emacs script which I dropped in ~/bin to run the synch. I
 used to schedule it while running in emacs but this got on my nerves
-as it interrupts the flow at (semmingly) random times.
+as it interrupts the flow at (seemingly) random times.
 
 #+BEGIN_SRC emacs-lisp :eval no :padline no :tangle ~/bin/org-sync-agenda
 #!/Applications/Emacs.app/Contents/MacOS/Emacs-x86_64-10_9 --script
@@ -2520,7 +2607,7 @@ as it interrupts the flow at (semmingly) random times.
 
 (package-initialize)
 
-(princ "packages inited")
+(print "packages inited")
 
 (require 'org)
 (setq org-directory "~/org")
@@ -3173,70 +3260,6 @@ emacs will mistake the awk snippet as a real varialble section.
 
 *** Consistent search path for programs
 
-A particular pain point is that graphical apps do not have the same
-path setup as the command lines in the terminal, because the rc files
-have not yet run.
-
-We can get the path by executing the user configured shell and
-printing the path.
-
-I usually use *zsh* on my machines, but sometimes on remote machines I
-use the default *bash* shell. This way works both ways.
-
-#+BEGIN_SRC emacs-lisp
-(defun set-exec-path-from-shell-PATH ()
-(let ((path-from-shell (shell-command-to-string "TERM=vt100 $SHELL -i -c 'echo $PATH'")))
-  (setenv "PATH" path-from-shell)
-  (setq exec-path (split-string path-from-shell path-separator))))
-
-;; when running in a GUI reset path from an initialized shell
-(when window-system (set-exec-path-from-shell-PATH))
-
-
-#+END_SRC
-
-Similarly the apps when started in a graphical environment lack a
-current directory. Let's start in the home folder.
-
-#+BEGIN_SRC emacs-lisp
-(cd "~")
-#+END_SRC
-
-*** OSX quirks
-
-#+BEGIN_SRC emacs-lisp
-
-#+END_SRC
-
-*** Browser Integration
-
-**** Skewer mode
-
-Provides live interaction with JavaScript, CSS, and HTML in a web
-browser. Expressions are sent on-the-fly from an editing buffer to be
-evaluated in the browser, just like Emacs does with an inferior Lisp
-process in Lisp modes.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package skewer-mode
-    :init
-    (skewer-setup))
-#+END_SRC
-
-**** Enable emacs to edit textareas
-
-There are browser plugins to allow emacs to be used to edit textareas.
-
-This use a server running in emacs to interact with.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package edit-server
-    :init
-    (edit-server-start))
-#+END_SRC
-
-#+RESULTS:
-
 ** with GitHub
 
 Gist buffer, always useful for collab.
@@ -3261,7 +3284,7 @@ the *cmdline*  parameter.
 
 e.g.
 
-#+BEGIN_SRC org
+#+BEGIN_SRC org :eval no
   ,#+name: get-risk-data
   ,#+header: :engine postgresql
   ,#+header: :cmdline -h postgresql.colo.elex.be -Ujira jira
