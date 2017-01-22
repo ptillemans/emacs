@@ -927,7 +927,6 @@ github and an up-to-date version is available from melpa.
 #+RESULTS:
 
 ** Javascript
-
 *** js2-mode
 
 For javascript, Steve Yegge's js2-mode is recommended over the version shipped with emacs.
@@ -1632,7 +1631,8 @@ OTOH I do very little scala atm, so I'll look at it later.
 
 #+RESULTS:
 
-** TODO Rust
+** DONE Rust
+   - State "DONE"       from "TODO"       [2017-01-13 Fri 10:40]
 
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
@@ -1643,7 +1643,7 @@ OTOH I do very little scala atm, so I'll look at it later.
   (use-package racer
     :config
     (setq racer-cmd "/Users/pti/.cargo/bin/racer")
-    (setq racer-rust-src-path "/Users/pti/.multirust/toolchains/nightly-x86_64-apple-darwin/lib/rustlib/src/rust/src")
+    (setq racer-rust-src-path "/Users/pti/.multirust/toolchains/stable-x86_64-apple-darwin/lib/rustlib/src/rust/src")
     :init
     (add-hook 'racer-mode-hook #'eldoc-mode)
     (add-hook 'racer-mode-hook #'company-mode))
@@ -3375,6 +3375,36 @@ _/docker:container_name:/file/name_ syntax
 
 #+RESULTS:
 : tramp-completion-handle-file-name-all-completions
+
+** Google Contacts
+#+BEGIN_SRC emacs-lisp
+  (use-package google-contacts)
+#+END_SRC
+
+#+RESULTS:
+
+
+
+** Elasticsearch
+
+Elasticsearch mode adds better support for elasticsearch queries in a
+buffer.
+#+BEGIN_SRC emacs-lisp
+
+  (setq pti-google-client-id "36868217908-4qetjh9iaoi404pi2e9ffjimteaun67h.apps.googleusercontent.com")
+  (setq pti-google-client-secret "lW-cKXGfGV91BdaL64LclxTg")
+
+  (use-package es-mode
+    :config (add-hook 'es-result-mode-hook 'hs-minor-mode))
+
+#+END_SRC
+
+#+RESULTS:
+: t
+
+Key bindings:
+
+- C-c C-c : execute query and show results in buffer
 
 ** Integrations done
 
