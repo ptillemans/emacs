@@ -555,6 +555,7 @@ back after an hiatus).
 
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
+    :ensure t
     :config (editorconfig-mode 1))
 #+END_SRC
 
