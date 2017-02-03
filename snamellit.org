@@ -3378,6 +3378,7 @@ _/docker:container_name:/file/name_ syntax
 
 ** Google Contacts
 #+BEGIN_SRC emacs-lisp
+  (use-package oauth2)
   (use-package google-contacts)
 #+END_SRC
 
