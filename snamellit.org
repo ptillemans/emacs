@@ -2268,6 +2268,7 @@ However it is best to let this be managed with custom.el.
 (sql . t)
 (sqlite . t)
 (clojure . t)
+(haskell . t)
 (js . t)))`%
 
 ; set language support using customize. Does not get picked up here.
