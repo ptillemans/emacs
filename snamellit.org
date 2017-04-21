@@ -1262,11 +1262,9 @@ Now enable swank-js in emacs
 
 *** flow support
 
-#+BEGIN_SRC emacs-lisp
-  (load-file "~/.emacs.d/vendor/flow/flow.el")
-#+END_SRC
+There is support for flow in the vendor folder but it defines global
+keybindings which conflict all over the place.
 
-#+RESULTS:
 
 *** Live Browser Interaction with skewer-mode
 
@@ -2354,6 +2352,7 @@ However it is best to let this be managed with custom.el.
 (sql . t)
 (sqlite . t)
 (clojure . t)
+(haskell . t)
 (js . t)))`%
 
 ; set language support using customize. Does not get picked up here.
@@ -2370,11 +2369,14 @@ However it is best to let this be managed with custom.el.
 **** Org Babel setup for fancy graphics etc
 
 #+BEGIN_SRC emacs-lisp
-(setq org-ditaa-jar-path "~/Dropbox/Tools/ditaa0_9.jar")
-(setq org-plantuml-jar-path "~/Dropbox/Tools/plantuml.jar")
+(setq org-ditaa-jar-path "~/Dropbox/tools/ditaa0_9.jar")
+(setq org-plantuml-jar-path "~/Dropbox/tools/plantuml.jar")
 
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
 #+END_SRC
+
+#+RESULTS:
+| org-display-inline-images |
 
 
 *** Latex Support
@@ -2939,6 +2941,21 @@ C-M-x: Load the HTML tag immediately around the point.
 (fset 'xml-mode 'nxml-mode)
 
 #+END_SRC
+
+*** Schemas
+
+Bootstrap the xml schemas with the seeded schemas collected in
+*~/.emacs.d/schema* folder.
+
+Currently this contains *B2MML* and  *DocBook*.
+
+#+BEGIN_SRC emacs-lisp
+  (push "~/.emacs.d/schema/schema.xml"
+        rng-schema-locating-files-default)
+#+END_SRC
+
+#+RESULTS:
+| ~/.emacs.d/schema/schema.xml | schemas.xml | /usr/local/Cellar/emacs/25.1/share/emacs/25.1/etc/schema/schemas.xml |
 
 ** Yaml files
 
