@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <16/11/21 09:02:10 /Users/pti/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <16/12/29 14:40:18 /Users/pti/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -56,4 +56,6 @@
   ("id" "/usr/bin/id")
   ("gid-string" "pi")
   ("file-exists" "test -e")
-  ("gid-integer" 1000)))
+  ("gid-integer" 1000))
+ (["scp" nil "sudo" nil nil]
+  nil))
