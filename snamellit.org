@@ -2960,12 +2960,12 @@ Bootstrap the xml schemas with the seeded schemas collected in
 Currently this contains *B2MML* and  *DocBook*.
 
 #+BEGIN_SRC emacs-lisp
-  (push "~/.emacs.d/schema/schema.xml"
-        rng-schema-locating-files-default)
+  (use-package nxml
+    :init (push "~/.emacs.d/schema/schema.xml"
+                rng-schema-locating-files-default))
 #+END_SRC
 
 #+RESULTS:
-| ~/.emacs.d/schema/schema.xml | schemas.xml | /usr/local/Cellar/emacs/25.1/share/emacs/25.1/etc/schema/schemas.xml |
 
 ** Yaml files
 
