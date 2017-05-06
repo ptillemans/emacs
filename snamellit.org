@@ -862,7 +862,8 @@ the variable *aggressive-indent-excluded-modes* .
   (use-package aggressive-indent
     :config (progn
               (global-aggressive-indent-mode 1)
-              (push 'feature-mode aggressive-indent-excluded-modes)))
+              (push 'feature-mode aggressive-indent-excluded-modes)
+              (push 'haskell-mode aggressive-indent-excluded-modes)))
 #+END_SRC
 
 #+RESULTS:
