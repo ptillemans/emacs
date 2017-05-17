@@ -882,14 +882,15 @@ Enable clojure-mode and add support for clojurescript.
 
 
 #+BEGIN_SRC emacs-lisp
-  (use-package paredit)
+  (use-package smart-parens-config
+    :ensure smartparens  )
+
   (use-package clojure-mode
     :mode ("\.cljs$" . clojure-mode)
     :init (progn
-            (add-hook 'clojure-mode-hook 'paredit-mode)
+            (add-hook 'clojure-mode-hook 'smartparens-mode)
             (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
             (add-hook 'clojure-mode-hook 'add-untabify-before-save)))
-
 
 #+END_SRC
 
@@ -897,13 +898,13 @@ Enable clojure-mode and add support for clojurescript.
 
 Enable the Cider package to connect to the nRepl's of running clojure apps.
 
-Enable paredit and rainbow delimiters in the repl. We also let the
+Enable smartparens and rainbow delimiters in the repl. We also let the
 clojure syntax highlighter work in the repl.
 
 #+BEGIN_SRC emacs-lisp
   (use-package cider
     :init (progn
-            (add-hook 'cider-repl-mode-hook 'paredit-mode)
+            (add-hook 'cider-repl-mode-hook 'smartparens-mode)
             (add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
             (setq cider-repl-use-clojure-font-lock t)
             (add-hook 'cider-mode-hook 'eldoc-mode)))
@@ -976,6 +977,7 @@ github and an up-to-date version is available from melpa.
 #+END_SRC
 
 #+RESULTS:
+
 
 ** Lisp
 
@@ -1335,28 +1337,31 @@ through previous inputs.
 
 ** Lisp
 
-*** Paredit Mode
+*** Smartparens Mode
 
-Paredit allows you to enter lisp code where it is actually impossible
+Smartparens allows you to enter lisp code where it is actually impossible
 to write syntax errors. With all the parentheses in lisp this is
 actually one of the killer apps in Emacs.
 
 Enable it when editing emacs lisp and also enable highlighting parens.
 
 #+BEGIN_SRC emacs-lisp
-(autoload 'paredit-mode "paredit"
-   "Minor mode for pseudo-structurally editing Lisp code."
-   t)
+(use-package smart-parens-config
+  :ensure smartparens  )
+
+
+
 (add-hook 'emacs-lisp-mode-hook
         (lambda ()
-          (paredit-mode +1)
+          (smartparens-mode +1)
           (show-paren-mode +1)
           (add-untabify-before-save)))
 
 #+END_SRC
 
 #+RESULTS:
-| lambda | nil | (paredit-mode 1) | (show-paren-mode 1) |
+| lambda | nil | (smartparens-mode 1) | (show-paren-mode 1) | (add-untabify-before-save) |
+| lambda | nil | (paredit-mode 1)     | (show-paren-mode 1) | (add-untabify-before-save) |
 
 *** Cucumber for emacs
 
@@ -1805,36 +1810,24 @@ more isolated from the rest of emacs.
 ** Haskell
 
 
-#+BEGIN_SRC emacs-lisp  :eval no
-  (autoload 'ghc-init "ghc" nil t)
-  (autoload 'ghc-debug "ghc" nil t)
-  (use-package ghc)
-  (use-package haskell-mode
-    :mode "\.hs$"
-    :init (progn
-            (custom-set-variables
-             '(haskell-tags-on-save t)
-             '(haskell-process-type 'cabal-repl)))
-    :config (progn
-              (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-              (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-              (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
-    :bind (:map haskell-mode-map
-                ("<f8>" . haskell-navigate-imports)
-                ("C-c C-l" . haskell-process-load-or-reload)
-                ("C-c C-z" . haskell-interactive-switch)
-                ("C-c C-n C-t" . haskell-process-do-type)
-                ("C-c C-n C-i" . haskell-process-do-info)
-                ("C-c C-n C-c" . haskell-process-cabal-build)
-                ("C-c C-n c" . haskell-process-cabal)
-                :map haskell-cabal-mode-map
-                ("C-c C-z" . haskell-interactive-switch)
-                ("C-c C-k" . haskell-interactive-mode-clear)
-                ("C-c C-c" . haskell-process-cabal-build)
-                ("C-c c" . haskell-process-cabal)))
+I found out about *Intero* mode and how would enable me to cut whole
+swaths of config code from my Emacs config and I was sold.
 
+Intero uses a special process per project to do the heavy lifting of
+the language interpretation to give feedback while developping,
+similar to what ghc-mod does. I was bitten a few days back when
+switching between projects that this system got seriously confused and
+started reading libraries from the wrong place for the compiler of the
+project.
+
+Intero does have a large startup cost the first time it is used in a
+project as it will adds it's own dependency to the sandbox. In view of
+recent experiences I am happy to pay this cost.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package  intero
+    :config (add-hook 'haskell-mode-hook 'intero-mode))
 #+END_SRC
-
 #+RESULTS:
 
 *** Useful shortcuts
