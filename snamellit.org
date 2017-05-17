@@ -413,6 +413,80 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 
 ** Close old untouched buffers
 
+** Utility functions to login to webservers
+
+#+BEGIN_SRC emacs-lisp
+
+(defun pti-make-digest (host port)
+  "Create a basic authentication digest if credentials known.
+
+Checks the auth-source database if there is a username/password defined
+for the host and port and calculates the base64 version needed to add
+to an *Authorization* header in a HTTP request.
+
+Returns nil if no credentials were found for the host/port combination.
+"
+  (let ((found (nth 0 (auth-source-search :max 1
+                                          :host host
+                                          :port port
+                                          :require '(:user :secret)))))
+    (if found
+        (let ((username (plist-get found :user))
+              (password (plist-get found :secret)))
+          (concat "Basic "
+                  (base64-encode-string
+                   (concat username ":" (if (functionp password)
+                                            (funcall password)
+                                          password)))))
+      nil)))
+
+
+(defun pti-make-url-request-extra-headers (host port)
+  "Adds a authorization header if credentials are known
+
+Generates a Basic Authentication header if credentials for the host and
+port combination are known and returns an alist containing the current
+values of the dynamically bound url-request-extra-headers with the
+authorization header added.
+
+The return value can be directly used te rebind the
+url-request-extra-headers variable.
+"
+  (let ((digest (pti-make-digest host port)))
+    (if digest
+        (cons `("Authorization" . ,digest) url-request-extra-headers)
+      url-request-extra-headers)))
+
+(defun pti-add-authorization-header (orig-fun url &rest args)
+  "Calls the original function after adding the auth headers
+
+Checks in the auth-source database if credentials are present for the
+host/scheme combination in the url and adds an Authorization header
+for Basic Authentication to the url-request-extra-headers before
+calling the original function.
+
+Add this function as advice to url-retrieve :
+
+  (advice-add 'url-retrieve :around #'pti-add-authorization-header )
+
+To remove this advice use :
+  (advice-remove 'url-retrieve #'pti-add-authorization)
+
+"
+  (let* ((url-obj (url-generic-parse-url url))
+         (url-request-extra-headers (pti-make-url-request-extra-headers (url-host url-obj) (url-type url-obj))))
+    (apply orig-fun url args)))
+
+
+
+;;; (advice-add 'url-retrieve :around #'pti-add-authorization-header )
+
+;;; (advice-remove 'url-retrieve #'pti-add-authorization)
+
+#+END_SRC
+
+#+RESULTS:
+: pti-add-authorization-header
 
 * Editing Environment
 
@@ -2150,16 +2224,14 @@ The following template are provided:
 
 #+BEGIN_SRC emacs-lisp
 
-
+(setq org-capture-templates
+  '(
+    ("m" "TODO from Mail" entry (file+headline "~/gitfiles/org/gtd.org" "Inbox")
+     "* TODO %?, Link: %a")))
 #+END_SRC
 
 #+RESULTS:
-| t | todo         | entry | (file ~/org/refile.org)         | (concat * TODO %?\n %U\n %a\n   %i)                                                         | :clock-in         | t | :clock-resume | t |
-| n | note         | entry | (file ~/org/refile.org)         | (concat * %? :NOTE:\n %U\n %a\n)                                                            |                   |   |               |   |
-| j | Journal      | entry | (file+datetree ~/org/diary.org) | (concat * %?\n %U\n   %i)                                                                   | :clock-in         | t | :clock-resume | t |
-| w | org-protocol | entry | (file ~/org/refile.org)         | (concat * TODO Review %c\n %U\n   %i)                                                       | :immediate-finish | t |               |   |
-| p | Phone call   | entry | (file ~/org/refile.org)         | (concat * PHONE %? :PHONE:\n %U\n   %i\n)                                                   | :clock-in         | t | :clock-resume | t |
-| h | Habit        | entry | (file ~/org/refile.org)         | (concat * TODO %?\n %U\n %a\n :SCHEDULED: %t\n :PROPERTIES:\n :STYLE: habit\n :END:\n   %i) |                   |   |               |   |
+| m | TODO from Mail | entry | (file+headline ~/org/gtd.org Inbox)          | * TODO %?, Link: %a |
 
 In these entries, the first string is the key to reach the template,
 the second is a short description. Then follows the type of the entry
@@ -2344,6 +2416,7 @@ However it is best to let this be managed with custom.el.
 '((emacs-lisp . t)
 (dot . t)
 (ditaa . t)
+(elasticsearch . t)
 (R . t)
 (python . t)
 (ruby . t)
@@ -3006,6 +3079,13 @@ the 3D printing world. I downloaded an extension for it in the
 (add-hook 'scad-mode 'add-untabify-before-save)
 #+END_SRC
 
+** ElasticSearch
+
+#+BEGIN_SRC emacs-lisp
+(use-package esmode
+  :mode ("\\.es" . es-mode)
+  :config (add-hook 'es-result-mode-hook 'hs-minor-mode))
+#+END_SRC
 ** Content Creation Done
 
 #+BEGIN_SRC emacs-lisp
@@ -3208,16 +3288,19 @@ listed.
 (setq gnus-secondary-select-methods
     '((nnimap "gmail-melexis"
               (nnimap-address "imap.gmail.com")
-              (nnimap-server-port 993)
+              (nnimap-server-port "imaps")
               (nnimap-stream ssl))))
 
 (setq message-send-mail-function 'smtpmail-send-it)
 
 #+END_SRC
 
+#+RESULTS:
+: smtpmail-send-it
+
 Note that in private.el are the mail accounts like:
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp eval: no
 ;; gnus email personal config
 (setq smtpmail-starttls-credentials '(("XXXX.XXXXX.XXX" 587
                                      nil nil))
