@@ -1877,6 +1877,7 @@ more isolated from the rest of emacs.
 
 ** Haskell
 
+
 #+BEGIN_SRC emacs-lisp  :eval no
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
@@ -1909,10 +1910,18 @@ more isolated from the rest of emacs.
 
 #+RESULTS:
 
-** Languages done
-#+BEGIN_SRC emacs-lisp
-(message "languages done")
-#+END_SRC
+*** Useful shortcuts
+
+ - C-c C-l: Load or reload file in repl and open it
+ - C-c C-z: toggle between repl and source
+ - C-c C-n C-c: cabal build project
+ - C-c C-n c: interactive cabal build command
+ - C-c C-n C-t: give type info about thing under cursor
+ - C-c C-n C-i: give info about thing under cursor
+
+note: sometimes it is needed to check the results of the info
+shortcuts in the *Messages* buffer.
+
 
 * Web Development
 ** Web Templates
@@ -3024,12 +3033,12 @@ Bootstrap the xml schemas with the seeded schemas collected in
 Currently this contains *B2MML* and  *DocBook*.
 
 #+BEGIN_SRC emacs-lisp
-  (push "~/.emacs.d/schema/schema.xml"
-        rng-schema-locating-files-default)
+  (use-package nxml
+    :init (push "~/.emacs.d/schema/schema.xml"
+                rng-schema-locating-files-default))
 #+END_SRC
 
 #+RESULTS:
-| ~/.emacs.d/schema/schema.xml | schemas.xml | /Applications/Emacs.app/Contents/Resources/etc/schema/schemas.xml |
 
 ** Yaml files
 
