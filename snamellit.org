@@ -317,7 +317,7 @@ Note: zenburn is incompatible with ansiterm and insist on displaying
 the content on a light background. I fixed it once, but it is broken
 again so I switched back to solarized.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp eval: no
   (use-package solarized-theme
                :config
                (load-theme 'solarized-light t))
@@ -415,73 +415,79 @@ Change default mode from 'scp' to 'ssh' as this is faster.
 
 ** Utility functions to login to webservers
 
+
+Note this implementation only works with the *url.el* backend and not
+with the *curl* backend
+
 #+BEGIN_SRC emacs-lisp
+  ;;; advice only works with the url-backend
+  (setq request-backend 'url-backend)
 
-(defun pti-make-digest (host port)
-  "Create a basic authentication digest if credentials known.
+  (defun pti-make-digest (host port)
+    "Create a basic authentication digest if credentials known.
 
-Checks the auth-source database if there is a username/password defined
-for the host and port and calculates the base64 version needed to add
-to an *Authorization* header in a HTTP request.
+  Checks the auth-source database if there is a username/password defined
+  for the host and port and calculates the base64 version needed to add
+  to an *Authorization* header in a HTTP request.
 
-Returns nil if no credentials were found for the host/port combination.
-"
-  (let ((found (nth 0 (auth-source-search :max 1
-                                          :host host
-                                          :port port
-                                          :require '(:user :secret)))))
-    (if found
-        (let ((username (plist-get found :user))
-              (password (plist-get found :secret)))
-          (concat "Basic "
-                  (base64-encode-string
-                   (concat username ":" (if (functionp password)
-                                            (funcall password)
-                                          password)))))
-      nil)))
-
-
-(defun pti-make-url-request-extra-headers (host port)
-  "Adds a authorization header if credentials are known
-
-Generates a Basic Authentication header if credentials for the host and
-port combination are known and returns an alist containing the current
-values of the dynamically bound url-request-extra-headers with the
-authorization header added.
-
-The return value can be directly used te rebind the
-url-request-extra-headers variable.
-"
-  (let ((digest (pti-make-digest host port)))
-    (if digest
-        (cons `("Authorization" . ,digest) url-request-extra-headers)
-      url-request-extra-headers)))
-
-(defun pti-add-authorization-header (orig-fun url &rest args)
-  "Calls the original function after adding the auth headers
-
-Checks in the auth-source database if credentials are present for the
-host/scheme combination in the url and adds an Authorization header
-for Basic Authentication to the url-request-extra-headers before
-calling the original function.
-
-Add this function as advice to url-retrieve :
-
-  (advice-add 'url-retrieve :around #'pti-add-authorization-header )
-
-To remove this advice use :
-  (advice-remove 'url-retrieve #'pti-add-authorization)
-
-"
-  (let* ((url-obj (url-generic-parse-url url))
-         (url-request-extra-headers (pti-make-url-request-extra-headers (url-host url-obj) (url-type url-obj))))
-    (apply orig-fun url args)))
+  Returns nil if no credentials were found for the host/port combination.
+  "
+    (let ((found (nth 0 (auth-source-search :max 1
+                                            :host host
+                                            :port port
+                                            :require '(:user :secret)))))
+      (if found
+          (let ((username (plist-get found :user))
+                (password (plist-get found :secret)))
+            (concat "Basic "
+                    (base64-encode-string
+                     (concat username ":" (if (functionp password)
+                                              (funcall password)
+                                            password)))))
+        nil)))
 
 
+  (defun pti-make-url-request-extra-headers (host port)
+    "Adds a authorization header if credentials are known
 
-;;; (advice-add 'url-retrieve :around #'pti-add-authorization-header )
+  Generates a Basic Authentication header if credentials for the host and
+  port combination are known and returns an alist containing the current
+  values of the dynamically bound url-request-extra-headers with the
+  authorization header added.
 
-;;; (advice-remove 'url-retrieve #'pti-add-authorization)
+  The return value can be directly used te rebind the
+  url-request-extra-headers variable.
+  "
+    (let ((digest (pti-make-digest host port)))
+      (if digest
+          (cons `("Authorization" . ,digest) url-request-extra-headers)
+        url-request-extra-headers)))
+
+  (defun pti-add-authorization-header (orig-fun url &rest args)
+    "Calls the original function after adding the auth headers
+
+  Checks in the auth-source database if credentials are present for the
+  host/scheme combination in the url and adds an Authorization header
+  for Basic Authentication to the url-request-extra-headers before
+  calling the original function.
+
+  Add this function as advice to url-retrieve :
+
+    (advice-add 'url-retrieve :around #'pti-add-authorization-header )
+
+  To remove this advice use :
+    (advice-remove 'url-retrieve #'pti-add-authorization-header)
+
+  "
+    (let* ((url-obj (url-generic-parse-url url))
+           (url-request-extra-headers (pti-make-url-request-extra-headers (url-host url-obj) (url-type url-obj))))
+      (apply orig-fun url args)))
+
+
+
+  ;;; (advice-add 'url-retrieve :around #'pti-add-authorization-header )
+
+  ;;; (advice-remove 'url-retrieve #'pti-add-authorization)
 
 #+END_SRC
 
@@ -551,6 +557,29 @@ The vi emulation can really benefit from the powerline port.
 #+END_SRC
 
 #+RESULTS:
+
+** Window switching
+
+Switching windows with C-x o quickly becomes an exercise in
+frustration. So some new keybindings are in order:
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-.") 'other-window)
+  (global-set-key (kbd "C-,") 'prev-window)
+
+  (defun prev-window ()
+    (interactive)
+    (other-window -1))
+#+END_SRC
+
+#+RESULTS:
+: prev-window
+
+These keybindings allow quickly to jump between 2 windows
+
+ - C-.   : other window
+ - C-,   : previous window
+
 
 
 ** resize windows with C-S-arrowkey
@@ -957,7 +986,10 @@ Enable clojure-mode and add support for clojurescript.
 
 #+BEGIN_SRC emacs-lisp
   (use-package smart-parens-config
-    :ensure smartparens  )
+    :ensure smartparens
+    :config (progn
+              (sp-use-smartparens-bindings)
+              (smartparens-global-mode 1)))
 
   (use-package clojure-mode
     :mode ("\.cljs$" . clojure-mode)
@@ -967,6 +999,8 @@ Enable clojure-mode and add support for clojurescript.
             (add-hook 'clojure-mode-hook 'add-untabify-before-save)))
 
 #+END_SRC
+
+#+RESULTS:
 
 *** Cider REPL integration
 
@@ -3082,10 +3116,13 @@ the 3D printing world. I downloaded an extension for it in the
 ** ElasticSearch
 
 #+BEGIN_SRC emacs-lisp
-(use-package esmode
+(use-package es-mode
   :mode ("\\.es" . es-mode)
   :config (add-hook 'es-result-mode-hook 'hs-minor-mode))
 #+END_SRC
+
+#+RESULTS:
+
 ** Content Creation Done
 
 #+BEGIN_SRC emacs-lisp

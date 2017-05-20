@@ -152,76 +152,76 @@
       ("\\subsection{%s}" . "\\subsection*{%s}")
       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
  '(org-latex-default-packages-alist
-   (quote
-    (("AUTO" "inputenc" t)
-     ("T1" "fontenc" t)
-     ("" "fixltx2e" nil)
-     ("" "graphicx" t)
-     ("" "longtable" nil)
-     ("" "float" nil)
-     ("" "wrapfig" nil)
-     ("" "rotating" nil)
-     ("normalem" "ulem" t)
-     ("" "amsmath" t)
-     ("" "textcomp" t)
-     ("" "marvosym" t)
-     ("" "wasysym" t)
-     ("" "amssymb" t)
-     ("" "hyperref" nil)
-     "\\tolerance=1000"
-     ("" "minted" nil))))
+(quote
+ (("AUTO" "inputenc" t)
+  ("T1" "fontenc" t)
+  ("" "fixltx2e" nil)
+  ("" "graphicx" t)
+  ("" "longtable" nil)
+  ("" "float" nil)
+  ("" "wrapfig" nil)
+  ("" "rotating" nil)
+  ("normalem" "ulem" t)
+  ("" "amsmath" t)
+  ("" "textcomp" t)
+  ("" "marvosym" t)
+  ("" "wasysym" t)
+  ("" "amssymb" t)
+  ("" "hyperref" nil)
+  "\\tolerance=1000"
+  ("" "minted" nil))))
  '(org-latex-listings (quote minted))
  '(org-return-follows-link t)
- '(org-structure-template-alist
-   (quote
-    (("S" "#+BEGIN_SRC emacs-lisp
+'(org-structure-template-alist
+(quote
+ (("S" "#+BEGIN_SRC emacs-lisp
 ?
 #+END_SRC" "<src lang=\"?\">
 
 </src>")
-     ("s" "#+BEGIN_SRC ?
+  ("s" "#+BEGIN_SRC ?
 
 #+END_SRC" "<src lang=\"?\">
 
 </src>")
-     ("e" "#+BEGIN_EXAMPLE
+  ("e" "#+BEGIN_EXAMPLE
 ?
 #+END_EXAMPLE" "<example>
 ?
 </example>")
-     ("q" "#+BEGIN_QUOTE
+  ("q" "#+BEGIN_QUOTE
 ?
 #+END_QUOTE" "<quote>
 ?
 </quote>")
-     ("v" "#+BEGIN_VERSE
+  ("v" "#+BEGIN_VERSE
 ?
 #+END_VERSE" "<verse>
 ?
 </verse>")
-     ("V" "#+BEGIN_VERBATIM
+  ("V" "#+BEGIN_VERBATIM
 ?
 #+END_VERBATIM" "<verbatim>
 ?
 </verbatim>")
-     ("c" "#+BEGIN_CENTER
+  ("c" "#+BEGIN_CENTER
 ?
 #+END_CENTER" "<center>
 ?
 </center>")
-     ("l" "#+BEGIN_LaTeX
+  ("l" "#+BEGIN_LaTeX
 ?
 #+END_LaTeX" "<literal style=\"latex\">
 ?
 </literal>")
-     ("L" "#+LaTeX: " "<literal style=\"latex\">?</literal>")
-     ("h" "#+BEGIN_HTML
+  ("L" "#+LaTeX: " "<literal style=\"latex\">?</literal>")
+  ("h" "#+BEGIN_HTML
 ?
 #+END_HTML" "<literal style=\"html\">
 ?
 </literal>")
-     ("H" "#+HTML: " "<literal style=\"html\">?</literal>")
-     ("a" "#+BEGIN_ASCII
+  ("H" "#+HTML: " "<literal style=\"html\">?</literal>")
+  ("a" "#+BEGIN_ASCII
 ?
 #+END_ASCII" "")
   ("A" "#+ASCII: " "")
@@ -229,7 +229,7 @@
   ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))))
 '(package-selected-packages
 (quote
- (smartparens-clojure smartparens intero rng-validate-mode rust-mode pyvenv go-mode company yasnippet gist google-contacts googleaccount oauth2 es-mode realgud genrnc ghc haskell-cabal toml-mode yaml-mode cargo cargo-mode rust-snippets indent-tools jedi coffee-mode haskell-mode tide solarized-theme rinari org-pomodoro feature-mode ecukes auto-compile use-package helm-projectile magit markdown-mode web-mode company-racer racer flycheck-rust scala-mode rspec-mode ruby-test-mode ruby-additional ein elpy js2-refactor slime go-projectile groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck multiple-cursors editorconfig command-log-mode which-key helm smart-mode-line mocha expand-region company-tern tern auctex-lua auctex htmlize aggressive-indent aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
+ (esmode aggressive-indent smartparens-clojure smartparens intero rng-validate-mode rust-mode pyvenv go-mode company yasnippet gist google-contacts googleaccount oauth2 es-mode realgud genrnc ghc haskell-cabal toml-mode yaml-mode cargo cargo-mode rust-snippets indent-tools jedi coffee-mode haskell-mode tide solarized-theme rinari org-pomodoro feature-mode ecukes auto-compile use-package helm-projectile magit markdown-mode web-mode company-racer racer flycheck-rust scala-mode rspec-mode ruby-test-mode ruby-additional ein elpy js2-refactor slime go-projectile groovy-mode cider clojure-mode paredit ggtags rainbow-delimiters flycheck multiple-cursors editorconfig command-log-mode which-key helm smart-mode-line mocha expand-region company-tern tern auctex-lua auctex htmlize aggressive-indent-mode lacarte tidy go-eldoc edit-server skewer-mode virtualenvwrapper scss-mode rvm ruby-refactor ruby-electric ruby-compilation python-django nose go-snippets fill-column-indicator elixir-yasnippets alchemist ace-jump-mode)))
  '(pos-tip-background-color "#073642")
  '(pos-tip-foreground-color "#93a1a1")
 '(rcirc-bright-nicks
@@ -237,35 +237,36 @@
  ("jwiegley" "bbatsov" "hiredman" "technomancy" "kodein" "wasamasa" "wgreenhouse")))
  '(rcirc-log-flag t)
  '(rcirc-log-process-buffers t)
- '(rcirc-server-alist
-   (quote
-    (("irc.freenode.net" :channels
-      ("#emacs" "#rcirc" "#clojure" "#cucumber" "#leiningen" "#ubuntu-bugs"))
-     ("irc.geekshed.net" \#jupiterbroadcasting nil))))
- '(rng-schema-locating-files
-   (quote
-    ("schemas.xml" "/usr/local/Cellar/emacs/25.1/share/emacs/25.1/etc/schema/schemas.xml" "~/.emacs.d/schema/schema.xml")))
- '(safe-local-variable-values
-   (quote
-    ((python-shell-virtualenv-path . "/Users/pti/playpen/python/gmailpurge")
-     (python-shell-completion-string-code . "';'.join(get_ipython().Completer.all_completions('''%s'''))
+'(rcirc-server-alist
+(quote
+ (("irc.freenode.net" :channels
+   ("#emacs" "#rcirc" "#clojure" "#cucumber" "#leiningen" "#ubuntu-bugs"))
+  ("irc.geekshed.net" \#jupiterbroadcasting nil))) t)
+ '(request-backend (quote url-retrieve))
+'(rng-schema-locating-files
+(quote
+ ("schemas.xml" "/usr/local/Cellar/emacs/25.1/share/emacs/25.1/etc/schema/schemas.xml" "~/.emacs.d/schema/schema.xml")))
+'(safe-local-variable-values
+(quote
+ ((python-shell-virtualenv-path . "/Users/pti/playpen/python/gmailpurge")
+  (python-shell-completion-string-code . "';'.join(get_ipython().Completer.all_completions('''%s'''))
 ")
-     (python-shell-completion-module-string-code . "';'.join(module_completion('''%s'''))
+  (python-shell-completion-module-string-code . "';'.join(module_completion('''%s'''))
 ")
-     (python-shell-completion-setup-code . "from IPython.core.completerlib import module_completion")
-     (python-shell-prompt-output-regexp . "Out[[0-9]+]: ")
-     (python-shell-prompt-regexp . "In [[0-9]+]: ")
-     (python-shell-interpreter-args . "/Users/pti/playpen/python/gmailpurge/manage.py")
-     (python-shell-interpreter . "python")
-     (buffer-read-only . 1)
-     (ruby-compilation-executable . "ruby")
-     (ruby-compilation-executable . "ruby1.8")
-     (ruby-compilation-executable . "ruby1.9")
-     (ruby-compilation-executable . "rbx")
-     (ruby-compilation-executable . "jruby"))))
- '(tidy-shell-command "/usr/local/bin/tidy")
- '(tidy-temp-directory "~/tmp")
- '(which-key-mode t))
+  (python-shell-completion-setup-code . "from IPython.core.completerlib import module_completion")
+  (python-shell-prompt-output-regexp . "Out[[0-9]+]: ")
+  (python-shell-prompt-regexp . "In [[0-9]+]: ")
+  (python-shell-interpreter-args . "/Users/pti/playpen/python/gmailpurge/manage.py")
+  (python-shell-interpreter . "python")
+  (buffer-read-only . 1)
+  (ruby-compilation-executable . "ruby")
+  (ruby-compilation-executable . "ruby1.8")
+  (ruby-compilation-executable . "ruby1.9")
+  (ruby-compilation-executable . "rbx")
+  (ruby-compilation-executable . "jruby"))))
+'(tidy-shell-command "/usr/local/bin/tidy")
+'(tidy-temp-directory "~/tmp")
+'(which-key-mode t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
